@@ -290,7 +290,7 @@ header{
     <div class="modal-body">
       <div class="fg">
         <div class="fl">Titre *</div>
-        <input class="fi" id="mTitleInp" placeholder="Ex: Poteau mal fini" maxlength="80">
+        <input class="fi" id="mTitleInp" placeholder="Ex: Élément mal fini" maxlength="80">
       </div>
       <div class="fg">
         <div class="fl">Catégorie</div>
@@ -312,15 +312,15 @@ header{
       </div>
       <div class="fg">
         <div class="fl">Description</div>
-        <textarea class="ft" id="mDesc" placeholder="Décrivez la réserve..."></textarea>
+        <textarea class="ft" id="mDesc" placeholder="Décrivez le problème..."></textarea>
       </div>
       <div class="fg">
-        <div class="fl">Lot / Corps de métier</div>
-        <input class="fi" id="mLot" placeholder="Ex: Gros œuvre, Menuiserie...">
+        <div class="fl">Intervenant / Lot</div>
+        <input class="fi" id="mLot" placeholder="Ex: Peintre, Menuisier...">
       </div>
       <div class="fg">
         <div class="fl">Localisation (zone / repère)</div>
-        <input class="fi" id="mLoc" placeholder="Ex: Cage A, Niveau 2, Axe B3...">
+        <input class="fi" id="mLoc" placeholder="Ex: Bâtiment A, Niveau 2...">
       </div>
       <div class="fg">
         <div class="fl">Photo</div>
@@ -338,16 +338,16 @@ header{
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-hdr">
-      <div class="modal-title">Paramètres du chantier</div>
+      <div class="modal-title">Paramètres du projet</div>
       <button class="ib" onclick="closeOverlay('ovSettings')">✕</button>
     </div>
     <div class="modal-body">
       <div class="fg">
-        <div class="fl">Nom du chantier</div>
-        <input class="fi" id="sChantier" placeholder="Ex: Résidence Igny – Bât A">
+        <div class="fl">Nom du projet</div>
+        <input class="fi" id="sChantier" placeholder="Ex: Résidence Les Lilas">
       </div>
       <div class="fg">
-        <div class="fl">Conducteur de travaux</div>
+        <div class="fl">Responsable</div>
         <input class="fi" id="sConducteur" placeholder="Votre nom">
       </div>
       <div class="fg">
@@ -425,8 +425,8 @@ header{
     <div class="wlc-setting-row" onclick="openOverlay('ovSettings')">
       <div class="wlc-setting-icon">⚙️</div>
       <div class="wlc-setting-info">
-        <div class="wlc-setting-title">Paramètres du chantier</div>
-        <div class="wlc-setting-val" id="wlcSettingVal">Configurer le nom, conducteur...</div>
+        <div class="wlc-setting-title">Paramètres du projet</div>
+        <div class="wlc-setting-val" id="wlcSettingVal">Configurer le nom, responsable...</div>
       </div>
       <div class="wlc-setting-arr">›</div>
     </div>
@@ -490,7 +490,7 @@ header{
       <div class="exp-ico">📊</div>
       <div class="exp-info">
         <div class="exp-title">Export Excel (.xlsx)</div>
-        <div class="exp-desc">Toutes les réserves avec statut, catégorie, lot, dates, position sur plan</div>
+        <div class="exp-desc">Toutes les réserves avec statut, catégorie, intervenant, position sur plan</div>
       </div>
       <div class="exp-arr">›</div>
     </div>
@@ -508,7 +508,7 @@ header{
       <div class="exp-ico">📋</div>
       <div class="exp-info">
         <div class="exp-title">Rapport global (HTML → PDF)</div>
-        <div class="exp-desc">Toutes les réserves du chantier avec photos • À imprimer en PDF depuis Safari</div>
+        <div class="exp-desc">Toutes les réserves avec photos et localisation visuelle sur le plan</div>
       </div>
       <div class="exp-arr">›</div>
     </div>
@@ -588,6 +588,7 @@ let curPhoto = null;
 let pinFilter = 'all', resFilter = 'all';
 let statusTarget = null;
 let deleteTarget = null;
+let planThumbs = {}; // Cache pour les images de plans dans le rapport
 
 // ═══════════════════════════════════════════════════════
 // INDEXEDDB — stockage des PDFs (binaire)
@@ -649,7 +650,6 @@ async function init() {
   renderPlansList();
 
   if (state.plans.length > 0) {
-    // Tenter de charger tous les PDFs depuis IndexedDB
     let anyLoaded = false;
     for (const plan of state.plans) {
       try {
@@ -671,7 +671,6 @@ async function init() {
       const firstLoaded = state.plans.find(p => pdfs[p.id]);
       if (firstLoaded) await activatePlan(firstLoaded.id);
     } else {
-      // PDFs non disponibles en IndexedDB — afficher demande de rechargement
       showReloadPrompt();
       switchTab('scPlan');
     }
@@ -703,7 +702,6 @@ async function loadPDFs(e) {
         plan.pages = pdfDoc.numPages;
       }
       pdfs[plan.id] = pdfDoc;
-      // Sauvegarder le binaire dans IndexedDB
       await idbSet(plan.id, ab);
       loaded++;
     } catch(err) { console.error(err); toast('Erreur: ' + file.name, 'err'); }
@@ -712,7 +710,6 @@ async function loadPDFs(e) {
   save();
   renderPlansList();
   if (loaded > 0) {
-    // Activer le premier des plans nouvellement chargés
     const newPlan = state.plans.find(p => pdfs[p.id]);
     if (newPlan) await activatePlan(newPlan.id);
   }
@@ -730,7 +727,6 @@ async function activatePlan(planId) {
   const plan = state.plans.find(p => p.id === planId);
   if (!plan) return;
 
-  // Si PDF pas encore en mémoire, tenter de le charger depuis IndexedDB
   if (!pdfs[planId]) {
     try {
       const ab = await idbGet(planId);
@@ -750,13 +746,11 @@ async function activatePlan(planId) {
   const shortName = plan.name.length > 14 ? plan.name.slice(0, 14) + '…' : plan.name;
   document.getElementById('planSwitchBtn').textContent = shortName + ' ▾';
 
-  // 1. D'ABORD : Forcer l'affichage de l'onglet plan pour avoir les bonnes dimensions
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
   document.getElementById('scPlan').classList.add('on');
   document.querySelector('.tab[data-s="scPlan"]')?.classList.add('on');
 
-  // 2. ENSUITE SEULEMENT : Calcul et rendu du PDF
   if (activePdf) {
     await renderPage(curPage);
     document.getElementById('pageNav').style.display = totalPages > 1 ? 'flex' : 'none';
@@ -797,7 +791,6 @@ async function renderPage(num) {
   if (!activePdf) return;
   const page = await activePdf.getPage(num);
 
-  // Attendre que le wrapper ait une taille réelle
   const wrap = document.getElementById('cvWrap');
   let ww = wrap.clientWidth, wh = wrap.clientHeight;
   if (ww < 10 || wh < 10) {
@@ -815,7 +808,6 @@ async function renderPage(num) {
 
   const cv = document.getElementById('cv');
   
-  // Rendu haute résolution (limité sur mobile pour éviter l'écran noir)
   let HIRES = Math.min(Math.ceil(window.devicePixelRatio) * 2, 4);
   if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
     HIRES = 1.5;
@@ -831,7 +823,6 @@ async function renderPage(num) {
   ctx.clearRect(0, 0, cv.width, cv.height);
   await page.render({ canvasContext: ctx, viewport: renderVP }).promise;
 
-  // Appliquer dimensions CSS et position APRÈS le rendu
   cv.style.width = baseW + 'px';
   cv.style.height = baseH + 'px';
   cv.style.transform = `translate(${panX}px,${panY}px)`;
@@ -904,6 +895,16 @@ const cvWrap = document.getElementById('cvWrap');
 // Touch state
 let touches = {};
 let gestureStart = null;
+let mouseDown = false, msx = 0, msy = 0;
+
+// SOLUTION 1 : Nettoyage forcé de la mémoire tactile
+function resetTouches() {
+  touches = {};
+  gestureStart = null;
+  mouseDown = false;
+}
+
+cvWrap.addEventListener('touchcancel', resetTouches);
 
 cvWrap.addEventListener('touchstart', e => {
   e.preventDefault();
@@ -936,7 +937,6 @@ cvWrap.addEventListener('touchmove', e => {
   }
 
   if (ids.length === 2 && gestureStart) {
-    // Update both touch positions
     Array.from(e.changedTouches).forEach(t => { if (touches[t.identifier]) touches[t.identifier] = { x: t.clientX, y: t.clientY }; });
     const [id0, id1] = ids;
     const t0 = touches[id0], t1 = touches[id1];
@@ -961,11 +961,14 @@ cvWrap.addEventListener('touchend', e => {
   const wasSingle = Object.keys(touches).length === 1;
   const t = e.changedTouches[0];
   changedIds.forEach(id => delete touches[id]);
-  gestureStart = null;
+  
+  // Correction ici : ne remet à zéro le geste que si on a levé un des doigts du zoom
+  if (Object.keys(touches).length < 2) {
+    gestureStart = null;
+  }
 
-  // Pin tap — only on single touch, small movement
-  if (pinMode && wasSingle && activePdf) {
-    const prev = { x: t.clientX, y: t.clientY }; // approximate
+  if (pinMode && wasSingle && activePdf && t) {
+    const prev = { x: t.clientX, y: t.clientY }; 
     const rect = cvWrap.getBoundingClientRect();
     const cv = document.getElementById('cv');
     const cw = parseFloat(cv.style.width);
@@ -981,7 +984,6 @@ cvWrap.addEventListener('touchend', e => {
 }, { passive: false });
 
 // Mouse support
-let mouseDown = false, msx = 0, msy = 0;
 cvWrap.addEventListener('mousedown', e => {
   if (pinMode) return;
   mouseDown = true; msx = e.clientX - panX; msy = e.clientY - panY;
@@ -1050,6 +1052,8 @@ function renderPins() {
 // RESERVE MODAL
 // ═══════════════════════════════════════════════════════
 function openReserveModal(id = null) {
+  resetTouches(); // Nettoie le cache tactile pour éviter le bug de zoom bloqué
+
   editId = id;
   curPhoto = null;
   curCat = 'SEC'; curStatus = 'todo';
@@ -1126,7 +1130,7 @@ function saveReserve() {
 }
 
 // ═══════════════════════════════════════════════════════
-// FORM HELPERS (AVEC COMPRESSION D'IMAGE)
+// FORM HELPERS
 // ═══════════════════════════════════════════════════════
 function pickCat(c) {
   curCat = c;
@@ -1142,11 +1146,10 @@ function handlePhoto(e) {
   
   const r = new FileReader();
   r.onload = ev => { 
-    // Au lieu de sauvegarder directement, on compresse l'image
     const img = new Image();
     img.onload = () => {
       const cvs = document.createElement('canvas');
-      const MAX_SIZE = 1000; // Limite la taille de l'image pour éviter les crashs de mémoire
+      const MAX_SIZE = 1000;
       let w = img.width, h = img.height;
       
       if (w > h) { 
@@ -1159,7 +1162,6 @@ function handlePhoto(e) {
       cvs.height = h;
       cvs.getContext('2d').drawImage(img, 0, 0, w, h);
       
-      // On convertit en JPEG compressé à 70% pour alléger le stockage
       curPhoto = cvs.toDataURL('image/jpeg', 0.7);
       showPhoto(curPhoto);
     };
@@ -1172,7 +1174,6 @@ function showPhoto(src) {
 }
 function removePhoto() { curPhoto = null; resetPhotoArea(); }
 function resetPhotoArea() {
-  // Retrait du onclick redondant qui causait des bugs sur le tap
   document.getElementById('photoArea').innerHTML = `
     <div class="photo-drop">
       <div class="photo-drop-ico">📷</div>
@@ -1256,7 +1257,6 @@ function renderReservesList() {
 function jumpTo(id) {
   const r = state.reserves.find(x => x.id === id);
   if (!r || r.pinX === null) { toast('Pas de position sur plan', 'err'); return; }
-  // Switch plan if needed
   const doJump = () => {
     const cv = document.getElementById('cv');
     const bw = parseFloat(cv.dataset.bw || baseW);
@@ -1340,9 +1340,6 @@ function deletePlan(e, id) {
   toast('Plan supprimé', 'ok');
 }
 
-// ═══════════════════════════════════════════════════════
-// PLAN SELECTOR (header button)
-// ═══════════════════════════════════════════════════════
 function openPlanSel() {
   const list = document.getElementById('planSelList');
   list.innerHTML = state.plans.map(p => `
@@ -1356,6 +1353,7 @@ function openPlanSel() {
     `<div style="padding-top:10px"><button class="btn btn-sec btn-sm" style="width:100%" onclick="closeOverlay('ovPlanSel');triggerPDF()">+ Ajouter un PDF</button></div>`;
   openOverlay('ovPlanSel');
 }
+
 async function selPlan(id) {
   closeOverlay('ovPlanSel');
   if (!pdfs[id]) { toast('PDF non chargé — rechargez le fichier', 'err'); return; }
@@ -1363,9 +1361,6 @@ async function selPlan(id) {
   renderPlansList();
 }
 
-// ═══════════════════════════════════════════════════════
-// PAGE NAV
-// ═══════════════════════════════════════════════════════
 async function goPage(d) {
   const np = curPage + d;
   if (np < 1 || np > totalPages) return;
@@ -1374,9 +1369,10 @@ async function goPage(d) {
 }
 
 // ═══════════════════════════════════════════════════════
-// SETTINGS
+// SETTINGS / OVERLAYS
 // ═══════════════════════════════════════════════════════
 function openOverlay(id) {
+  resetTouches(); // Fixes sticky touches when opening modal
   if (id === 'ovSettings') {
     document.getElementById('sChantier').value = state.settings.chantier;
     document.getElementById('sConducteur').value = state.settings.conducteur;
@@ -1384,7 +1380,9 @@ function openOverlay(id) {
   }
   document.getElementById(id).classList.add('on');
 }
+
 function closeOverlay(id) { document.getElementById(id).classList.remove('on'); }
+
 function saveSettings() {
   state.settings.chantier = document.getElementById('sChantier').value.trim();
   state.settings.conducteur = document.getElementById('sConducteur').value.trim();
@@ -1392,19 +1390,18 @@ function saveSettings() {
   save(); updateSettingVal(); closeOverlay('ovSettings');
   toast('Paramètres sauvegardés', 'ok');
 }
+
 function updateSettingVal() {
-  const v = state.settings.chantier || state.settings.conducteur || 'Configurer le nom, conducteur...';
+  const v = state.settings.chantier || state.settings.conducteur || 'Configurer le nom, responsable...';
   document.getElementById('wlcSettingVal').textContent = v;
 }
 
-// ═══════════════════════════════════════════════════════
-// STATS & BADGE
-// ═══════════════════════════════════════════════════════
 function updateBadge() {
   const n = state.reserves.length;
   const b = document.getElementById('resBadge');
   b.textContent = n; b.style.display = n ? 'inline' : 'none';
 }
+
 function updateStats() {
   const r = state.reserves;
   document.getElementById('statsGrid').innerHTML = `
@@ -1417,24 +1414,21 @@ function updateStats() {
 }
 
 // ═══════════════════════════════════════════════════════
-// EXPORT EXCEL
+// EXPORTS
 // ═══════════════════════════════════════════════════════
 function exportXLSX() {
   if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
   const wb = XLSX.utils.book_new();
-  // Main sheet
-  const hdr = ['Code','Titre','Catégorie','Statut','Description','Lot','Localisation','Plan','Page','Date','Heure'];
+  const hdr = ['Code','Titre','Catégorie','Statut','Description','Intervenant/Lot','Localisation','Plan','Page','Date','Heure'];
   const rows = state.reserves.map(r => [
     r.code, r.title, CAT_LABEL[r.cat] || r.cat, STATUS_LABEL[r.status],
     r.desc || '', r.lot || '', r.loc || '', r.planName || '', r.page, r.date, r.time
   ]);
   const ws = XLSX.utils.aoa_to_sheet([hdr, ...rows]);
   ws['!cols'] = [10,35,15,12,45,20,20,25,6,12,8].map(w => ({ wch: w }));
-  // Color header row
   if (!ws['!rows']) ws['!rows'] = [];
   XLSX.utils.book_append_sheet(wb, ws, 'Réserves');
 
-  // Summary per category
   const cats = ['SEC','FIN','NC','QUA','AVA'];
   const sumHdr = ['Catégorie','Total','À faire','En cours','Levées'];
   const sumRows = cats.map(c => {
@@ -1445,15 +1439,14 @@ function exportXLSX() {
   wsSum['!cols'] = [18,8,10,12,10].map(w => ({ wch: w }));
   XLSX.utils.book_append_sheet(wb, wsSum, 'Récapitulatif');
 
-  const date = new Date().toISOString().slice(0, 10);
-  XLSX.writeFile(wb, `reserves-chantier-${date}.xlsx`);
+  XLSX.writeFile(wb, `reserves-${new Date().toISOString().slice(0, 10)}.xlsx`);
   toast('Excel exporté 📊', 'ok');
 }
 
 function exportCSV() {
   if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
   const esc = v => `"${String(v || '').replace(/"/g,'""')}"`;
-  const hdr = ['Code','Titre','Catégorie','Statut','Description','Lot','Localisation','Plan','Page','Date','Heure'].map(esc).join(',');
+  const hdr = ['Code','Titre','Catégorie','Statut','Description','Intervenant','Localisation','Plan','Page','Date','Heure'].map(esc).join(',');
   const rows = state.reserves.map(r =>
     [r.code,r.title,CAT_LABEL[r.cat],STATUS_LABEL[r.status],r.desc||'',r.lot||'',r.loc||'',r.planName||'',r.page,r.date,r.time].map(esc).join(',')
   );
@@ -1465,16 +1458,54 @@ function exportCSV() {
   toast('CSV exporté', 'ok');
 }
 
-// ═══════════════════════════════════════════════════════
-// RAPPORT HTML (ouvre dans nouvel onglet → imprimer en PDF)
-// ═══════════════════════════════════════════════════════
-function exportReport(mode) {
+// Outil interne : générer l'image miniature du plan pour le rapport
+async function getPlanThumb(planId, pageNum) {
+  const key = planId + '_' + pageNum;
+  if (planThumbs[key]) return planThumbs[key];
+  
+  let pdf = pdfs[planId];
+  if (!pdf) {
+    try {
+      const ab = await idbGet(planId);
+      if (ab) pdf = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
+    } catch(e) {}
+  }
+  if (!pdf) return null;
+
+  try {
+    const p = await pdf.getPage(pageNum);
+    const vp = p.getViewport({ scale: 1 });
+    const scale = Math.min(600 / vp.width, 2); 
+    const renderVp = p.getViewport({ scale });
+    const c = document.createElement('canvas');
+    c.width = renderVp.width; 
+    c.height = renderVp.height;
+    await p.render({ canvasContext: c.getContext('2d'), viewport: renderVp }).promise;
+    const data = c.toDataURL('image/jpeg', 0.6);
+    planThumbs[key] = data;
+    return data;
+  } catch(e) {
+    return null;
+  }
+}
+
+// Rapport HTML asynchrone pour pouvoir inclure les plans
+async function exportReport(mode) {
   let reserves = state.reserves;
   if (mode === 'today') {
     const today = new Date().toLocaleDateString('fr-FR');
     reserves = reserves.filter(r => r.date === today);
   }
   if (!reserves.length) { toast('Aucune réserve à exporter', 'err'); return; }
+
+  toast('Génération du rapport en cours...', 'info');
+
+  // Génère les miniatures du plan de manière transparente
+  for (const r of reserves) {
+    if (r.pinX !== null && !r._thumb) {
+      r._thumb = await getPlanThumb(r.planId, r.page);
+    }
+  }
 
   const s = state.settings;
   const date = new Date().toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
@@ -1490,12 +1521,30 @@ function exportReport(mode) {
       </div>
       <div style="padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:12px;color:#374151">
         ${r.desc ? `<div style="grid-column:1/-1"><strong>Description :</strong> ${r.desc}</div>` : ''}
-        ${r.lot ? `<div><strong>Lot :</strong> ${r.lot}</div>` : ''}
+        ${r.lot ? `<div><strong>Intervenant :</strong> ${r.lot}</div>` : ''}
         ${r.loc ? `<div><strong>Localisation :</strong> ${r.loc}</div>` : ''}
         <div><strong>Plan :</strong> ${r.planName || '-'} — Page ${r.page}</div>
         <div><strong>Date :</strong> ${r.date} à ${r.time}</div>
       </div>
-      ${r.photo ? `<div style="padding:0 14px 12px"><img src="${r.photo}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px"></div>` : ''}
+      
+      ${(r.photo || (r.pinX !== null && r._thumb)) ? `
+      <div style="padding:0 14px 12px; display:flex; gap:12px; align-items:flex-start">
+        ${r.photo ? `
+        <div style="flex:1; min-width:0">
+          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Photo</div>
+          <img src="${r.photo}" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; border:1px solid #e5e7eb; display:block">
+        </div>` : ''}
+        
+        ${(r.pinX !== null && r._thumb) ? `
+        <div style="flex:1; min-width:0; text-align:center">
+          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase;text-align:left">Localisation sur Plan</div>
+          <div style="position:relative; display:inline-block; max-width:100%; border-radius:8px; overflow:hidden; border:1px solid #e5e7eb; background:#fff">
+            <img src="${r._thumb}" style="max-width:100%; max-height:200px; display:block">
+            <div style="position:absolute; left:${r.pinX*100}%; top:${r.pinY*100}%; transform:translate(-50%,-50%); width:14px; height:14px; background:${cMap[r.cat]}; border:2px solid #fff; border-radius:50%; box-shadow:0 2px 5px rgba(0,0,0,0.5)"></div>
+          </div>
+        </div>` : ''}
+      </div>` : ''}
+
     </div>`).join('');
 
   const catSummary = ['SEC','FIN','NC','QUA','AVA'].map(c => {
@@ -1504,18 +1553,18 @@ function exportReport(mode) {
     return `<span style="display:inline-flex;align-items:center;gap:5px;background:${cMap[c]}22;color:${cMap[c]};border:1px solid ${cMap[c]}44;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin:3px">● ${CAT_LABEL[c]} : ${n}</span>`;
   }).join('');
 
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport de chantier</title>
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport de Projet</title>
   <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;background:#fff;padding:24px;max-width:800px;margin:0 auto}
   @media print{body{padding:0}@page{margin:18mm}}</style></head><body>
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #f97316">
     <div>
-      <div style="font-size:22px;font-weight:800;color:#111">${s.chantier || 'Rapport de chantier'}</div>
-      ${s.conducteur ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">Conducteur : <strong>${s.conducteur}</strong>${s.entreprise ? ' — ' + s.entreprise : ''}</div>` : ''}
+      <div style="font-size:22px;font-weight:800;color:#111">${s.chantier || 'Rapport de suivi'}</div>
+      ${s.conducteur ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">Responsable : <strong>${s.conducteur}</strong>${s.entreprise ? ' — ' + s.entreprise : ''}</div>` : ''}
       <div style="font-size:12px;color:#9ca3af;margin-top:4px">${date}</div>
     </div>
     <div style="text-align:right">
       <div style="font-size:28px;font-weight:800;color:#f97316">${reserves.length}</div>
-      <div style="font-size:11px;color:#6b7280">${mode === 'today' ? 'réserves du jour' : 'réserves total'}</div>
+      <div style="font-size:11px;color:#6b7280">${mode === 'today' ? 'réserves du jour' : 'réserves au total'}</div>
     </div>
   </div>
   <div style="margin-bottom:18px;display:flex;flex-wrap:wrap;gap:4px">${catSummary}</div>
@@ -1527,15 +1576,15 @@ function exportReport(mode) {
   <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Détail des réserves</div>
   ${cards}
   <div style="margin-top:24px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center">
-    Rapport généré le ${date} via ChantierView
+    Généré le ${date} via ChantierView
   </div>
   </body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
   w.document.close();
-  setTimeout(() => { w.focus(); w.print(); }, 600);
-  toast('Rapport ouvert — imprimer en PDF 🖨️', 'info');
+  setTimeout(() => { w.focus(); w.print(); }, 800);
+  toast('Rapport ouvert — prêt à imprimer 🖨️', 'ok');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1545,10 +1594,11 @@ function exportJSON() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `chantier-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   toast('Sauvegarde exportée 💾', 'ok');
 }
+
 function importJSON(e) {
   const file = e.target.files[0]; if (!file) return;
   const r = new FileReader();
@@ -1565,7 +1615,6 @@ function importJSON(e) {
           document.getElementById('scWelcome').classList.remove('on');
           document.getElementById('scPlan').classList.add('on');
           document.getElementById('planSwitchBtn').style.display = 'flex';
-          showEmptyPlan();
           switchTab('scPlan');
         }
       } else { toast('Fichier invalide', 'err'); }
@@ -1575,9 +1624,6 @@ function importJSON(e) {
   e.target.value = '';
 }
 
-// ═══════════════════════════════════════════════════════
-// CLEAR ALL
-// ═══════════════════════════════════════════════════════
 function confirmClear() {
   if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
   document.getElementById('confirmTitle').textContent = 'Tout effacer';
@@ -1591,9 +1637,6 @@ function confirmClear() {
   openOverlay('ovConfirm');
 }
 
-// ═══════════════════════════════════════════════════════
-// LIGHTBOX
-// ═══════════════════════════════════════════════════════
 function openLb(id) {
   const r = state.reserves.find(x => x.id === id);
   if (!r?.photo) return;
@@ -1602,9 +1645,6 @@ function openLb(id) {
 }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('on'); }
 
-// ═══════════════════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════════════════
 function switchTab(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
@@ -1615,9 +1655,6 @@ function switchTab(id) {
   if (id === 'scExport') updateStats();
 }
 
-// ═══════════════════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════════════════
 let toastT;
 function toast(msg, type='') {
   const t = document.getElementById('toast');
@@ -1626,16 +1663,10 @@ function toast(msg, type='') {
   toastT = setTimeout(() => t.classList.remove('on'), 2800);
 }
 
-// ═══════════════════════════════════════════════════════
-// CLOSE OVERLAY ON BACKDROP CLICK
-// ═══════════════════════════════════════════════════════
 document.querySelectorAll('.overlay').forEach(ov => {
   ov.addEventListener('click', e => { if (e.target === ov) closeOverlay(ov.id); });
 });
 
-// ═══════════════════════════════════════════════════════
-// START
-// ═══════════════════════════════════════════════════════
 init();
 </script>
 </body>

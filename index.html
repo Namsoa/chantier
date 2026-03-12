@@ -826,8 +826,11 @@ async function renderPage(num) {
   panY = (wh - baseH) / 2;
 
   const cv = document.getElementById('cv');
-  // Rendu haute résolution pour zoom sans flou
-  const HIRES = Math.min(Math.ceil(window.devicePixelRatio) * 2, 4);
+  // Rendu haute résolution (limité sur mobile pour éviter le crash mémoire et l'écran vide)
+  let HIRES = Math.min(Math.ceil(window.devicePixelRatio) * 2, 4);
+  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+    HIRES = 1.5; // Baisse la limite pour que le téléphone l'accepte
+  }
   cv.width = Math.round(vp1.width * HIRES);
   cv.height = Math.round(vp1.height * HIRES);
   cv.dataset.bw = baseW;

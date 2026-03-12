@@ -203,9 +203,9 @@ header{
 .cp-ava.on{background:var(--green);color:#0a2a10}
 
 /* Photo */
-.photo-drop{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;position:relative;transition:border-color .18s}
+.photo-drop{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;position:relative;transition:border-color .18s;overflow:hidden}
 .photo-drop:active{border-color:var(--accent)}
-.photo-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.photo-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .photo-drop-ico{font-size:28px;margin-bottom:4px}
 .photo-drop-txt{font-size:12px;color:var(--text2)}
 .photo-prev-wrap{position:relative}
@@ -631,7 +631,7 @@ function idbDel(key) {
 // PERSIST (localStorage pour state, IndexedDB pour PDFs)
 // ═══════════════════════════════════════════════════════
 function save() {
-  try { localStorage.setItem('cv_state', JSON.stringify(state)); } catch(e) {}
+  try { localStorage.setItem('cv_state', JSON.stringify(state)); } catch(e) { console.error("Erreur de sauvegarde:", e); }
 }
 function loadState() {
   try {
@@ -1036,7 +1036,6 @@ function renderPins() {
     .forEach(r => {
       const el = document.createElement('div');
       el.className = 'pin-m';
-      // SOLUTION : Utilisation des pourcentages pour que l'épingle suive le zoom en temps réel
       el.style.left = (r.pinX * 100) + '%';
       el.style.top = (r.pinY * 100) + '%';
       const color = CAT_COLOR[r.cat] || '#f97316';
@@ -1127,7 +1126,7 @@ function saveReserve() {
 }
 
 // ═══════════════════════════════════════════════════════
-// FORM HELPERS
+// FORM HELPERS (AVEC COMPRESSION D'IMAGE)
 // ═══════════════════════════════════════════════════════
 function pickCat(c) {
   curCat = c;
@@ -1137,11 +1136,35 @@ function pickStatus(s) {
   curStatus = s;
   document.querySelectorAll('.stp').forEach(el => el.classList.toggle('on', el.dataset.s === s));
 }
-function triggerPhoto() { document.getElementById('photoFileInp')?.click(); }
 function handlePhoto(e) {
-  const file = e.target.files[0]; if (!file) return;
+  const file = e.target.files[0]; 
+  if (!file) return;
+  
   const r = new FileReader();
-  r.onload = ev => { curPhoto = ev.target.result; showPhoto(curPhoto); };
+  r.onload = ev => { 
+    // Au lieu de sauvegarder directement, on compresse l'image
+    const img = new Image();
+    img.onload = () => {
+      const cvs = document.createElement('canvas');
+      const MAX_SIZE = 1000; // Limite la taille de l'image pour éviter les crashs de mémoire
+      let w = img.width, h = img.height;
+      
+      if (w > h) { 
+        if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } 
+      } else { 
+        if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } 
+      }
+      
+      cvs.width = w; 
+      cvs.height = h;
+      cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+      
+      // On convertit en JPEG compressé à 70% pour alléger le stockage
+      curPhoto = cvs.toDataURL('image/jpeg', 0.7);
+      showPhoto(curPhoto);
+    };
+    img.src = ev.target.result;
+  };
   r.readAsDataURL(file);
 }
 function showPhoto(src) {
@@ -1149,11 +1172,12 @@ function showPhoto(src) {
 }
 function removePhoto() { curPhoto = null; resetPhotoArea(); }
 function resetPhotoArea() {
+  // Retrait du onclick redondant qui causait des bugs sur le tap
   document.getElementById('photoArea').innerHTML = `
-    <div class="photo-drop" onclick="triggerPhoto()">
+    <div class="photo-drop">
       <div class="photo-drop-ico">📷</div>
       <div class="photo-drop-txt">Prendre une photo ou importer</div>
-      <input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+      <input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)">
     </div>`;
 }
 

@@ -273,16 +273,13 @@ header{
 </head>
 <body>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lb-close" onclick="closeLightbox()">✕</button>
   <img id="lbImg" src="" alt="">
 </div>
 
-<!-- MODAL: Reserve -->
 <div class="overlay" id="ovReserve">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -337,7 +334,6 @@ header{
   </div>
 </div>
 
-<!-- MODAL: Settings -->
 <div class="overlay" id="ovSettings">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -365,7 +361,6 @@ header{
   </div>
 </div>
 
-<!-- MODAL: Plan selector -->
 <div class="overlay" id="ovPlanSel">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -377,7 +372,6 @@ header{
   </div>
 </div>
 
-<!-- MODAL: Status change -->
 <div class="overlay" id="ovStatus">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -390,7 +384,6 @@ header{
   </div>
 </div>
 
-<!-- MODAL: Delete confirm -->
 <div class="overlay" id="ovConfirm">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -405,7 +398,6 @@ header{
   </div>
 </div>
 
-<!-- HEADER -->
 <header>
   <div class="logo">Chantier<em>View</em></div>
   <div class="hdr-btns">
@@ -414,7 +406,6 @@ header{
   </div>
 </header>
 
-<!-- TABS -->
 <div class="tabs" id="mainTabs">
   <div class="tab on" data-s="scPlan" onclick="switchTab('scPlan')"><span class="ti">🗺️</span>Plan</div>
   <div class="tab" data-s="scPlans" onclick="switchTab('scPlans')"><span class="ti">📂</span>Plans</div>
@@ -422,7 +413,6 @@ header{
   <div class="tab" data-s="scExport" onclick="switchTab('scExport')"><span class="ti">📤</span>Export</div>
 </div>
 
-<!-- SCREEN: Welcome -->
 <div class="screen on" id="scWelcome">
   <div class="wlc-logo">🏗️</div>
   <div class="wlc-title">Chantier<em>View</em></div>
@@ -444,7 +434,6 @@ header{
   <div style="font-size:11px;color:var(--text3);text-align:center">Vos données sont sauvegardées automatiquement sur cet appareil</div>
 </div>
 
-<!-- SCREEN: Plan -->
 <div class="screen" id="scPlan">
   <div class="plan-bar" id="planBar">
     <button class="chip on" data-f="all" onclick="filterPins(this,'all')">Tous</button>
@@ -473,12 +462,10 @@ header{
   </div>
 </div>
 
-<!-- SCREEN: Plans list -->
 <div class="screen" id="scPlans">
   <div id="plansList" style="padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1"></div>
 </div>
 
-<!-- SCREEN: Reserves -->
 <div class="screen" id="scReserves">
   <div class="res-bar" id="resBar">
     <button class="chip on" data-f="all" onclick="filterRes(this,'all')">Tous</button>
@@ -495,7 +482,6 @@ header{
   <div id="resList" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:10px"></div>
 </div>
 
-<!-- SCREEN: Export -->
 <div class="screen" id="scExport">
   <div style="padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1">
     <div class="stats-grid" id="statsGrid"></div>
@@ -764,17 +750,19 @@ async function activatePlan(planId) {
   const shortName = plan.name.length > 14 ? plan.name.slice(0, 14) + '…' : plan.name;
   document.getElementById('planSwitchBtn').textContent = shortName + ' ▾';
 
+  // 1. D'ABORD : Forcer l'affichage de l'onglet plan pour avoir les bonnes dimensions
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('scPlan').classList.add('on');
+  document.querySelector('.tab[data-s="scPlan"]')?.classList.add('on');
+
+  // 2. ENSUITE SEULEMENT : Calcul et rendu du PDF
   if (activePdf) {
     await renderPage(curPage);
     document.getElementById('pageNav').style.display = totalPages > 1 ? 'flex' : 'none';
   } else {
     showReloadPrompt();
   }
-  // Forcer l'affichage de l'onglet plan
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  document.getElementById('scPlan').classList.add('on');
-  document.querySelector('.tab[data-s="scPlan"]')?.classList.add('on');
 }
 
 function showReloadPrompt() {
@@ -826,11 +814,13 @@ async function renderPage(num) {
   panY = (wh - baseH) / 2;
 
   const cv = document.getElementById('cv');
-  // Rendu haute résolution (limité sur mobile pour éviter le crash mémoire et l'écran vide)
+  
+  // Rendu haute résolution (limité sur mobile pour éviter l'écran noir)
   let HIRES = Math.min(Math.ceil(window.devicePixelRatio) * 2, 4);
   if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    HIRES = 1.5; // Baisse la limite pour que le téléphone l'accepte
+    HIRES = 1.5;
   }
+  
   cv.width = Math.round(vp1.width * HIRES);
   cv.height = Math.round(vp1.height * HIRES);
   cv.dataset.bw = baseW;

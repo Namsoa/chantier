@@ -127,7 +127,6 @@ header{
 .add-plan-btn:active{background:var(--s2)}
 
 /* ── RESERVES SCREEN ── */
-/* Modification importante ici : on enlève le scroll sur l'écran global pour forcer la liste interne à scroller proprement */
 .res-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 .res-bar::-webkit-scrollbar{display:none}
 
@@ -1143,7 +1142,7 @@ function saveReserve() {
 }
 
 // ═══════════════════════════════════════════════════════
-// FORM HELPERS & DRAWING ANNOTATION (NOUVEAU)
+// FORM HELPERS & DRAWING ANNOTATION
 // ═══════════════════════════════════════════════════════
 function pickCat(c) {
   curCat = c;
@@ -1170,7 +1169,7 @@ function handlePhoto(e) {
     const img = new Image();
     img.onload = () => {
       const cvs = document.createElement('canvas');
-      const MAX_SIZE = 1200; // Légèrement plus grand pour un beau dessin
+      const MAX_SIZE = 1200; 
       let w = img.width, h = img.height;
       
       if (w > h) { 
@@ -1189,7 +1188,7 @@ function handlePhoto(e) {
     img.src = ev.target.result;
   };
   r.readAsDataURL(file);
-  e.target.value = ''; // Reset
+  e.target.value = ''; 
 }
 
 function openAnnotateModal() {
@@ -1201,7 +1200,6 @@ function openAnnotateModal() {
   
   annotImg = new Image();
   annotImg.onload = () => {
-    // Redimensionner le canvas de l'éditeur pour qu'il tienne dans l'écran
     const cw = container.clientWidth;
     const ch = container.clientHeight;
     const ratio = Math.min(cw / annotImg.width, ch / annotImg.height);
@@ -1213,7 +1211,6 @@ function openAnnotateModal() {
   };
   annotImg.src = rawPhotoData;
   
-  // Écouteurs pour le dessin tactile/souris
   cv.ontouchstart = annotStart;
   cv.ontouchmove = annotMove;
   cv.ontouchend = annotEnd;
@@ -1226,7 +1223,7 @@ function redrawAnnotate() {
   const cv = document.getElementById('annotCv');
   annotCtx.clearRect(0, 0, cv.width, cv.height);
   annotCtx.drawImage(annotImg, 0, 0, cv.width, cv.height);
-  annotCtx.strokeStyle = '#ef4444'; // Couleur rouge pour marquer
+  annotCtx.strokeStyle = '#ef4444'; 
   annotCtx.lineWidth = 4;
   annotCtx.lineCap = 'round';
   annotCtx.lineJoin = 'round';
@@ -1260,7 +1257,7 @@ function annotMove(e) {
   if(!annotIsDrawing) return;
   e.preventDefault();
   currentStroke.push(getAnnotPos(e));
-  redrawAnnotate(); // Mise à jour temps réel
+  redrawAnnotate(); 
 }
 
 function annotEnd(e) {
@@ -1291,7 +1288,7 @@ function saveAnnotate() {
   offCtx.lineJoin = 'round';
   
   const ratio = parseFloat(document.getElementById('annotCv').dataset.ratio || 1);
-  offCtx.lineWidth = 6 / ratio; // Rendre le trait bien visible
+  offCtx.lineWidth = 6 / ratio; 
   
   for (const stroke of annotStrokes) {
     if(stroke.length < 2) continue;
@@ -1541,14 +1538,18 @@ function updateBadge() {
   b.textContent = n; b.style.display = n ? 'inline' : 'none';
 }
 
+// GRILLE DES STATISTIQUES RÉPARÉE (9 CASES AU LIEU DE 6)
 function updateStats() {
   const r = state.reserves;
   document.getElementById('statsGrid').innerHTML = `
-    <div class="stat-box"><div class="stat-n" style="color:var(--accent)">${r.length}</div><div class="stat-l">Total</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--text)">${r.length}</div><div class="stat-l">Total</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.cat==='SEC').length}</div><div class="stat-l">Sécurité</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--purple)">${r.filter(x=>x.cat==='FIN').length}</div><div class="stat-l">Finition</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.cat==='NC').length}</div><div class="stat-l">Non-conf.</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--blue)">${r.filter(x=>x.cat==='QUA').length}</div><div class="stat-l">Qualité</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.cat==='AVA').length}</div><div class="stat-l">Avanc.</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.status==='todo').length}</div><div class="stat-l">À faire</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.status==='wip').length}</div><div class="stat-l">En cours</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.status==='done').length}</div><div class="stat-l">Levées</div></div>`;
 }
 
@@ -1597,7 +1598,7 @@ function exportCSV() {
   toast('CSV exporté', 'ok');
 }
 
-// Outil interne : générer l'image miniature du plan pour le rapport
+// RÉSOLUTION DU FLOU DU PLAN SUR LE RAPPORT
 async function getPlanThumb(planId, pageNum) {
   const key = planId + '_' + pageNum;
   if (planThumbs[key]) return planThumbs[key];
@@ -1614,13 +1615,14 @@ async function getPlanThumb(planId, pageNum) {
   try {
     const p = await pdf.getPage(pageNum);
     const vp = p.getViewport({ scale: 1 });
-    const scale = Math.min(600 / vp.width, 2); 
+    // L'astuce : générer une image gigantesque en arrière-plan (jusqu'à 2500px)
+    const scale = Math.min(2500 / vp.width, 5); 
     const renderVp = p.getViewport({ scale });
     const c = document.createElement('canvas');
     c.width = renderVp.width; 
     c.height = renderVp.height;
     await p.render({ canvasContext: c.getContext('2d'), viewport: renderVp }).promise;
-    const data = c.toDataURL('image/jpeg', 0.6);
+    const data = c.toDataURL('image/jpeg', 0.85); // Haute qualité JPG
     planThumbs[key] = data;
     return data;
   } catch(e) {

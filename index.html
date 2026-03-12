@@ -522,7 +522,7 @@ header{
       <div class="exp-ico">📋</div>
       <div class="exp-info">
         <div class="exp-title">Rapport global (HTML → PDF)</div>
-        <div class="exp-desc">Toutes les réserves avec photos et localisation visuelle sur le plan</div>
+        <div class="exp-desc">Toutes les réserves avec photos et localisation visuelle ultra-nette</div>
       </div>
       <div class="exp-arr">›</div>
     </div>
@@ -602,7 +602,6 @@ let curPhoto = null;
 let pinFilter = 'all', resFilter = 'all';
 let statusTarget = null;
 let deleteTarget = null;
-let planThumbs = {}; // Cache pour les images de plans dans le rapport
 
 // ═══════════════════════════════════════════════════════
 // INDEXEDDB — stockage des PDFs (binaire)
@@ -1538,16 +1537,22 @@ function updateBadge() {
   b.textContent = n; b.style.display = n ? 'inline' : 'none';
 }
 
-// GRILLE DES STATISTIQUES RÉPARÉE (9 CASES AU LIEU DE 6)
+// ═══════════════════════════════════════════════════════
+// NOUVEAU TABLEAU DE BORD A 9 CASES (POUR TOUTES LES STATS)
+// ═══════════════════════════════════════════════════════
 function updateStats() {
   const r = state.reserves;
   document.getElementById('statsGrid').innerHTML = `
-    <div class="stat-box"><div class="stat-n" style="color:var(--text)">${r.length}</div><div class="stat-l">Total</div></div>
+    <div class="stat-box" style="grid-column: 1 / -1; background:rgba(249,115,22,0.1); border-color:var(--accent)"><div class="stat-n" style="color:var(--accent)">${r.length}</div><div class="stat-l">Total Réserves</div></div>
+    
     <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.cat==='SEC').length}</div><div class="stat-l">Sécurité</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--purple)">${r.filter(x=>x.cat==='FIN').length}</div><div class="stat-l">Finition</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.cat==='NC').length}</div><div class="stat-l">Non-conf.</div></div>
+    
     <div class="stat-box"><div class="stat-n" style="color:var(--blue)">${r.filter(x=>x.cat==='QUA').length}</div><div class="stat-l">Qualité</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.cat==='AVA').length}</div><div class="stat-l">Avanc.</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--text2)">-</div><div class="stat-l">-</div></div>
+
     <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.status==='todo').length}</div><div class="stat-l">À faire</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.status==='wip').length}</div><div class="stat-l">En cours</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.status==='done').length}</div><div class="stat-l">Levées</div></div>`;
@@ -1598,11 +1603,10 @@ function exportCSV() {
   toast('CSV exporté', 'ok');
 }
 
-// RÉSOLUTION DU FLOU DU PLAN SUR LE RAPPORT
-async function getPlanThumb(planId, pageNum) {
-  const key = planId + '_' + pageNum;
-  if (planThumbs[key]) return planThumbs[key];
-  
+// ═══════════════════════════════════════════════════════
+// GÉNÉRATION DU MINI-PLAN ULTRA NET
+// ═══════════════════════════════════════════════════════
+async function getPlanThumb(planId, pageNum, pinX, pinY, catColor) {
   let pdf = pdfs[planId];
   if (!pdf) {
     try {
@@ -1614,23 +1618,60 @@ async function getPlanThumb(planId, pageNum) {
 
   try {
     const p = await pdf.getPage(pageNum);
-    const vp = p.getViewport({ scale: 1 });
-    // L'astuce : générer une image gigantesque en arrière-plan (jusqu'à 2500px)
-    const scale = Math.min(2500 / vp.width, 5); 
-    const renderVp = p.getViewport({ scale });
+    const vp1 = p.getViewport({ scale: 1 });
+    
+    // On génère une image HD de 800x800 pixels pour le rapport
+    const SIZE = 800; 
+    
+    // Zoom de x3 par rapport au plan complet
+    const scale = (SIZE * 3) / Math.max(vp1.width, vp1.height); 
+    
+    const px = pinX * vp1.width * scale;
+    const py = pinY * vp1.height * scale;
+    
+    // L'outil magique : on demande à PDF.js de "cadrer" directement sur le point
+    const cropVp = p.getViewport({ 
+      scale: scale, 
+      offsetX: (SIZE / 2) - px, 
+      offsetY: (SIZE / 2) - py 
+    });
+
     const c = document.createElement('canvas');
-    c.width = renderVp.width; 
-    c.height = renderVp.height;
-    await p.render({ canvasContext: c.getContext('2d'), viewport: renderVp }).promise;
-    const data = c.toDataURL('image/jpeg', 0.85); // Haute qualité JPG
-    planThumbs[key] = data;
-    return data;
+    c.width = SIZE; 
+    c.height = SIZE;
+    const ctx = c.getContext('2d');
+    
+    // Fond blanc
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    // Dessine le PDF HD recadré
+    await p.render({ canvasContext: ctx, viewport: cropVp }).promise;
+    
+    // Dessine l'épingle directement au milieu de l'image
+    ctx.beginPath();
+    ctx.arc(SIZE/2, SIZE/2, 24, 0, 2 * Math.PI); // Point central
+    ctx.fillStyle = catColor || '#f97316';
+    ctx.fill();
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+    
+    // Ajoute une petite ombre au point pour qu'il ressorte
+    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    
+    return c.toDataURL('image/jpeg', 0.85); // Export haute qualité
   } catch(e) {
+    console.error(e);
     return null;
   }
 }
 
-// Rapport HTML asynchrone pour pouvoir inclure les plans
+// ═══════════════════════════════════════════════════════
+// RAPPORT HTML
+// ═══════════════════════════════════════════════════════
 async function exportReport(mode) {
   let reserves = state.reserves;
   if (mode === 'today') {
@@ -1639,11 +1680,12 @@ async function exportReport(mode) {
   }
   if (!reserves.length) { toast('Aucune réserve à exporter', 'err'); return; }
 
-  toast('Génération du rapport en cours...', 'info');
+  toast('Génération du plan HD, veuillez patienter...', 'info');
 
+  // Génère les images pour chaque réserve
   for (const r of reserves) {
     if (r.pinX !== null && !r._thumb) {
-      r._thumb = await getPlanThumb(r.planId, r.page);
+      r._thumb = await getPlanThumb(r.planId, r.page, r.pinX, r.pinY, CAT_COLOR[r.cat]);
     }
   }
 
@@ -1678,10 +1720,7 @@ async function exportReport(mode) {
         ${(r.pinX !== null && r._thumb) ? `
         <div style="flex:1; min-width:0; text-align:center">
           <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase;text-align:left">Localisation sur Plan</div>
-          <div style="position:relative; width:100%; padding-bottom:100%; border-radius:8px; overflow:hidden; border:1px solid #e5e7eb; background:#fff">
-            <img src="${r._thumb}" style="position:absolute; width:400%; max-width:none; left:calc(50% - ${r.pinX*400}%); top:calc(50% - ${r.pinY*400}%);">
-            <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; background:${cMap[r.cat]}; border:2px solid #fff; border-radius:50%; box-shadow:0 2px 5px rgba(0,0,0,0.5)"></div>
-          </div>
+          <img src="${r._thumb}" style="width:100%; border-radius:8px; border:1px solid #e5e7eb; display:block;">
         </div>` : ''}
       </div>` : ''}
 

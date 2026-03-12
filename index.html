@@ -1036,8 +1036,9 @@ function renderPins() {
     .forEach(r => {
       const el = document.createElement('div');
       el.className = 'pin-m';
-      el.style.left = (r.pinX * cw) + 'px';
-      el.style.top = (r.pinY * ch) + 'px';
+      // SOLUTION : Utilisation des pourcentages pour que l'épingle suive le zoom en temps réel
+      el.style.left = (r.pinX * 100) + '%';
+      el.style.top = (r.pinY * 100) + '%';
       const color = CAT_COLOR[r.cat] || '#f97316';
       el.innerHTML = `<div class="pin-drop" style="background:${color}"><span>${r.code}</span></div><div class="pin-lbl">${r.title}</div>`;
       el.addEventListener('click', ev => { ev.stopPropagation(); openReserveModal(r.id); });

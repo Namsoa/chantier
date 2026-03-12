@@ -148,9 +148,6 @@ header{
 .ib.red{color:var(--red)}
 .res-card-body{padding:0 13px 11px}
 .res-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:7px}
-.res-photo{width:100%;max-height:160px;object-fit:cover;border-radius:8px;cursor:pointer}
-.res-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
-.res-tag{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:var(--s2);color:var(--text2)}
 
 /* ── EXPORT SCREEN ── */
 #scExport{overflow-y:auto;padding:12px;gap:10px}
@@ -183,7 +180,6 @@ header{
 .fi,.ft,.fs{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:inherit;font-size:14px;outline:none;width:100%;transition:border-color .18s}
 .fi:focus,.ft:focus,.fs:focus{border-color:var(--accent)}
 .ft{resize:none;min-height:72px}
-.fs option{background:var(--s2)}
 
 /* Cat pills */
 .cat-row{display:flex;gap:7px;flex-wrap:wrap}
@@ -199,16 +195,6 @@ header{
 .cp-qua.on{background:var(--blue);color:#fff}
 .cp-ava{background:rgba(34,197,94,.2);color:var(--green)}
 .cp-ava.on{background:var(--green);color:#0a2a10}
-
-/* Photo */
-.photo-drop{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;position:relative;transition:border-color .18s;overflow:hidden}
-.photo-drop:active{border-color:var(--accent)}
-.photo-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.photo-drop-ico{font-size:28px;margin-bottom:4px}
-.photo-drop-txt{font-size:12px;color:var(--text2)}
-.photo-prev-wrap{position:relative}
-.photo-prev{width:100%;border-radius:9px;max-height:180px;object-fit:cover}
-.photo-rem{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
 /* Status picker in modal */
 .status-row{display:flex;gap:7px}
@@ -226,22 +212,14 @@ header{
 .btn-acc{background:var(--accent);color:#fff}.btn-acc:active{background:var(--accent-d)}
 .btn-sec{background:var(--s2);color:var(--text);border:1px solid var(--border)}.btn-sec:active{background:var(--s3)}
 .btn-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}.btn-red:active{background:rgba(239,68,68,.2)}
-.btn-grn{background:var(--green);color:#071a0b}.btn-grn:active{filter:brightness(.9)}
-.btn-sm{padding:9px 14px;font-size:13px;border-radius:9px}
 
 /* Settings modal */
 #ovSettings .modal-body{gap:0}
 .setting-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
-.setting-row:last-child{border-bottom:none}
-.setting-ico{font-size:22px;flex-shrink:0}
-.setting-label{font-size:14px;font-weight:500;flex:1}
-.setting-val{font-size:12px;color:var(--text2);font-family:'IBM Plex Mono',monospace}
 
 /* Plan selector modal */
 #ovPlanSel .modal-body{gap:0}
 .plan-sel-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer}
-.plan-sel-item:last-child{border-bottom:none}
-.plan-sel-item:active{opacity:.7}
 .plan-sel-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
 .plan-sel-item.on .plan-sel-check{background:var(--accent);border-color:var(--accent);color:#fff}
 
@@ -260,9 +238,6 @@ header{
 
 /* Misc */
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text2);padding:40px;text-align:center}
-.empty-ico{font-size:44px}
-.empty-ttl{font-size:16px;font-weight:600;color:var(--text)}
-.empty-sub{font-size:12px;line-height:1.6}
 .prog-wrap{width:100%;height:3px;background:var(--s2);border-radius:2px;overflow:hidden;display:none}
 .prog-wrap.on{display:block}
 .prog-bar{height:100%;background:var(--accent);transition:width .25s;border-radius:2px}
@@ -337,7 +312,7 @@ header{
         <input class="fi" id="mLoc" placeholder="Ex: Bâtiment A, Niveau 2...">
       </div>
       <div class="fg">
-        <div class="fl">Photo</div>
+        <div class="fl">Photos</div>
         <div id="photoArea"></div>
       </div>
     </div>
@@ -522,7 +497,7 @@ header{
       <div class="exp-ico">📋</div>
       <div class="exp-info">
         <div class="exp-title">Rapport global (HTML → PDF)</div>
-        <div class="exp-desc">Toutes les réserves avec photos et localisation visuelle ultra-nette</div>
+        <div class="exp-desc">Toutes les réserves avec photos et localisation HD</div>
       </div>
       <div class="exp-arr">›</div>
     </div>
@@ -568,7 +543,6 @@ header{
 // ═══════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════
-// Worker CDN — nécessite internet (Chrome/Safari avec accès web)
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 const CAT_COLOR = { SEC:'#ef4444', FIN:'#a855f7', NC:'#eab308', QUA:'#3b82f6', AVA:'#22c55e' };
@@ -580,14 +554,13 @@ const STATUS_LABEL = { todo:'À faire', wip:'En cours', done:'Levée' };
 // ═══════════════════════════════════════════════════════
 let state = {
   settings: { chantier:'', conducteur:'', entreprise:'' },
-  plans: [],       // [{id, name, pages}] — no PDF data stored
+  plans: [],
   activePlanId: null,
-  reserves: [],    // [{id, num, code, title, cat, status, desc, lot, loc, photo, pinX, pinY, planId, page, date, time}]
+  reserves: [], 
   counter: { SEC:0, FIN:0, NC:0, QUA:0, AVA:0 }
 };
 
-// PDF runtime (not persisted)
-let pdfs = {};            // planId -> pdfDoc
+let pdfs = {};
 let activePdf = null;
 let curPage = 1;
 let totalPages = 1;
@@ -598,13 +571,17 @@ let pinMode = false;
 let editId = null;
 let pendingX = null, pendingY = null;
 let curCat = 'SEC', curStatus = 'todo';
-let curPhoto = null;
+
+// SOLUTION 2 : ARRAY DE PHOTOS (Multi-photos)
+let curPhotos = [];
+
 let pinFilter = 'all', resFilter = 'all';
 let statusTarget = null;
 let deleteTarget = null;
+let planThumbs = {};
 
 // ═══════════════════════════════════════════════════════
-// INDEXEDDB — stockage des PDFs (binaire)
+// INDEXEDDB — SOLUTION 1 : Sauvegarde massive et fiable
 // ═══════════════════════════════════════════════════════
 let db = null;
 function openDB() {
@@ -642,21 +619,41 @@ function idbDel(key) {
 }
 
 // ═══════════════════════════════════════════════════════
-// PERSIST (localStorage pour state, IndexedDB pour PDFs)
+// PERSIST & INIT
 // ═══════════════════════════════════════════════════════
 function save() {
-  try { localStorage.setItem('cv_state', JSON.stringify(state)); } catch(e) { console.error("Erreur de sauvegarde:", e); }
-}
-function loadState() {
-  try {
-    const raw = localStorage.getItem('cv_state');
-    if (raw) state = JSON.parse(raw);
-  } catch(e) {}
+  // Sauvegarde tout l'état dans IndexedDB sans limite de stockage
+  idbSet('app_state', state).catch(e => console.error("Erreur de sauvegarde IndexedDB:", e));
+  // Nettoyage de l'ancien localStorage bugué pour gagner de la place
+  try { localStorage.removeItem('cv_state'); } catch(e) {}
 }
 
 async function init() {
   await openDB();
-  loadState();
+  
+  // Charge l'état depuis IndexedDB
+  try {
+    const savedState = await idbGet('app_state');
+    if (savedState) {
+      state = savedState;
+    } else {
+      // Si vide (1er lancement de cette version), on tente de récupérer le localStorage
+      const raw = localStorage.getItem('cv_state');
+      if (raw) {
+        state = JSON.parse(raw);
+        await idbSet('app_state', state); 
+      }
+    }
+  } catch(e) { console.error('Erreur chargement DB:', e); }
+
+  // Mise à jour de la compatibilité des anciennes données vers le format multi-photos
+  state.reserves.forEach(r => {
+    if (r.photo && !r.photos) {
+      r.photos = [r.photo];
+      delete r.photo;
+    }
+  });
+
   updateBadge();
   updateStats();
   updateSettingVal();
@@ -904,8 +901,6 @@ function zFit() {
 // TOUCH / PAN / ZOOM
 // ═══════════════════════════════════════════════════════
 const cvWrap = document.getElementById('cvWrap');
-
-// Touch state
 let touches = {};
 let gestureStart = null;
 let mouseDown = false, msx = 0, msy = 0;
@@ -994,7 +989,6 @@ cvWrap.addEventListener('touchend', e => {
   }
 }, { passive: false });
 
-// Mouse support
 cvWrap.addEventListener('mousedown', e => {
   if (pinMode) return;
   mouseDown = true; msx = e.clientX - panX; msy = e.clientY - panY;
@@ -1021,7 +1015,7 @@ cvWrap.addEventListener('click', e => {
 });
 
 // ═══════════════════════════════════════════════════════
-// PIN MODE
+// PIN MODE & RENDER
 // ═══════════════════════════════════════════════════════
 function togglePinMode() {
   if (!activePdf && !state.plans.length) { toast('Chargez d\'abord un PDF', 'err'); return; }
@@ -1031,9 +1025,6 @@ function togglePinMode() {
   cvWrap.classList.toggle('pin-mode', pinMode);
 }
 
-// ═══════════════════════════════════════════════════════
-// RENDER PINS
-// ═══════════════════════════════════════════════════════
 function renderPins() {
   const layer = document.getElementById('pinsLayer');
   const cv = document.getElementById('cv');
@@ -1066,9 +1057,8 @@ function openReserveModal(id = null) {
   resetTouches(); 
 
   editId = id;
-  curPhoto = null;
+  curPhotos = [];
   curCat = 'SEC'; curStatus = 'todo';
-  resetPhotoArea();
 
   if (id !== null) {
     const r = state.reserves.find(x => x.id === id);
@@ -1078,8 +1068,7 @@ function openReserveModal(id = null) {
     document.getElementById('mLot').value = r.lot || '';
     document.getElementById('mLoc').value = r.loc || '';
     curCat = r.cat; curStatus = r.status;
-    curPhoto = r.photo || null;
-    if (r.photo) showPhoto(r.photo);
+    curPhotos = r.photos ? [...r.photos] : [];
   } else {
     document.getElementById('mTitle').textContent = 'Nouvelle réserve';
     document.getElementById('mTitleInp').value = '';
@@ -1087,6 +1076,8 @@ function openReserveModal(id = null) {
     document.getElementById('mLot').value = '';
     document.getElementById('mLoc').value = '';
   }
+  
+  renderPhotoArea();
   pickCat(curCat);
   pickStatus(curStatus);
   openOverlay('ovReserve');
@@ -1104,7 +1095,7 @@ function saveReserve() {
     r.lot = document.getElementById('mLot').value.trim();
     r.loc = document.getElementById('mLoc').value.trim();
     r.cat = curCat; r.status = curStatus;
-    if (curPhoto) r.photo = curPhoto;
+    r.photos = [...curPhotos];
     toast('Réserve modifiée ✓', 'ok');
   } else {
     state.counter[curCat] = (state.counter[curCat] || 0) + 1;
@@ -1118,7 +1109,7 @@ function saveReserve() {
       desc: document.getElementById('mDesc').value.trim(),
       lot: document.getElementById('mLot').value.trim(),
       loc: document.getElementById('mLoc').value.trim(),
-      photo: curPhoto,
+      photos: [...curPhotos],
       pinX: pendingX, pinY: pendingY,
       planId: state.activePlanId,
       planName: state.plans.find(p => p.id === state.activePlanId)?.name || '',
@@ -1159,6 +1150,7 @@ let annotStrokes = [];
 let currentStroke = [];
 let rawPhotoData = null;
 
+// Gérer la photo avec compression optimale pour éviter le rapport à 19 Mo
 function handlePhoto(e) {
   const file = e.target.files[0]; 
   if (!file) return;
@@ -1168,7 +1160,7 @@ function handlePhoto(e) {
     const img = new Image();
     img.onload = () => {
       const cvs = document.createElement('canvas');
-      const MAX_SIZE = 1200; 
+      const MAX_SIZE = 800; // Légère baisse pour un fichier ultra léger
       let w = img.width, h = img.height;
       
       if (w > h) { 
@@ -1181,7 +1173,8 @@ function handlePhoto(e) {
       cvs.height = h;
       cvs.getContext('2d').drawImage(img, 0, 0, w, h);
       
-      rawPhotoData = cvs.toDataURL('image/jpeg', 0.8);
+      // Compression JPEG très efficace (60%) pour le rapport
+      rawPhotoData = cvs.toDataURL('image/jpeg', 0.6);
       openAnnotateModal();
     };
     img.src = ev.target.result;
@@ -1299,26 +1292,46 @@ function saveAnnotate() {
     offCtx.stroke();
   }
   
-  curPhoto = offCv.toDataURL('image/jpeg', 0.8);
-  showPhoto(curPhoto);
+  // On pousse la photo terminée dans la liste des photos !
+  curPhotos.push(offCv.toDataURL('image/jpeg', 0.6));
+  renderPhotoArea();
   closeAnnotate();
 }
 
-function showPhoto(src) {
-  document.getElementById('photoArea').innerHTML = `<div class="photo-prev-wrap"><img class="photo-prev" src="${src}"><button class="photo-rem" onclick="removePhoto()">✕</button></div>`;
-}
-function removePhoto() { curPhoto = null; resetPhotoArea(); }
-function resetPhotoArea() {
-  document.getElementById('photoArea').innerHTML = `
-    <div class="photo-drop">
-      <div class="photo-drop-ico">📷</div>
-      <div class="photo-drop-txt">Prendre une photo ou importer</div>
-      <input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)">
+function renderPhotoArea() {
+  const area = document.getElementById('photoArea');
+  let html = '<div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;">';
+  
+  curPhotos.forEach((p, i) => {
+    html += `
+    <div style="position:relative; flex-shrink:0; height:80px; width:80px; border-radius:8px; border:1px solid var(--border); overflow:hidden;">
+      <img src="${p}" style="width:100%; height:100%; object-fit:cover;">
+      <button onclick="removePhoto(${i})" style="position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,.7); border:none; color:#fff; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
     </div>`;
+  });
+  
+  html += `
+    <div style="flex-shrink:0; height:80px; width:80px; display:flex; flex-direction:column; justify-content:center; padding:0; cursor:pointer; border:2px dashed var(--border); border-radius:10px; text-align:center; transition:border-color .18s" onclick="triggerPhoto()">
+      <div style="font-size:24px; margin-bottom:2px">📷</div>
+      <div style="font-size:10px; color:var(--text2)">Ajouter</div>
+    </div>
+  </div>`;
+  
+  // On ajoute l'input de manière invisible
+  area.innerHTML = html + `<input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="display:none">`;
+}
+
+function removePhoto(index) {
+  curPhotos.splice(index, 1);
+  renderPhotoArea();
+}
+
+function triggerPhoto() {
+  document.getElementById('photoFileInp').click();
 }
 
 // ═══════════════════════════════════════════════════════
-// STATUS CHANGE
+// STATUS CHANGE & DELETE
 // ═══════════════════════════════════════════════════════
 function openStatusModal(id) {
   statusTarget = id;
@@ -1332,9 +1345,6 @@ function applyStatus(s) {
   statusTarget = null;
 }
 
-// ═══════════════════════════════════════════════════════
-// DELETE
-// ═══════════════════════════════════════════════════════
 function confirmDelete(id) {
   deleteTarget = id;
   const r = state.reserves.find(x => x.id === id);
@@ -1364,7 +1374,10 @@ function renderReservesList() {
     return;
   }
   const sMap = { todo:'status-todo', wip:'status-wip', done:'status-done' };
-  list.innerHTML = filtered.map(r => `
+  
+  list.innerHTML = filtered.map(r => {
+    const photos = r.photos || [];
+    return `
     <div class="res-card" id="rc-${r.id}">
       <div class="res-card-head">
         <div class="res-num" style="background:${CAT_COLOR[r.cat]}">${r.code}</div>
@@ -1381,12 +1394,15 @@ function renderReservesList() {
           </div>
         </div>
       </div>
-      ${r.desc || r.photo || r.loc ? `<div class="res-card-body">
+      ${r.desc || photos.length || r.loc ? `<div class="res-card-body">
         ${r.loc ? `<div class="res-tags"><span class="res-tag">📍 ${r.loc}</span></div>` : ''}
         ${r.desc ? `<div class="res-desc">${r.desc}</div>` : ''}
-        ${r.photo ? `<img class="res-photo" src="${r.photo}" onclick="openLb(${r.id})">` : ''}
+        ${photos.length ? `<div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-top:6px">
+          ${photos.map((p, i) => `<img src="${p}" style="height:60px; width:60px; object-fit:cover; border-radius:6px; cursor:pointer; flex-shrink:0; border:1px solid var(--border)" onclick="openLb(${r.id}, ${i})">`).join('')}
+        </div>` : ''}
       </div>` : ''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function jumpTo(id) {
@@ -1537,9 +1553,6 @@ function updateBadge() {
   b.textContent = n; b.style.display = n ? 'inline' : 'none';
 }
 
-// ═══════════════════════════════════════════════════════
-// NOUVEAU TABLEAU DE BORD A 9 CASES (POUR TOUTES LES STATS)
-// ═══════════════════════════════════════════════════════
 function updateStats() {
   const r = state.reserves;
   document.getElementById('statsGrid').innerHTML = `
@@ -1603,9 +1616,8 @@ function exportCSV() {
   toast('CSV exporté', 'ok');
 }
 
-// ═══════════════════════════════════════════════════════
-// GÉNÉRATION DU MINI-PLAN ULTRA NET
-// ═══════════════════════════════════════════════════════
+// L'OUTIL MAGIQUE PDF.JS POUR LA VRAIE NETTETÉ !
+// On ne crée pas une image géante, on demande à l'outil de cadrer *directement* la zone du PDF et de la calculer en HD 
 async function getPlanThumb(planId, pageNum, pinX, pinY, catColor) {
   let pdf = pdfs[planId];
   if (!pdf) {
@@ -1620,16 +1632,16 @@ async function getPlanThumb(planId, pageNum, pinX, pinY, catColor) {
     const p = await pdf.getPage(pageNum);
     const vp1 = p.getViewport({ scale: 1 });
     
-    // On génère une image HD de 800x800 pixels pour le rapport
-    const SIZE = 800; 
+    // Le carré parfait du rapport
+    const SIZE = 500; 
     
-    // Zoom de x3 par rapport au plan complet
-    const scale = (SIZE * 3) / Math.max(vp1.width, vp1.height); 
+    // Le niveau de zoom (4x plus grand que l'écran complet)
+    const scale = (SIZE * 4) / Math.max(vp1.width, vp1.height); 
     
     const px = pinX * vp1.width * scale;
     const py = pinY * vp1.height * scale;
     
-    // L'outil magique : on demande à PDF.js de "cadrer" directement sur le point
+    // On recadre nativement dans le PDF (qualité vectorielle) !
     const cropVp = p.getViewport({ 
       scale: scale, 
       offsetX: (SIZE / 2) - px, 
@@ -1641,28 +1653,22 @@ async function getPlanThumb(planId, pageNum, pinX, pinY, catColor) {
     c.height = SIZE;
     const ctx = c.getContext('2d');
     
-    // Fond blanc
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, SIZE, SIZE);
 
-    // Dessine le PDF HD recadré
     await p.render({ canvasContext: ctx, viewport: cropVp }).promise;
     
-    // Dessine l'épingle directement au milieu de l'image
+    // On dessine la cible au centre parfait
     ctx.beginPath();
-    ctx.arc(SIZE/2, SIZE/2, 24, 0, 2 * Math.PI); // Point central
+    ctx.arc(SIZE/2, SIZE/2, 14, 0, 2 * Math.PI);
     ctx.fillStyle = catColor || '#f97316';
     ctx.fill();
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 4;
     ctx.strokeStyle = '#ffffff';
     ctx.stroke();
     
-    // Ajoute une petite ombre au point pour qu'il ressorte
-    ctx.shadowColor = 'rgba(0,0,0,0.4)';
-    ctx.shadowBlur = 12;
-    ctx.stroke();
-    
-    return c.toDataURL('image/jpeg', 0.85); // Export haute qualité
+    // Compression 60% pour le poids du fichier, la netteté vient du calcul vectoriel juste avant !
+    return c.toDataURL('image/jpeg', 0.6); 
   } catch(e) {
     console.error(e);
     return null;
@@ -1680,9 +1686,8 @@ async function exportReport(mode) {
   }
   if (!reserves.length) { toast('Aucune réserve à exporter', 'err'); return; }
 
-  toast('Génération du plan HD, veuillez patienter...', 'info');
+  toast('Génération du plan net HD, veuillez patienter...', 'info');
 
-  // Génère les images pour chaque réserve
   for (const r of reserves) {
     if (r.pinX !== null && !r._thumb) {
       r._thumb = await getPlanThumb(r.planId, r.page, r.pinX, r.pinY, CAT_COLOR[r.cat]);
@@ -1694,7 +1699,9 @@ async function exportReport(mode) {
   const sMap = { todo:'#ef4444', wip:'#eab308', done:'#22c55e' };
   const cMap = CAT_COLOR;
 
-  const cards = reserves.map(r => `
+  const cards = reserves.map(r => {
+    const photos = r.photos || [];
+    return `
     <div style="page-break-inside:avoid;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:14px;overflow:hidden">
       <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f9fafb;border-bottom:1px solid #e5e7eb">
         <div style="background:${cMap[r.cat]};color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;font-family:monospace">${r.code}</div>
@@ -1709,22 +1716,27 @@ async function exportReport(mode) {
         <div><strong>Date :</strong> ${r.date} à ${r.time}</div>
       </div>
       
-      ${(r.photo || (r.pinX !== null && r._thumb)) ? `
-      <div style="padding:0 14px 12px; display:flex; gap:12px; align-items:flex-start">
-        ${r.photo ? `
-        <div style="flex:1; min-width:0">
-          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Photo</div>
-          <img src="${r.photo}" style="width:100%; max-height:400px; object-fit:contain; border-radius:8px; display:block; background:#f9fafb">
-        </div>` : ''}
+      ${(photos.length || (r.pinX !== null && r._thumb)) ? `
+      <div style="padding:0 14px 12px; display:flex; flex-direction:column; gap:12px">
         
         ${(r.pinX !== null && r._thumb) ? `
-        <div style="flex:1; min-width:0; text-align:center">
-          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase;text-align:left">Localisation sur Plan</div>
-          <img src="${r._thumb}" style="width:100%; border-radius:8px; border:1px solid #e5e7eb; display:block;">
+        <div style="width:100%">
+          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase;">Localisation sur Plan</div>
+          <img src="${r._thumb}" style="width:100%; max-width:400px; border-radius:8px; border:1px solid #e5e7eb; display:block;">
         </div>` : ''}
+        
+        ${(photos.length) ? `
+        <div style="width:100%">
+          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Photos (${photos.length})</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            ${photos.map(p => `<img src="${p}" style="max-width:100%; max-height:280px; object-fit:contain; border-radius:8px; border:1px solid #e5e7eb; background:#f9fafb">`).join('')}
+          </div>
+        </div>` : ''}
+
       </div>` : ''}
 
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   const catSummary = ['SEC','FIN','NC','QUA','AVA'].map(c => {
     const n = reserves.filter(r => r.cat === c).length;
@@ -1816,10 +1828,10 @@ function confirmClear() {
   openOverlay('ovConfirm');
 }
 
-function openLb(id) {
+function openLb(id, idx = 0) {
   const r = state.reserves.find(x => x.id === id);
-  if (!r?.photo) return;
-  document.getElementById('lbImg').src = r.photo;
+  if (!r || !r.photos || !r.photos[idx]) return;
+  document.getElementById('lbImg').src = r.photos[idx];
   document.getElementById('lightbox').classList.add('on');
 }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('on'); }

@@ -127,12 +127,11 @@ header{
 .add-plan-btn:active{background:var(--s2)}
 
 /* ── RESERVES SCREEN ── */
-#scReserves{overflow-y:auto}
+/* Modification importante ici : on enlève le scroll sur l'écran global pour forcer la liste interne à scroller proprement */
 .res-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 .res-bar::-webkit-scrollbar{display:none}
-#resList{padding:12px;display:flex;flex-direction:column;gap:10px}
 
-.res-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:fadeUp .22s ease}
+.res-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:fadeUp .22s ease;flex-shrink:0}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .res-card-head{display:flex;align-items:center;gap:10px;padding:11px 13px}
 .res-num{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;font-family:'IBM Plex Mono',monospace;line-height:1.1;text-align:center}
@@ -278,6 +277,22 @@ header{
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lb-close" onclick="closeLightbox()">✕</button>
   <img id="lbImg" src="" alt="">
+</div>
+
+<div class="overlay" id="ovAnnotate" style="z-index:200;">
+  <div class="modal" style="height:92dvh; display:flex; flex-direction:column; border-radius:18px 18px 0 0; overflow:hidden; padding:0">
+    <div class="modal-hdr" style="padding:14px 18px">
+      <div class="modal-title">Dessiner sur la photo</div>
+      <button class="ib" onclick="closeAnnotate()">✕</button>
+    </div>
+    <div class="modal-body" id="annotBody" style="flex:1; padding:0; background:#111; display:flex; align-items:center; justify-content:center; touch-action:none; position:relative; overflow:hidden">
+      <canvas id="annotCv" style="touch-action:none; border: 1px solid #333"></canvas>
+    </div>
+    <div class="modal-foot" style="padding:12px 18px max(16px, env(safe-area-inset-bottom)); display:flex; gap:10px; background:var(--s1); border-top:1px solid var(--border)">
+      <button class="btn btn-sec" onclick="clearAnnotate()" style="flex:1">Effacer</button>
+      <button class="btn btn-acc" onclick="saveAnnotate()" style="flex:2">✓ Valider</button>
+    </div>
+  </div>
 </div>
 
 <div class="overlay" id="ovReserve">
@@ -479,7 +494,7 @@ header{
     <button class="chip" data-f="wip" onclick="filterRes(this,'wip')">En cours</button>
     <button class="chip" data-f="done" onclick="filterRes(this,'done')">Levées</button>
   </div>
-  <div id="resList" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:10px"></div>
+  <div id="resList" style="overflow-y:auto; flex:1; min-height:0; padding:12px; padding-bottom:max(24px, env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:10px"></div>
 </div>
 
 <div class="screen" id="scExport">
@@ -888,7 +903,7 @@ function zFit() {
 }
 
 // ═══════════════════════════════════════════════════════
-// TOUCH / PAN / ZOOM — rewritten for stability
+// TOUCH / PAN / ZOOM
 // ═══════════════════════════════════════════════════════
 const cvWrap = document.getElementById('cvWrap');
 
@@ -897,7 +912,6 @@ let touches = {};
 let gestureStart = null;
 let mouseDown = false, msx = 0, msy = 0;
 
-// SOLUTION 1 : Nettoyage forcé de la mémoire tactile
 function resetTouches() {
   touches = {};
   gestureStart = null;
@@ -962,7 +976,6 @@ cvWrap.addEventListener('touchend', e => {
   const t = e.changedTouches[0];
   changedIds.forEach(id => delete touches[id]);
   
-  // Correction ici : ne remet à zéro le geste que si on a levé un des doigts du zoom
   if (Object.keys(touches).length < 2) {
     gestureStart = null;
   }
@@ -1052,7 +1065,7 @@ function renderPins() {
 // RESERVE MODAL
 // ═══════════════════════════════════════════════════════
 function openReserveModal(id = null) {
-  resetTouches(); // Nettoie le cache tactile pour éviter le bug de zoom bloqué
+  resetTouches(); 
 
   editId = id;
   curPhoto = null;
@@ -1130,7 +1143,7 @@ function saveReserve() {
 }
 
 // ═══════════════════════════════════════════════════════
-// FORM HELPERS
+// FORM HELPERS & DRAWING ANNOTATION (NOUVEAU)
 // ═══════════════════════════════════════════════════════
 function pickCat(c) {
   curCat = c;
@@ -1140,6 +1153,14 @@ function pickStatus(s) {
   curStatus = s;
   document.querySelectorAll('.stp').forEach(el => el.classList.toggle('on', el.dataset.s === s));
 }
+
+let annotImg = null;
+let annotCtx = null;
+let annotIsDrawing = false;
+let annotStrokes = [];
+let currentStroke = [];
+let rawPhotoData = null;
+
 function handlePhoto(e) {
   const file = e.target.files[0]; 
   if (!file) return;
@@ -1149,7 +1170,7 @@ function handlePhoto(e) {
     const img = new Image();
     img.onload = () => {
       const cvs = document.createElement('canvas');
-      const MAX_SIZE = 1000;
+      const MAX_SIZE = 1200; // Légèrement plus grand pour un beau dessin
       let w = img.width, h = img.height;
       
       if (w > h) { 
@@ -1162,13 +1183,131 @@ function handlePhoto(e) {
       cvs.height = h;
       cvs.getContext('2d').drawImage(img, 0, 0, w, h);
       
-      curPhoto = cvs.toDataURL('image/jpeg', 0.7);
-      showPhoto(curPhoto);
+      rawPhotoData = cvs.toDataURL('image/jpeg', 0.8);
+      openAnnotateModal();
     };
     img.src = ev.target.result;
   };
   r.readAsDataURL(file);
+  e.target.value = ''; // Reset
 }
+
+function openAnnotateModal() {
+  document.getElementById('ovAnnotate').classList.add('on');
+  const cv = document.getElementById('annotCv');
+  const container = document.getElementById('annotBody');
+  annotCtx = cv.getContext('2d');
+  annotStrokes = [];
+  
+  annotImg = new Image();
+  annotImg.onload = () => {
+    // Redimensionner le canvas de l'éditeur pour qu'il tienne dans l'écran
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+    const ratio = Math.min(cw / annotImg.width, ch / annotImg.height);
+    cv.width = annotImg.width * ratio;
+    cv.height = annotImg.height * ratio;
+    cv.dataset.ratio = ratio;
+    
+    redrawAnnotate();
+  };
+  annotImg.src = rawPhotoData;
+  
+  // Écouteurs pour le dessin tactile/souris
+  cv.ontouchstart = annotStart;
+  cv.ontouchmove = annotMove;
+  cv.ontouchend = annotEnd;
+  cv.onmousedown = annotStart;
+  cv.onmousemove = annotMove;
+  cv.onmouseup = annotEnd;
+}
+
+function redrawAnnotate() {
+  const cv = document.getElementById('annotCv');
+  annotCtx.clearRect(0, 0, cv.width, cv.height);
+  annotCtx.drawImage(annotImg, 0, 0, cv.width, cv.height);
+  annotCtx.strokeStyle = '#ef4444'; // Couleur rouge pour marquer
+  annotCtx.lineWidth = 4;
+  annotCtx.lineCap = 'round';
+  annotCtx.lineJoin = 'round';
+  
+  for (const stroke of annotStrokes) {
+    if(!stroke.length) continue;
+    annotCtx.beginPath();
+    annotCtx.moveTo(stroke[0].x, stroke[0].y);
+    for (let i=1; i<stroke.length; i++) {
+      annotCtx.lineTo(stroke[i].x, stroke[i].y);
+    }
+    annotCtx.stroke();
+  }
+}
+
+function getAnnotPos(e) {
+  const cv = document.getElementById('annotCv');
+  const rect = cv.getBoundingClientRect();
+  const touch = e.touches ? e.touches[0] : e;
+  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+}
+
+function annotStart(e) {
+  e.preventDefault();
+  annotIsDrawing = true;
+  currentStroke = [getAnnotPos(e)];
+  annotStrokes.push(currentStroke);
+}
+
+function annotMove(e) {
+  if(!annotIsDrawing) return;
+  e.preventDefault();
+  currentStroke.push(getAnnotPos(e));
+  redrawAnnotate(); // Mise à jour temps réel
+}
+
+function annotEnd(e) {
+  if(!annotIsDrawing) return;
+  e.preventDefault();
+  annotIsDrawing = false;
+}
+
+function clearAnnotate() {
+  annotStrokes = [];
+  redrawAnnotate();
+}
+
+function closeAnnotate() {
+  document.getElementById('ovAnnotate').classList.remove('on');
+  annotStrokes = [];
+}
+
+function saveAnnotate() {
+  const offCv = document.createElement('canvas');
+  offCv.width = annotImg.width;
+  offCv.height = annotImg.height;
+  const offCtx = offCv.getContext('2d');
+  offCtx.drawImage(annotImg, 0, 0);
+  
+  offCtx.strokeStyle = '#ef4444';
+  offCtx.lineCap = 'round';
+  offCtx.lineJoin = 'round';
+  
+  const ratio = parseFloat(document.getElementById('annotCv').dataset.ratio || 1);
+  offCtx.lineWidth = 6 / ratio; // Rendre le trait bien visible
+  
+  for (const stroke of annotStrokes) {
+    if(stroke.length < 2) continue;
+    offCtx.beginPath();
+    offCtx.moveTo(stroke[0].x / ratio, stroke[0].y / ratio);
+    for (let i=1; i<stroke.length; i++) {
+      offCtx.lineTo(stroke[i].x / ratio, stroke[i].y / ratio);
+    }
+    offCtx.stroke();
+  }
+  
+  curPhoto = offCv.toDataURL('image/jpeg', 0.8);
+  showPhoto(curPhoto);
+  closeAnnotate();
+}
+
 function showPhoto(src) {
   document.getElementById('photoArea').innerHTML = `<div class="photo-prev-wrap"><img class="photo-prev" src="${src}"><button class="photo-rem" onclick="removePhoto()">✕</button></div>`;
 }
@@ -1372,7 +1511,7 @@ async function goPage(d) {
 // SETTINGS / OVERLAYS
 // ═══════════════════════════════════════════════════════
 function openOverlay(id) {
-  resetTouches(); // Fixes sticky touches when opening modal
+  resetTouches(); 
   if (id === 'ovSettings') {
     document.getElementById('sChantier').value = state.settings.chantier;
     document.getElementById('sConducteur').value = state.settings.conducteur;
@@ -1500,7 +1639,6 @@ async function exportReport(mode) {
 
   toast('Génération du rapport en cours...', 'info');
 
-  // Génère les miniatures du plan de manière transparente
   for (const r of reserves) {
     if (r.pinX !== null && !r._thumb) {
       r._thumb = await getPlanThumb(r.planId, r.page);
@@ -1532,15 +1670,15 @@ async function exportReport(mode) {
         ${r.photo ? `
         <div style="flex:1; min-width:0">
           <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Photo</div>
-          <img src="${r.photo}" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; border:1px solid #e5e7eb; display:block">
+          <img src="${r.photo}" style="width:100%; max-height:400px; object-fit:contain; border-radius:8px; display:block; background:#f9fafb">
         </div>` : ''}
         
         ${(r.pinX !== null && r._thumb) ? `
         <div style="flex:1; min-width:0; text-align:center">
           <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase;text-align:left">Localisation sur Plan</div>
-          <div style="position:relative; display:inline-block; max-width:100%; border-radius:8px; overflow:hidden; border:1px solid #e5e7eb; background:#fff">
-            <img src="${r._thumb}" style="max-width:100%; max-height:200px; display:block">
-            <div style="position:absolute; left:${r.pinX*100}%; top:${r.pinY*100}%; transform:translate(-50%,-50%); width:14px; height:14px; background:${cMap[r.cat]}; border:2px solid #fff; border-radius:50%; box-shadow:0 2px 5px rgba(0,0,0,0.5)"></div>
+          <div style="position:relative; width:100%; padding-bottom:100%; border-radius:8px; overflow:hidden; border:1px solid #e5e7eb; background:#fff">
+            <img src="${r._thumb}" style="position:absolute; width:400%; max-width:none; left:calc(50% - ${r.pinX*400}%); top:calc(50% - ${r.pinY*400}%);">
+            <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; background:${cMap[r.cat]}; border:2px solid #fff; border-radius:50%; box-shadow:0 2px 5px rgba(0,0,0,0.5)"></div>
           </div>
         </div>` : ''}
       </div>` : ''}

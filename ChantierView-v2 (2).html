@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ChantierView">
+<title>ChantierView</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #111214;
+  --s1: #1c1d20;
+  --s2: #25262b;
+  --s3: #2e2f35;
+  --border: #363740;
+  --text: #e8e9f0;
+  --text2: #7c7d8a;
+  --text3: #4e4f5c;
+  --accent: #f97316;
+  --accent-d: #c45d10;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #eab308;
+  --purple: #a855f7;
+  --teal: #14b8a6;
+  --r: 12px;
+  --shadow: 0 8px 32px rgba(0,0,0,.6);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100dvh}
+
+/* ── HEADER ── */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;
+  padding-top:max(10px,env(safe-area-inset-top));
+  background:var(--s1);border-bottom:1px solid var(--border);
+  flex-shrink:0;z-index:50;
+}
+.logo{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.logo em{color:var(--accent);font-style:normal}
+.hdr-btns{display:flex;gap:6px}
+
+/* ── TABS ── */
+.tabs{display:none;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--border)}
+.tabs.show{display:flex}
+.tab{flex:1;padding:9px 4px 7px;text-align:center;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;user-select:none}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.ti{font-size:17px;display:block;margin-bottom:1px}
+.badge{background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:3px;vertical-align:middle}
+
+/* ── SCREENS ── */
+.screen{display:none;flex:1;overflow:hidden;flex-direction:column}
+.screen.on{display:flex}
+
+/* ── WELCOME SCREEN ── */
+#scWelcome{align-items:center;justify-content:center;gap:16px;padding:32px 24px;text-align:center;overflow-y:auto}
+.wlc-logo{font-size:64px;line-height:1}
+.wlc-title{font-size:24px;font-weight:700}.wlc-title em{color:var(--accent);font-style:normal}
+.wlc-sub{font-size:13px;color:var(--text2);line-height:1.7;max-width:320px}
+.wlc-btn{width:100%;max-width:320px;padding:15px;border-radius:13px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;font-family:inherit;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.wlc-btn:active{background:var(--accent-d)}
+.wlc-divider{width:100%;max-width:320px;display:flex;align-items:center;gap:10px;color:var(--text3);font-size:12px}
+.wlc-divider::before,.wlc-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.wlc-settings{width:100%;max-width:320px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.wlc-setting-row{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;border-bottom:1px solid var(--border)}
+.wlc-setting-row:last-child{border-bottom:none}
+.wlc-setting-row:active{background:var(--s2)}
+.wlc-setting-icon{font-size:20px;flex-shrink:0}
+.wlc-setting-info{flex:1;min-width:0}
+.wlc-setting-title{font-size:14px;font-weight:500}
+.wlc-setting-val{font-size:11px;color:var(--text2);margin-top:1px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wlc-setting-arr{color:var(--text3)}
+
+/* ── PLAN SCREEN ── */
+#scPlan{position:relative}
+.plan-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.plan-bar::-webkit-scrollbar{display:none}
+.chip{padding:5px 11px;border-radius:20px;font-size:12px;font-weight:500;border:1.5px solid var(--border);color:var(--text2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;font-family:inherit}
+.chip.on{border-color:var(--accent);color:var(--accent);background:rgba(249,115,22,.1)}
+.chip.pin-active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
+
+.cv-wrap{flex:1;overflow:hidden;position:relative;background:#141416;touch-action:none}
+.cv-wrap.pin-mode{cursor:crosshair}
+#cv{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;touch-action:none}
+.pins-layer{position:absolute;top:0;left:0;pointer-events:none;transform-origin:0 0}
+
+/* Pin marker */
+.pin-m{position:absolute;pointer-events:all;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%);cursor:pointer;z-index:10}
+.pin-m:active{opacity:.7}
+.pin-drop{width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.25);box-shadow:0 3px 12px rgba(0,0,0,.5)}
+.pin-drop span{transform:rotate(45deg);font-size:11px;font-weight:700;color:#fff}
+.pin-lbl{background:rgba(0,0,0,.8);color:#fff;font-size:9px;font-weight:600;padding:2px 6px;border-radius:5px;margin-top:2px;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;backdrop-filter:blur(6px)}
+
+.zoom-btns{position:absolute;bottom:20px;right:14px;display:flex;flex-direction:column;gap:5px;z-index:30}
+.zb{width:42px;height:42px;border-radius:10px;background:var(--s1);border:1px solid var(--border);color:var(--text);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);user-select:none}
+.zb:active{background:var(--s2)}
+
+.page-nav{position:absolute;bottom:20px;left:14px;display:flex;gap:5px;z-index:30}
+.pn-btn{padding:7px 13px;border-radius:10px;background:var(--s1);border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;box-shadow:var(--shadow);user-select:none}
+.pn-btn:active{background:var(--s2)}
+
+.pin-banner{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;z-index:40;display:none;white-space:nowrap;box-shadow:var(--shadow)}
+.pin-banner.on{display:block}
+
+/* ── PLANS SCREEN ── */
+#scPlans{overflow-y:auto;padding:12px;gap:10px}
+.plan-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:background .15s}
+.plan-card:active{background:var(--s2)}
+.plan-card.active-plan{border-color:var(--accent);background:rgba(249,115,22,.05)}
+.plan-icon{font-size:28px;flex-shrink:0}
+.plan-info{flex:1;min-width:0}
+.plan-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plan-meta{font-size:11px;color:var(--text2);margin-top:2px;font-family:'IBM Plex Mono',monospace}
+.plan-actions{display:flex;gap:5px}
+
+.add-plan-btn{width:100%;padding:14px;border-radius:var(--r);background:var(--s1);border:1.5px dashed var(--border);color:var(--text2);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
+.add-plan-btn:active{background:var(--s2)}
+
+/* ── RESERVES SCREEN ── */
+#scReserves{overflow-y:auto}
+.res-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.res-bar::-webkit-scrollbar{display:none}
+#resList{padding:12px;display:flex;flex-direction:column;gap:10px}
+
+.res-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:fadeUp .22s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.res-card-head{display:flex;align-items:center;gap:10px;padding:11px 13px}
+.res-num{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;font-family:'IBM Plex Mono',monospace;line-height:1.1;text-align:center}
+.res-info{flex:1;min-width:0}
+.res-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res-meta{font-size:10px;color:var(--text2);margin-top:2px;font-family:'IBM Plex Mono',monospace}
+.res-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.status-pill{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;user-select:none;white-space:nowrap}
+.status-todo{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.status-wip{background:rgba(234,179,8,.15);color:var(--yellow);border:1px solid rgba(234,179,8,.3)}
+.status-done{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.res-btns{display:flex;gap:5px}
+.ib{width:30px;height:30px;border-radius:8px;background:var(--s2);border:1px solid var(--border);color:var(--text2);font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.ib:active{background:var(--s3)}
+.ib.red{color:var(--red)}
+.res-card-body{padding:0 13px 11px}
+.res-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:7px}
+.res-photo{width:100%;max-height:160px;object-fit:cover;border-radius:8px;cursor:pointer}
+.res-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.res-tag{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:var(--s2);color:var(--text2)}
+
+/* ── EXPORT SCREEN ── */
+#scExport{overflow-y:auto;padding:12px;gap:10px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-box{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
+.stat-n{font-size:26px;font-weight:700}
+.stat-l{font-size:10px;color:var(--text2);margin-top:2px}
+.exp-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:background .15s}
+.exp-card:active{background:var(--s2)}
+.exp-ico{font-size:32px;flex-shrink:0}
+.exp-info{flex:1}
+.exp-title{font-size:14px;font-weight:600}
+.exp-desc{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4}
+.exp-arr{color:var(--text3);font-size:16px}
+.section-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;padding:4px 0 6px}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:none;align-items:flex-end;backdrop-filter:blur(5px)}
+.overlay.on{display:flex}
+.modal{width:100%;background:var(--s1);border-radius:18px 18px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 max(16px,env(safe-area-inset-bottom));animation:slideUp .28s ease;max-height:94dvh;display:flex;flex-direction:column}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:34px;height:4px;background:var(--border);border-radius:2px;margin:10px auto 0;flex-shrink:0}
+.modal-hdr{padding:10px 18px 12px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:16px;font-weight:700}
+.modal-body{padding:14px 18px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:13px}
+.modal-foot{padding:10px 18px 0;display:flex;flex-direction:column;gap:7px;flex-shrink:0}
+
+.fg{display:flex;flex-direction:column;gap:5px}
+.fl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+.fi,.ft,.fs{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:inherit;font-size:14px;outline:none;width:100%;transition:border-color .18s}
+.fi:focus,.ft:focus,.fs:focus{border-color:var(--accent)}
+.ft{resize:none;min-height:72px}
+.fs option{background:var(--s2)}
+
+/* Cat pills */
+.cat-row{display:flex;gap:7px;flex-wrap:wrap}
+.cp{padding:7px 12px;border-radius:20px;font-size:12px;font-weight:600;border:2px solid transparent;cursor:pointer;transition:all .15s;opacity:.45}
+.cp.on{opacity:1;border-color:rgba(255,255,255,.35)!important}
+.cp-sec{background:rgba(239,68,68,.2);color:var(--red)}
+.cp-sec.on{background:var(--red);color:#fff}
+.cp-fin{background:rgba(168,85,247,.2);color:var(--purple)}
+.cp-fin.on{background:var(--purple);color:#fff}
+.cp-nc{background:rgba(234,179,8,.2);color:var(--yellow)}
+.cp-nc.on{background:var(--yellow);color:#1a1a00}
+.cp-qua{background:rgba(59,130,246,.2);color:var(--blue)}
+.cp-qua.on{background:var(--blue);color:#fff}
+.cp-ava{background:rgba(34,197,94,.2);color:var(--green)}
+.cp-ava.on{background:var(--green);color:#0a2a10}
+
+/* Photo */
+.photo-drop{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;position:relative;transition:border-color .18s}
+.photo-drop:active{border-color:var(--accent)}
+.photo-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.photo-drop-ico{font-size:28px;margin-bottom:4px}
+.photo-drop-txt{font-size:12px;color:var(--text2)}
+.photo-prev-wrap{position:relative}
+.photo-prev{width:100%;border-radius:9px;max-height:180px;object-fit:cover}
+.photo-rem{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* Status picker in modal */
+.status-row{display:flex;gap:7px}
+.stp{flex:1;padding:8px 4px;border-radius:9px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .15s;opacity:.45}
+.stp.on{opacity:1;border-color:rgba(255,255,255,.3)!important}
+.stp-todo{background:rgba(239,68,68,.15);color:var(--red)}
+.stp-todo.on{background:var(--red);color:#fff}
+.stp-wip{background:rgba(234,179,8,.15);color:var(--yellow)}
+.stp-wip.on{background:var(--yellow);color:#1a1500}
+.stp-done{background:rgba(34,197,94,.15);color:var(--green)}
+.stp-done.on{background:var(--green);color:#071a0b}
+
+/* Buttons */
+.btn{padding:13px 18px;border-radius:11px;font-size:15px;font-weight:600;font-family:inherit;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.btn-acc{background:var(--accent);color:#fff}.btn-acc:active{background:var(--accent-d)}
+.btn-sec{background:var(--s2);color:var(--text);border:1px solid var(--border)}.btn-sec:active{background:var(--s3)}
+.btn-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}.btn-red:active{background:rgba(239,68,68,.2)}
+.btn-grn{background:var(--green);color:#071a0b}.btn-grn:active{filter:brightness(.9)}
+.btn-sm{padding:9px 14px;font-size:13px;border-radius:9px}
+
+/* Settings modal */
+#ovSettings .modal-body{gap:0}
+.setting-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-ico{font-size:22px;flex-shrink:0}
+.setting-label{font-size:14px;font-weight:500;flex:1}
+.setting-val{font-size:12px;color:var(--text2);font-family:'IBM Plex Mono',monospace}
+
+/* Plan selector modal */
+#ovPlanSel .modal-body{gap:0}
+.plan-sel-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.plan-sel-item:last-child{border-bottom:none}
+.plan-sel-item:active{opacity:.7}
+.plan-sel-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
+.plan-sel-item.on .plan-sel-check{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* Lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:200;display:none;align-items:center;justify-content:center;flex-direction:column}
+.lightbox.on{display:flex}
+.lightbox img{max-width:100%;max-height:82dvh;object-fit:contain;border-radius:8px}
+.lb-close{position:absolute;top:max(18px,env(safe-area-inset-top));right:18px;width:38px;height:38px;border-radius:50%;background:var(--s2);border:1px solid var(--border);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* Toast */
+.toast{position:fixed;top:max(56px,calc(env(safe-area-inset-top)+46px));left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:9px 15px;font-size:13px;font-weight:500;z-index:999;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap;box-shadow:var(--shadow)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--green);color:var(--green)}
+.toast.err{border-color:var(--red);color:var(--red)}
+.toast.info{border-color:var(--blue);color:var(--blue)}
+
+/* Misc */
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text2);padding:40px;text-align:center}
+.empty-ico{font-size:44px}
+.empty-ttl{font-size:16px;font-weight:600;color:var(--text)}
+.empty-sub{font-size:12px;line-height:1.6}
+.prog-wrap{width:100%;height:3px;background:var(--s2);border-radius:2px;overflow:hidden;display:none}
+.prog-wrap.on{display:block}
+.prog-bar{height:100%;background:var(--accent);transition:width .25s;border-radius:2px}
+.divider{height:1px;background:var(--border);flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lbImg" src="" alt="">
+</div>
+
+<!-- MODAL: Reserve -->
+<div class="overlay" id="ovReserve">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title" id="mTitle">Nouvelle réserve</div>
+      <button class="ib" onclick="closeOverlay('ovReserve')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <div class="fl">Titre *</div>
+        <input class="fi" id="mTitleInp" placeholder="Ex: Poteau mal fini" maxlength="80">
+      </div>
+      <div class="fg">
+        <div class="fl">Catégorie</div>
+        <div class="cat-row">
+          <div class="cp cp-sec" data-c="SEC" onclick="pickCat('SEC')">🔴 Sécurité</div>
+          <div class="cp cp-fin" data-c="FIN" onclick="pickCat('FIN')">🟣 Finition</div>
+          <div class="cp cp-nc" data-c="NC" onclick="pickCat('NC')">🟡 Non-conf.</div>
+          <div class="cp cp-qua" data-c="QUA" onclick="pickCat('QUA')">🔵 Qualité</div>
+          <div class="cp cp-ava" data-c="AVA" onclick="pickCat('AVA')">🟢 Avanc.</div>
+        </div>
+      </div>
+      <div class="fg">
+        <div class="fl">Statut</div>
+        <div class="status-row">
+          <div class="stp stp-todo" data-s="todo" onclick="pickStatus('todo')">À faire</div>
+          <div class="stp stp-wip" data-s="wip" onclick="pickStatus('wip')">En cours</div>
+          <div class="stp stp-done" data-s="done" onclick="pickStatus('done')">Levée ✓</div>
+        </div>
+      </div>
+      <div class="fg">
+        <div class="fl">Description</div>
+        <textarea class="ft" id="mDesc" placeholder="Décrivez la réserve..."></textarea>
+      </div>
+      <div class="fg">
+        <div class="fl">Lot / Corps de métier</div>
+        <input class="fi" id="mLot" placeholder="Ex: Gros œuvre, Menuiserie...">
+      </div>
+      <div class="fg">
+        <div class="fl">Localisation (zone / repère)</div>
+        <input class="fi" id="mLoc" placeholder="Ex: Cage A, Niveau 2, Axe B3...">
+      </div>
+      <div class="fg">
+        <div class="fl">Photo</div>
+        <div id="photoArea"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-acc" onclick="saveReserve()">✓ Enregistrer</button>
+      <button class="btn btn-sec" onclick="closeOverlay('ovReserve')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Settings -->
+<div class="overlay" id="ovSettings">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title">Paramètres du chantier</div>
+      <button class="ib" onclick="closeOverlay('ovSettings')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <div class="fl">Nom du chantier</div>
+        <input class="fi" id="sChantier" placeholder="Ex: Résidence Igny – Bât A">
+      </div>
+      <div class="fg">
+        <div class="fl">Conducteur de travaux</div>
+        <input class="fi" id="sConducteur" placeholder="Votre nom">
+      </div>
+      <div class="fg">
+        <div class="fl">Entreprise</div>
+        <input class="fi" id="sEntreprise" placeholder="Nom de votre entreprise">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-acc" onclick="saveSettings()">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Plan selector -->
+<div class="overlay" id="ovPlanSel">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title">Choisir un plan</div>
+      <button class="ib" onclick="closeOverlay('ovPlanSel')">✕</button>
+    </div>
+    <div class="modal-body" id="planSelList"></div>
+  </div>
+</div>
+
+<!-- MODAL: Status change -->
+<div class="overlay" id="ovStatus">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr"><div class="modal-title">Changer le statut</div><button class="ib" onclick="closeOverlay('ovStatus')">✕</button></div>
+    <div class="modal-body">
+      <button class="btn btn-sec" style="border-color:rgba(239,68,68,.4);color:var(--red)" onclick="applyStatus('todo')">🔴 À faire</button>
+      <button class="btn btn-sec" style="border-color:rgba(234,179,8,.4);color:var(--yellow)" onclick="applyStatus('wip')">🟡 En cours</button>
+      <button class="btn btn-sec" style="border-color:rgba(34,197,94,.4);color:var(--green)" onclick="applyStatus('done')">🟢 Levée ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Delete confirm -->
+<div class="overlay" id="ovConfirm">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr"><div class="modal-title" id="confirmTitle">Confirmer</div><button class="ib" onclick="closeOverlay('ovConfirm')">✕</button></div>
+    <div class="modal-body">
+      <div id="confirmMsg" style="font-size:14px;color:var(--text2);line-height:1.6"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-red" id="confirmOk">Supprimer</button>
+      <button class="btn btn-sec" onclick="closeOverlay('ovConfirm')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Chantier<em>View</em></div>
+  <div class="hdr-btns">
+    <button class="ib" onclick="openOverlay('ovSettings')" title="Paramètres">⚙️</button>
+    <button class="ib" id="planSwitchBtn" style="display:none;font-size:11px;font-family:'IBM Plex Mono',monospace;width:auto;padding:0 8px;color:var(--accent)" onclick="openPlanSel()">PLAN ▾</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs" id="mainTabs">
+  <div class="tab on" data-s="scPlan" onclick="switchTab('scPlan')"><span class="ti">🗺️</span>Plan</div>
+  <div class="tab" data-s="scPlans" onclick="switchTab('scPlans')"><span class="ti">📂</span>Plans</div>
+  <div class="tab" data-s="scReserves" onclick="switchTab('scReserves')"><span class="ti">📋</span>Réserves<span class="badge" id="resBadge" style="display:none">0</span></div>
+  <div class="tab" data-s="scExport" onclick="switchTab('scExport')"><span class="ti">📤</span>Export</div>
+</div>
+
+<!-- SCREEN: Welcome -->
+<div class="screen on" id="scWelcome">
+  <div class="wlc-logo">🏗️</div>
+  <div class="wlc-title">Chantier<em>View</em></div>
+  <div class="wlc-sub">Chargez vos plans PDF, épinglez vos réserves directement sur le plan, et exportez un rapport professionnel en fin de journée.</div>
+  <div class="prog-wrap" id="progWrap"><div class="prog-bar" id="progBar" style="width:0"></div></div>
+  <button class="wlc-btn" onclick="triggerPDF()">📄 Charger un plan PDF</button>
+  <input type="file" id="pdfInput" accept=".pdf,application/pdf" multiple onchange="loadPDFs(event)" style="display:none">
+  <div class="wlc-divider">ou</div>
+  <div class="wlc-settings">
+    <div class="wlc-setting-row" onclick="openOverlay('ovSettings')">
+      <div class="wlc-setting-icon">⚙️</div>
+      <div class="wlc-setting-info">
+        <div class="wlc-setting-title">Paramètres du chantier</div>
+        <div class="wlc-setting-val" id="wlcSettingVal">Configurer le nom, conducteur...</div>
+      </div>
+      <div class="wlc-setting-arr">›</div>
+    </div>
+  </div>
+  <div style="font-size:11px;color:var(--text3);text-align:center">Vos données sont sauvegardées automatiquement sur cet appareil</div>
+</div>
+
+<!-- SCREEN: Plan -->
+<div class="screen" id="scPlan">
+  <div class="plan-bar" id="planBar">
+    <button class="chip on" data-f="all" onclick="filterPins(this,'all')">Tous</button>
+    <button class="chip" data-f="SEC" onclick="filterPins(this,'SEC')">🔴 Sécu</button>
+    <button class="chip" data-f="FIN" onclick="filterPins(this,'FIN')">🟣 Fini</button>
+    <button class="chip" data-f="NC" onclick="filterPins(this,'NC')">🟡 NC</button>
+    <button class="chip" data-f="QUA" onclick="filterPins(this,'QUA')">🔵 Qual</button>
+    <button class="chip" data-f="AVA" onclick="filterPins(this,'AVA')">🟢 Avanc</button>
+    <div class="sep"></div>
+    <button class="chip" id="pinBtn" onclick="togglePinMode()">📍 Épingler</button>
+  </div>
+  <div class="cv-wrap" id="cvWrap">
+    <canvas id="cv"></canvas>
+    <div class="pins-layer" id="pinsLayer"></div>
+    <div class="pin-banner" id="pinBanner">📍 Touchez le plan pour placer la réserve</div>
+    <div class="zoom-btns">
+      <div class="zb" onclick="zI()">+</div>
+      <div class="zb" onclick="zO()">−</div>
+      <div class="zb" onclick="zFit()">⊡</div>
+    </div>
+    <div class="page-nav" id="pageNav" style="display:none">
+      <button class="pn-btn" onclick="goPage(-1)">‹</button>
+      <button class="pn-btn" id="pageInfo">1/1</button>
+      <button class="pn-btn" onclick="goPage(1)">›</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN: Plans list -->
+<div class="screen" id="scPlans">
+  <div id="plansList" style="padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1"></div>
+</div>
+
+<!-- SCREEN: Reserves -->
+<div class="screen" id="scReserves">
+  <div class="res-bar" id="resBar">
+    <button class="chip on" data-f="all" onclick="filterRes(this,'all')">Tous</button>
+    <button class="chip" data-f="SEC" onclick="filterRes(this,'SEC')">🔴 Sécu</button>
+    <button class="chip" data-f="FIN" onclick="filterRes(this,'FIN')">🟣 Fini</button>
+    <button class="chip" data-f="NC" onclick="filterRes(this,'NC')">🟡 NC</button>
+    <button class="chip" data-f="QUA" onclick="filterRes(this,'QUA')">🔵 Qual</button>
+    <button class="chip" data-f="AVA" onclick="filterRes(this,'AVA')">🟢 Avanc</button>
+    <div class="sep"></div>
+    <button class="chip" data-f="todo" onclick="filterRes(this,'todo')">À faire</button>
+    <button class="chip" data-f="wip" onclick="filterRes(this,'wip')">En cours</button>
+    <button class="chip" data-f="done" onclick="filterRes(this,'done')">Levées</button>
+  </div>
+  <div id="resList" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:10px"></div>
+</div>
+
+<!-- SCREEN: Export -->
+<div class="screen" id="scExport">
+  <div style="padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="section-title">📊 Tableaux de bord</div>
+    <div class="exp-card" onclick="exportXLSX()">
+      <div class="exp-ico">📊</div>
+      <div class="exp-info">
+        <div class="exp-title">Export Excel (.xlsx)</div>
+        <div class="exp-desc">Toutes les réserves avec statut, catégorie, lot, dates, position sur plan</div>
+      </div>
+      <div class="exp-arr">›</div>
+    </div>
+    <div class="exp-card" onclick="exportCSV()">
+      <div class="exp-ico">📑</div>
+      <div class="exp-info">
+        <div class="exp-title">Export CSV</div>
+        <div class="exp-desc">Compatible Numbers, Google Sheets, tout tableur</div>
+      </div>
+      <div class="exp-arr">›</div>
+    </div>
+    <div class="divider"></div>
+    <div class="section-title">📋 Rapport de fin de journée</div>
+    <div class="exp-card" onclick="exportReport('all')">
+      <div class="exp-ico">📋</div>
+      <div class="exp-info">
+        <div class="exp-title">Rapport global (HTML → PDF)</div>
+        <div class="exp-desc">Toutes les réserves du chantier avec photos • À imprimer en PDF depuis Safari</div>
+      </div>
+      <div class="exp-arr">›</div>
+    </div>
+    <div class="exp-card" onclick="exportReport('today')">
+      <div class="exp-ico">📅</div>
+      <div class="exp-info">
+        <div class="exp-title">Rapport du jour seulement</div>
+        <div class="exp-desc">Réserves créées aujourd'hui uniquement</div>
+      </div>
+      <div class="exp-arr">›</div>
+    </div>
+    <div class="divider"></div>
+    <div class="section-title">💾 Sauvegarde</div>
+    <div class="exp-card" onclick="exportJSON()">
+      <div class="exp-ico">💾</div>
+      <div class="exp-info">
+        <div class="exp-title">Exporter une sauvegarde (.json)</div>
+        <div class="exp-desc">Backup de toutes les données — importable sur un autre appareil</div>
+      </div>
+      <div class="exp-arr">›</div>
+    </div>
+    <div class="exp-card" onclick="document.getElementById('jsonInput').click()">
+      <div class="exp-ico">📥</div>
+      <div class="exp-info">
+        <div class="exp-title">Importer une sauvegarde</div>
+        <div class="exp-desc">Restaurer les données depuis un fichier .json</div>
+      </div>
+      <div class="exp-arr">›</div>
+    </div>
+    <input type="file" id="jsonInput" accept=".json" onchange="importJSON(event)" style="display:none">
+    <div class="exp-card" onclick="confirmClear()">
+      <div class="exp-ico">🗑️</div>
+      <div class="exp-info">
+        <div class="exp-title" style="color:var(--red)">Tout effacer</div>
+        <div class="exp-desc">Supprimer toutes les réserves</div>
+      </div>
+      <div class="exp-arr">›</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════
+// Worker CDN — nécessite internet (Chrome/Safari avec accès web)
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const CAT_COLOR = { SEC:'#ef4444', FIN:'#a855f7', NC:'#eab308', QUA:'#3b82f6', AVA:'#22c55e' };
+const CAT_LABEL = { SEC:'Sécurité', FIN:'Finition', NC:'Non-conformité', QUA:'Qualité', AVA:'Avancement' };
+const STATUS_LABEL = { todo:'À faire', wip:'En cours', done:'Levée' };
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let state = {
+  settings: { chantier:'', conducteur:'', entreprise:'' },
+  plans: [],       // [{id, name, pages}] — no PDF data stored
+  activePlanId: null,
+  reserves: [],    // [{id, num, code, title, cat, status, desc, lot, loc, photo, pinX, pinY, planId, page, date, time}]
+  counter: { SEC:0, FIN:0, NC:0, QUA:0, AVA:0 }
+};
+
+// PDF runtime (not persisted)
+let pdfs = {};            // planId -> pdfDoc
+let activePdf = null;
+let curPage = 1;
+let totalPages = 1;
+let scale = 1, baseScale = 1;
+let panX = 0, panY = 0;
+let baseW = 0, baseH = 0;
+let pinMode = false;
+let editId = null;
+let pendingX = null, pendingY = null;
+let curCat = 'SEC', curStatus = 'todo';
+let curPhoto = null;
+let pinFilter = 'all', resFilter = 'all';
+let statusTarget = null;
+let deleteTarget = null;
+
+// ═══════════════════════════════════════════════════════
+// INDEXEDDB — stockage des PDFs (binaire)
+// ═══════════════════════════════════════════════════════
+let db = null;
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('ChantierViewDB', 1);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('pdfs')) d.createObjectStore('pdfs');
+    };
+    req.onsuccess = e => { db = e.target.result; resolve(db); };
+    req.onerror = () => reject(req.error);
+  });
+}
+function idbSet(key, value) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction('pdfs', 'readwrite');
+    tx.objectStore('pdfs').put(value, key);
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+function idbGet(key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction('pdfs', 'readonly');
+    const req = tx.objectStore('pdfs').get(key);
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+function idbDel(key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction('pdfs', 'readwrite');
+    tx.objectStore('pdfs').delete(key);
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// PERSIST (localStorage pour state, IndexedDB pour PDFs)
+// ═══════════════════════════════════════════════════════
+function save() {
+  try { localStorage.setItem('cv_state', JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem('cv_state');
+    if (raw) state = JSON.parse(raw);
+  } catch(e) {}
+}
+
+async function init() {
+  await openDB();
+  loadState();
+  updateBadge();
+  updateStats();
+  updateSettingVal();
+  renderPlansList();
+
+  if (state.plans.length > 0) {
+    // Tenter de charger tous les PDFs depuis IndexedDB
+    let anyLoaded = false;
+    for (const plan of state.plans) {
+      try {
+        const ab = await idbGet(plan.id);
+        if (ab) {
+          const pdfDoc = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
+          pdfs[plan.id] = pdfDoc;
+          anyLoaded = true;
+        }
+      } catch(e) {}
+    }
+    document.getElementById('mainTabs').classList.add('show');
+    document.getElementById('planSwitchBtn').style.display = 'flex';
+    document.getElementById('scWelcome').classList.remove('on');
+
+    if (state.activePlanId && pdfs[state.activePlanId]) {
+      await activatePlan(state.activePlanId);
+    } else if (anyLoaded) {
+      const firstLoaded = state.plans.find(p => pdfs[p.id]);
+      if (firstLoaded) await activatePlan(firstLoaded.id);
+    } else {
+      // PDFs non disponibles en IndexedDB — afficher demande de rechargement
+      showReloadPrompt();
+      switchTab('scPlan');
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// PDF LOADING
+// ═══════════════════════════════════════════════════════
+function triggerPDF() { document.getElementById('pdfInput').click(); }
+
+async function loadPDFs(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  setProgress(5);
+  let loaded = 0;
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    try {
+      setProgress(5 + (i / files.length) * 85);
+      const ab = await file.arrayBuffer();
+      const pdfDoc = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
+      const planName = file.name.replace(/\.pdf$/i, '');
+      let plan = state.plans.find(p => p.name === planName);
+      if (!plan) {
+        plan = { id: 'p_' + Date.now() + '_' + i, name: planName, pages: pdfDoc.numPages };
+        state.plans.push(plan);
+      } else {
+        plan.pages = pdfDoc.numPages;
+      }
+      pdfs[plan.id] = pdfDoc;
+      // Sauvegarder le binaire dans IndexedDB
+      await idbSet(plan.id, ab);
+      loaded++;
+    } catch(err) { console.error(err); toast('Erreur: ' + file.name, 'err'); }
+  }
+  setProgress(100);
+  save();
+  renderPlansList();
+  if (loaded > 0) {
+    // Activer le premier des plans nouvellement chargés
+    const newPlan = state.plans.find(p => pdfs[p.id]);
+    if (newPlan) await activatePlan(newPlan.id);
+  }
+  setTimeout(() => document.getElementById('progWrap').classList.remove('on'), 600);
+  e.target.value = '';
+  toast(`✓ ${loaded} plan(s) chargé(s) et sauvegardé(s)`, 'ok');
+}
+
+function setProgress(v) {
+  document.getElementById('progWrap').classList.add('on');
+  document.getElementById('progBar').style.width = v + '%';
+}
+
+async function activatePlan(planId) {
+  const plan = state.plans.find(p => p.id === planId);
+  if (!plan) return;
+
+  // Si PDF pas encore en mémoire, tenter de le charger depuis IndexedDB
+  if (!pdfs[planId]) {
+    try {
+      const ab = await idbGet(planId);
+      if (ab) pdfs[planId] = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
+    } catch(e) {}
+  }
+
+  state.activePlanId = planId;
+  activePdf = pdfs[planId] || null;
+  totalPages = plan.pages;
+  curPage = 1;
+  save();
+
+  document.getElementById('scWelcome').classList.remove('on');
+  document.getElementById('mainTabs').classList.add('show');
+  document.getElementById('planSwitchBtn').style.display = 'flex';
+  const shortName = plan.name.length > 14 ? plan.name.slice(0, 14) + '…' : plan.name;
+  document.getElementById('planSwitchBtn').textContent = shortName + ' ▾';
+
+  if (activePdf) {
+    await renderPage(curPage);
+    document.getElementById('pageNav').style.display = totalPages > 1 ? 'flex' : 'none';
+  } else {
+    showReloadPrompt();
+  }
+  // Forcer l'affichage de l'onglet plan
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('scPlan').classList.add('on');
+  document.querySelector('.tab[data-s="scPlan"]')?.classList.add('on');
+}
+
+function showReloadPrompt() {
+  const cv = document.getElementById('cv');
+  const wrap = document.getElementById('cvWrap');
+  const ww = Math.max(wrap.clientWidth, 300);
+  const wh = Math.max(wrap.clientHeight, 200);
+  cv.width = ww; cv.height = wh;
+  cv.style.width = ww + 'px'; cv.style.height = wh + 'px';
+  cv.style.transform = 'translate(0px,0px)';
+  document.getElementById('pinsLayer').style.transform = 'translate(0px,0px)';
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#1c1d20';
+  ctx.fillRect(0, 0, ww, wh);
+  ctx.fillStyle = '#f97316';
+  ctx.font = 'bold 16px IBM Plex Sans, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('📄 Rechargez le PDF', ww / 2, wh / 2 - 16);
+  ctx.fillStyle = '#7c7d8a';
+  ctx.font = '13px IBM Plex Sans, sans-serif';
+  ctx.fillText('Vos réserves sont sauvegardées', ww / 2, wh / 2 + 12);
+  ctx.fillText('Appuyez sur 📂 en haut à droite', ww / 2, wh / 2 + 34);
+  baseW = ww; baseH = wh; baseScale = 1; scale = 1;
+  panX = 0; panY = 0;
+  cv.dataset.bw = ww; cv.dataset.bh = wh;
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER PAGE
+// ═══════════════════════════════════════════════════════
+async function renderPage(num) {
+  if (!activePdf) return;
+  const page = await activePdf.getPage(num);
+
+  // Attendre que le wrapper ait une taille réelle
+  const wrap = document.getElementById('cvWrap');
+  let ww = wrap.clientWidth, wh = wrap.clientHeight;
+  if (ww < 10 || wh < 10) {
+    await new Promise(r => setTimeout(r, 80));
+    ww = wrap.clientWidth; wh = wrap.clientHeight;
+  }
+
+  const vp1 = page.getViewport({ scale: 1 });
+  baseScale = Math.min(ww / vp1.width, wh / vp1.height) * 0.96;
+  scale = baseScale;
+  baseW = vp1.width * baseScale;
+  baseH = vp1.height * baseScale;
+  panX = (ww - baseW) / 2;
+  panY = (wh - baseH) / 2;
+
+  const cv = document.getElementById('cv');
+  // Rendu haute résolution pour zoom sans flou
+  const HIRES = Math.min(Math.ceil(window.devicePixelRatio) * 2, 4);
+  cv.width = Math.round(vp1.width * HIRES);
+  cv.height = Math.round(vp1.height * HIRES);
+  cv.dataset.bw = baseW;
+  cv.dataset.bh = baseH;
+
+  const renderVP = page.getViewport({ scale: HIRES });
+  const ctx = cv.getContext('2d');
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  await page.render({ canvasContext: ctx, viewport: renderVP }).promise;
+
+  // Appliquer dimensions CSS et position APRÈS le rendu
+  cv.style.width = baseW + 'px';
+  cv.style.height = baseH + 'px';
+  cv.style.transform = `translate(${panX}px,${panY}px)`;
+  const layer = document.getElementById('pinsLayer');
+  layer.style.width = baseW + 'px';
+  layer.style.height = baseH + 'px';
+  layer.style.transform = `translate(${panX}px,${panY}px)`;
+
+  document.getElementById('pageInfo').textContent = `${num}/${totalPages}`;
+  renderPins();
+}
+
+// ═══════════════════════════════════════════════════════
+// TRANSFORM — RAF-based, fluide
+// ═══════════════════════════════════════════════════════
+let rafId = null;
+function applyT() {
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(() => {
+    const cv = document.getElementById('cv');
+    const layer = document.getElementById('pinsLayer');
+    const bw = parseFloat(cv.dataset.bw) || baseW;
+    const bh = parseFloat(cv.dataset.bh) || baseH;
+    const ratio = baseScale > 0 ? scale / baseScale : 1;
+    const cw = bw * ratio;
+    const ch = bh * ratio;
+    const t = `translate(${panX}px,${panY}px)`;
+    cv.style.width = cw + 'px';
+    cv.style.height = ch + 'px';
+    cv.style.transform = t;
+    layer.style.width = cw + 'px';
+    layer.style.height = ch + 'px';
+    layer.style.transform = t;
+    rafId = null;
+  });
+}
+
+function smartZoom(factor, cx, cy) {
+  const minS = baseScale * 0.4;
+  const maxS = baseScale * 28;
+  const ns = Math.min(Math.max(scale * factor, minS), maxS);
+  if (ns === scale) return;
+  const ratio = ns / scale;
+  scale = ns;
+  const wrap = document.getElementById('cvWrap');
+  const pcx = cx !== undefined ? cx : wrap.clientWidth / 2;
+  const pcy = cy !== undefined ? cy : wrap.clientHeight / 2;
+  panX = pcx - (pcx - panX) * ratio;
+  panY = pcy - (pcy - panY) * ratio;
+  applyT();
+  renderPins();
+}
+
+function zI() { smartZoom(1.3); }
+function zO() { smartZoom(0.77); }
+function zFit() {
+  scale = baseScale;
+  const wrap = document.getElementById('cvWrap');
+  panX = (wrap.clientWidth - baseW) / 2;
+  panY = (wrap.clientHeight - baseH) / 2;
+  applyT();
+  renderPins();
+}
+
+// ═══════════════════════════════════════════════════════
+// TOUCH / PAN / ZOOM — rewritten for stability
+// ═══════════════════════════════════════════════════════
+const cvWrap = document.getElementById('cvWrap');
+
+// Touch state
+let touches = {};
+let gestureStart = null;
+
+cvWrap.addEventListener('touchstart', e => {
+  e.preventDefault();
+  Array.from(e.changedTouches).forEach(t => { touches[t.identifier] = { x: t.clientX, y: t.clientY }; });
+  const ids = Object.keys(touches);
+  if (ids.length === 2) {
+    const t0 = touches[ids[0]], t1 = touches[ids[1]];
+    gestureStart = {
+      dist: Math.hypot(t1.x - t0.x, t1.y - t0.y),
+      cx: (t0.x + t1.x) / 2, cy: (t0.y + t1.y) / 2,
+      panX, panY, scale
+    };
+  }
+}, { passive: false });
+
+cvWrap.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const ids = Object.keys(touches);
+
+  if (ids.length === 1 && !pinMode) {
+    const t = e.changedTouches[0];
+    const prev = touches[t.identifier];
+    if (prev) {
+      panX += t.clientX - prev.x;
+      panY += t.clientY - prev.y;
+      applyT();
+    }
+    touches[t.identifier] = { x: t.clientX, y: t.clientY };
+    return;
+  }
+
+  if (ids.length === 2 && gestureStart) {
+    // Update both touch positions
+    Array.from(e.changedTouches).forEach(t => { if (touches[t.identifier]) touches[t.identifier] = { x: t.clientX, y: t.clientY }; });
+    const [id0, id1] = ids;
+    const t0 = touches[id0], t1 = touches[id1];
+    const newDist = Math.hypot(t1.x - t0.x, t1.y - t0.y);
+    const newCx = (t0.x + t1.x) / 2, newCy = (t0.y + t1.y) / 2;
+    const factor = newDist / gestureStart.dist;
+    const minS = baseScale * 0.4, maxS = baseScale * 28;
+    const ns = Math.min(Math.max(gestureStart.scale * factor, minS), maxS);
+    const ratio = ns / gestureStart.scale;
+    scale = ns;
+    const rect = cvWrap.getBoundingClientRect();
+    const pivX = gestureStart.cx - rect.left;
+    const pivY = gestureStart.cy - rect.top;
+    panX = pivX - (pivX - gestureStart.panX) * ratio + (newCx - gestureStart.cx);
+    panY = pivY - (pivY - gestureStart.panY) * ratio + (newCy - gestureStart.cy);
+    applyT();
+  }
+}, { passive: false });
+
+cvWrap.addEventListener('touchend', e => {
+  const changedIds = Array.from(e.changedTouches).map(t => t.identifier);
+  const wasSingle = Object.keys(touches).length === 1;
+  const t = e.changedTouches[0];
+  changedIds.forEach(id => delete touches[id]);
+  gestureStart = null;
+
+  // Pin tap — only on single touch, small movement
+  if (pinMode && wasSingle && activePdf) {
+    const prev = { x: t.clientX, y: t.clientY }; // approximate
+    const rect = cvWrap.getBoundingClientRect();
+    const cv = document.getElementById('cv');
+    const cw = parseFloat(cv.style.width);
+    const ch = parseFloat(cv.style.height);
+    const x = t.clientX - rect.left;
+    const y = t.clientY - rect.top;
+    pendingX = (x - panX) / cw;
+    pendingY = (y - panY) / ch;
+    if (pendingX >= 0 && pendingX <= 1 && pendingY >= 0 && pendingY <= 1) {
+      openReserveModal();
+    }
+  }
+}, { passive: false });
+
+// Mouse support
+let mouseDown = false, msx = 0, msy = 0;
+cvWrap.addEventListener('mousedown', e => {
+  if (pinMode) return;
+  mouseDown = true; msx = e.clientX - panX; msy = e.clientY - panY;
+  cvWrap.style.cursor = 'grabbing';
+});
+window.addEventListener('mousemove', e => {
+  if (!mouseDown) return;
+  panX = e.clientX - msx; panY = e.clientY - msy; applyT();
+});
+window.addEventListener('mouseup', () => { mouseDown = false; cvWrap.style.cursor = pinMode ? 'crosshair' : 'grab'; });
+cvWrap.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = cvWrap.getBoundingClientRect();
+  smartZoom(e.deltaY < 0 ? 1.12 : 0.89, e.clientX - rect.left, e.clientY - rect.top);
+}, { passive: false });
+cvWrap.addEventListener('click', e => {
+  if (!pinMode || !activePdf) return;
+  const rect = cvWrap.getBoundingClientRect();
+  const cv = document.getElementById('cv');
+  const cw = parseFloat(cv.style.width), ch = parseFloat(cv.style.height);
+  pendingX = (e.clientX - rect.left - panX) / cw;
+  pendingY = (e.clientY - rect.top - panY) / ch;
+  if (pendingX >= 0 && pendingX <= 1 && pendingY >= 0 && pendingY <= 1) openReserveModal();
+});
+
+// ═══════════════════════════════════════════════════════
+// PIN MODE
+// ═══════════════════════════════════════════════════════
+function togglePinMode() {
+  if (!activePdf && !state.plans.length) { toast('Chargez d\'abord un PDF', 'err'); return; }
+  pinMode = !pinMode;
+  document.getElementById('pinBtn').classList.toggle('pin-active', pinMode);
+  document.getElementById('pinBanner').classList.toggle('on', pinMode);
+  cvWrap.classList.toggle('pin-mode', pinMode);
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER PINS
+// ═══════════════════════════════════════════════════════
+function renderPins() {
+  const layer = document.getElementById('pinsLayer');
+  const cv = document.getElementById('cv');
+  const cw = parseFloat(cv.style.width || cv.dataset.bw || 100);
+  const ch = parseFloat(cv.style.height || cv.dataset.bh || 100);
+  layer.innerHTML = '';
+  layer.style.width = cw + 'px';
+  layer.style.height = ch + 'px';
+
+  state.reserves
+    .filter(r => r.planId === state.activePlanId && r.page === curPage &&
+      r.pinX !== null && (pinFilter === 'all' || r.cat === pinFilter))
+    .forEach(r => {
+      const el = document.createElement('div');
+      el.className = 'pin-m';
+      el.style.left = (r.pinX * cw) + 'px';
+      el.style.top = (r.pinY * ch) + 'px';
+      const color = CAT_COLOR[r.cat] || '#f97316';
+      el.innerHTML = `<div class="pin-drop" style="background:${color}"><span>${r.code}</span></div><div class="pin-lbl">${r.title}</div>`;
+      el.addEventListener('click', ev => { ev.stopPropagation(); openReserveModal(r.id); });
+      el.addEventListener('touchend', ev => { ev.stopPropagation(); if (!pinMode) openReserveModal(r.id); }, { passive: true });
+      layer.appendChild(el);
+    });
+}
+
+// ═══════════════════════════════════════════════════════
+// RESERVE MODAL
+// ═══════════════════════════════════════════════════════
+function openReserveModal(id = null) {
+  editId = id;
+  curPhoto = null;
+  curCat = 'SEC'; curStatus = 'todo';
+  resetPhotoArea();
+
+  if (id !== null) {
+    const r = state.reserves.find(x => x.id === id);
+    document.getElementById('mTitle').textContent = `Réserve ${r.code}`;
+    document.getElementById('mTitleInp').value = r.title;
+    document.getElementById('mDesc').value = r.desc || '';
+    document.getElementById('mLot').value = r.lot || '';
+    document.getElementById('mLoc').value = r.loc || '';
+    curCat = r.cat; curStatus = r.status;
+    curPhoto = r.photo || null;
+    if (r.photo) showPhoto(r.photo);
+  } else {
+    document.getElementById('mTitle').textContent = 'Nouvelle réserve';
+    document.getElementById('mTitleInp').value = '';
+    document.getElementById('mDesc').value = '';
+    document.getElementById('mLot').value = '';
+    document.getElementById('mLoc').value = '';
+  }
+  pickCat(curCat);
+  pickStatus(curStatus);
+  openOverlay('ovReserve');
+  setTimeout(() => document.getElementById('mTitleInp').focus(), 350);
+}
+
+function saveReserve() {
+  const title = document.getElementById('mTitleInp').value.trim();
+  if (!title) { toast('Titre requis', 'err'); return; }
+
+  if (editId !== null) {
+    const r = state.reserves.find(x => x.id === editId);
+    r.title = title;
+    r.desc = document.getElementById('mDesc').value.trim();
+    r.lot = document.getElementById('mLot').value.trim();
+    r.loc = document.getElementById('mLoc').value.trim();
+    r.cat = curCat; r.status = curStatus;
+    if (curPhoto) r.photo = curPhoto;
+    toast('Réserve modifiée ✓', 'ok');
+  } else {
+    state.counter[curCat] = (state.counter[curCat] || 0) + 1;
+    const num = String(state.counter[curCat]).padStart(3, '0');
+    const code = `${curCat}-${num}`;
+    const now = new Date();
+    const r = {
+      id: Date.now(),
+      code, cat: curCat, status: curStatus,
+      title,
+      desc: document.getElementById('mDesc').value.trim(),
+      lot: document.getElementById('mLot').value.trim(),
+      loc: document.getElementById('mLoc').value.trim(),
+      photo: curPhoto,
+      pinX: pendingX, pinY: pendingY,
+      planId: state.activePlanId,
+      planName: state.plans.find(p => p.id === state.activePlanId)?.name || '',
+      page: curPage,
+      date: now.toLocaleDateString('fr-FR'),
+      time: now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      ts: now.toISOString()
+    };
+    state.reserves.push(r);
+    toast(`📍 ${code} ajoutée`, 'ok');
+  }
+
+  closeOverlay('ovReserve');
+  save();
+  if (pinMode) togglePinMode();
+  pendingX = null; pendingY = null;
+  renderPins();
+  updateBadge();
+  updateStats();
+}
+
+// ═══════════════════════════════════════════════════════
+// FORM HELPERS
+// ═══════════════════════════════════════════════════════
+function pickCat(c) {
+  curCat = c;
+  document.querySelectorAll('.cp').forEach(el => el.classList.toggle('on', el.dataset.c === c));
+}
+function pickStatus(s) {
+  curStatus = s;
+  document.querySelectorAll('.stp').forEach(el => el.classList.toggle('on', el.dataset.s === s));
+}
+function triggerPhoto() { document.getElementById('photoFileInp')?.click(); }
+function handlePhoto(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => { curPhoto = ev.target.result; showPhoto(curPhoto); };
+  r.readAsDataURL(file);
+}
+function showPhoto(src) {
+  document.getElementById('photoArea').innerHTML = `<div class="photo-prev-wrap"><img class="photo-prev" src="${src}"><button class="photo-rem" onclick="removePhoto()">✕</button></div>`;
+}
+function removePhoto() { curPhoto = null; resetPhotoArea(); }
+function resetPhotoArea() {
+  document.getElementById('photoArea').innerHTML = `
+    <div class="photo-drop" onclick="triggerPhoto()">
+      <div class="photo-drop-ico">📷</div>
+      <div class="photo-drop-txt">Prendre une photo ou importer</div>
+      <input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// STATUS CHANGE
+// ═══════════════════════════════════════════════════════
+function openStatusModal(id) {
+  statusTarget = id;
+  openOverlay('ovStatus');
+}
+function applyStatus(s) {
+  if (!statusTarget) return;
+  const r = state.reserves.find(x => x.id === statusTarget);
+  if (r) { r.status = s; save(); renderReservesList(); updateStats(); toast('Statut mis à jour', 'ok'); }
+  closeOverlay('ovStatus');
+  statusTarget = null;
+}
+
+// ═══════════════════════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════════════════════
+function confirmDelete(id) {
+  deleteTarget = id;
+  const r = state.reserves.find(x => x.id === id);
+  document.getElementById('confirmTitle').textContent = 'Supprimer la réserve';
+  document.getElementById('confirmMsg').textContent = `Supprimer "${r.title}" (${r.code}) ? Cette action est irréversible.`;
+  document.getElementById('confirmOk').onclick = () => {
+    state.reserves = state.reserves.filter(x => x.id !== deleteTarget);
+    save(); renderReservesList(); renderPins(); updateBadge(); updateStats();
+    toast('Réserve supprimée', 'ok');
+    closeOverlay('ovConfirm');
+  };
+  openOverlay('ovConfirm');
+}
+
+// ═══════════════════════════════════════════════════════
+// RESERVES LIST
+// ═══════════════════════════════════════════════════════
+function renderReservesList() {
+  const list = document.getElementById('resList');
+  let filtered = state.reserves;
+  if (resFilter !== 'all') {
+    if (['todo','wip','done'].includes(resFilter)) filtered = filtered.filter(r => r.status === resFilter);
+    else filtered = filtered.filter(r => r.cat === resFilter);
+  }
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-ico">📋</div><div class="empty-ttl">Aucune réserve</div><div class="empty-sub">Chargez un plan et utilisez le mode 📍 Épingler pour ajouter des réserves.</div></div>`;
+    return;
+  }
+  const sMap = { todo:'status-todo', wip:'status-wip', done:'status-done' };
+  list.innerHTML = filtered.map(r => `
+    <div class="res-card" id="rc-${r.id}">
+      <div class="res-card-head">
+        <div class="res-num" style="background:${CAT_COLOR[r.cat]}">${r.code}</div>
+        <div class="res-info">
+          <div class="res-title">${r.title}</div>
+          <div class="res-meta">${r.planName || ''} · P${r.page} · ${r.date} ${r.time}${r.lot ? ' · ' + r.lot : ''}</div>
+        </div>
+        <div class="res-right">
+          <span class="status-pill ${sMap[r.status]}" onclick="openStatusModal(${r.id})">${STATUS_LABEL[r.status]}</span>
+          <div class="res-btns">
+            ${r.pinX !== null ? `<div class="ib" onclick="jumpTo(${r.id})" title="Localiser">🗺️</div>` : ''}
+            <div class="ib" onclick="openReserveModal(${r.id})" title="Modifier">✏️</div>
+            <div class="ib red" onclick="confirmDelete(${r.id})" title="Supprimer">🗑️</div>
+          </div>
+        </div>
+      </div>
+      ${r.desc || r.photo || r.loc ? `<div class="res-card-body">
+        ${r.loc ? `<div class="res-tags"><span class="res-tag">📍 ${r.loc}</span></div>` : ''}
+        ${r.desc ? `<div class="res-desc">${r.desc}</div>` : ''}
+        ${r.photo ? `<img class="res-photo" src="${r.photo}" onclick="openLb(${r.id})">` : ''}
+      </div>` : ''}
+    </div>`).join('');
+}
+
+function jumpTo(id) {
+  const r = state.reserves.find(x => x.id === id);
+  if (!r || r.pinX === null) { toast('Pas de position sur plan', 'err'); return; }
+  // Switch plan if needed
+  const doJump = () => {
+    const cv = document.getElementById('cv');
+    const bw = parseFloat(cv.dataset.bw || baseW);
+    const bh = parseFloat(cv.dataset.bh || baseH);
+    const cw = bw * (scale / baseScale), ch = bh * (scale / baseScale);
+    const wrap = document.getElementById('cvWrap');
+    panX = wrap.clientWidth / 2 - r.pinX * cw;
+    panY = wrap.clientHeight / 2 - r.pinY * ch;
+    applyT(); renderPins();
+    toast(`📍 ${r.code} localisée`, 'ok');
+  };
+  if (r.planId !== state.activePlanId) {
+    if (pdfs[r.planId]) {
+      activatePlan(r.planId).then(() => {
+        if (r.page !== curPage) { curPage = r.page; renderPage(curPage).then(doJump); } else doJump();
+      });
+    } else { toast('Rechargez le PDF de ce plan', 'err'); return; }
+  } else {
+    if (r.page !== curPage) { curPage = r.page; renderPage(curPage).then(doJump); } else doJump();
+  }
+  switchTab('scPlan');
+}
+
+function filterPins(el, f) {
+  pinFilter = f;
+  document.querySelectorAll('#planBar .chip[data-f]').forEach(c => c.classList.toggle('on', c.dataset.f === f));
+  renderPins();
+}
+function filterRes(el, f) {
+  resFilter = f;
+  document.querySelectorAll('#resBar .chip[data-f]').forEach(c => c.classList.toggle('on', c.dataset.f === f));
+  renderReservesList();
+}
+
+// ═══════════════════════════════════════════════════════
+// PLANS LIST
+// ═══════════════════════════════════════════════════════
+function renderPlansList() {
+  const list = document.getElementById('plansList');
+  if (!state.plans.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-ico">📂</div><div class="empty-ttl">Aucun plan</div><div class="empty-sub">Chargez vos plans PDF pour commencer.</div></div>
+      <button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un plan PDF</button>`;
+    return;
+  }
+  const reserveCount = id => state.reserves.filter(r => r.planId === id).length;
+  list.innerHTML = state.plans.map(p => `
+    <div class="plan-card ${p.id === state.activePlanId ? 'active-plan' : ''}" onclick="selectPlanFromList('${p.id}')">
+      <div class="plan-icon">${pdfs[p.id] ? '🗺️' : '📄'}</div>
+      <div class="plan-info">
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-meta">${p.pages} page(s) · ${reserveCount(p.id)} réserve(s)${!pdfs[p.id] ? ' · ⚠️ PDF non chargé' : ''}</div>
+      </div>
+      <div class="plan-actions">
+        <div class="ib red" onclick="deletePlan(event,'${p.id}')">🗑️</div>
+      </div>
+    </div>`).join('') +
+    `<button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un plan PDF</button>`;
+}
+
+async function selectPlanFromList(id) {
+  if (!pdfs[id]) { toast('PDF non chargé — rechargez le fichier', 'err'); return; }
+  await activatePlan(id);
+  renderPlansList();
+}
+
+function deletePlan(e, id) {
+  e.stopPropagation();
+  const plan = state.plans.find(p => p.id === id);
+  const resCount = state.reserves.filter(r => r.planId === id).length;
+  if (!confirm(`Supprimer le plan "${plan.name}"${resCount ? ` et ses ${resCount} réserve(s)` : ''} ?`)) return;
+  state.plans = state.plans.filter(p => p.id !== id);
+  state.reserves = state.reserves.filter(r => r.planId !== id);
+  delete pdfs[id];
+  idbDel(id).catch(() => {});
+  if (state.activePlanId === id) {
+    state.activePlanId = state.plans[0]?.id || null;
+    if (state.activePlanId) activatePlan(state.activePlanId);
+    else { document.getElementById('mainTabs').classList.remove('show'); document.getElementById('scWelcome').classList.add('on'); }
+  }
+  save(); renderPlansList(); updateBadge(); updateStats();
+  toast('Plan supprimé', 'ok');
+}
+
+// ═══════════════════════════════════════════════════════
+// PLAN SELECTOR (header button)
+// ═══════════════════════════════════════════════════════
+function openPlanSel() {
+  const list = document.getElementById('planSelList');
+  list.innerHTML = state.plans.map(p => `
+    <div class="plan-sel-item ${p.id === state.activePlanId ? 'on' : ''}" onclick="selPlan('${p.id}')">
+      <div class="plan-sel-check">${p.id === state.activePlanId ? '✓' : ''}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+        <div style="font-size:11px;color:var(--text2)">${p.pages}p · ${state.reserves.filter(r=>r.planId===p.id).length} rés.${!pdfs[p.id]?' · ⚠️ non chargé':''}</div>
+      </div>
+    </div>`).join('') +
+    `<div style="padding-top:10px"><button class="btn btn-sec btn-sm" style="width:100%" onclick="closeOverlay('ovPlanSel');triggerPDF()">+ Ajouter un PDF</button></div>`;
+  openOverlay('ovPlanSel');
+}
+async function selPlan(id) {
+  closeOverlay('ovPlanSel');
+  if (!pdfs[id]) { toast('PDF non chargé — rechargez le fichier', 'err'); return; }
+  await activatePlan(id);
+  renderPlansList();
+}
+
+// ═══════════════════════════════════════════════════════
+// PAGE NAV
+// ═══════════════════════════════════════════════════════
+async function goPage(d) {
+  const np = curPage + d;
+  if (np < 1 || np > totalPages) return;
+  curPage = np;
+  await renderPage(curPage);
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+function openOverlay(id) {
+  if (id === 'ovSettings') {
+    document.getElementById('sChantier').value = state.settings.chantier;
+    document.getElementById('sConducteur').value = state.settings.conducteur;
+    document.getElementById('sEntreprise').value = state.settings.entreprise;
+  }
+  document.getElementById(id).classList.add('on');
+}
+function closeOverlay(id) { document.getElementById(id).classList.remove('on'); }
+function saveSettings() {
+  state.settings.chantier = document.getElementById('sChantier').value.trim();
+  state.settings.conducteur = document.getElementById('sConducteur').value.trim();
+  state.settings.entreprise = document.getElementById('sEntreprise').value.trim();
+  save(); updateSettingVal(); closeOverlay('ovSettings');
+  toast('Paramètres sauvegardés', 'ok');
+}
+function updateSettingVal() {
+  const v = state.settings.chantier || state.settings.conducteur || 'Configurer le nom, conducteur...';
+  document.getElementById('wlcSettingVal').textContent = v;
+}
+
+// ═══════════════════════════════════════════════════════
+// STATS & BADGE
+// ═══════════════════════════════════════════════════════
+function updateBadge() {
+  const n = state.reserves.length;
+  const b = document.getElementById('resBadge');
+  b.textContent = n; b.style.display = n ? 'inline' : 'none';
+}
+function updateStats() {
+  const r = state.reserves;
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-box"><div class="stat-n" style="color:var(--accent)">${r.length}</div><div class="stat-l">Total</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.cat==='SEC').length}</div><div class="stat-l">Sécurité</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--purple)">${r.filter(x=>x.cat==='FIN').length}</div><div class="stat-l">Finition</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.cat==='NC').length}</div><div class="stat-l">Non-conf.</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.status==='todo').length}</div><div class="stat-l">À faire</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.status==='done').length}</div><div class="stat-l">Levées</div></div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT EXCEL
+// ═══════════════════════════════════════════════════════
+function exportXLSX() {
+  if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
+  const wb = XLSX.utils.book_new();
+  // Main sheet
+  const hdr = ['Code','Titre','Catégorie','Statut','Description','Lot','Localisation','Plan','Page','Date','Heure'];
+  const rows = state.reserves.map(r => [
+    r.code, r.title, CAT_LABEL[r.cat] || r.cat, STATUS_LABEL[r.status],
+    r.desc || '', r.lot || '', r.loc || '', r.planName || '', r.page, r.date, r.time
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([hdr, ...rows]);
+  ws['!cols'] = [10,35,15,12,45,20,20,25,6,12,8].map(w => ({ wch: w }));
+  // Color header row
+  if (!ws['!rows']) ws['!rows'] = [];
+  XLSX.utils.book_append_sheet(wb, ws, 'Réserves');
+
+  // Summary per category
+  const cats = ['SEC','FIN','NC','QUA','AVA'];
+  const sumHdr = ['Catégorie','Total','À faire','En cours','Levées'];
+  const sumRows = cats.map(c => {
+    const rs = state.reserves.filter(r => r.cat === c);
+    return [CAT_LABEL[c], rs.length, rs.filter(r=>r.status==='todo').length, rs.filter(r=>r.status==='wip').length, rs.filter(r=>r.status==='done').length];
+  });
+  const wsSum = XLSX.utils.aoa_to_sheet([sumHdr, ...sumRows]);
+  wsSum['!cols'] = [18,8,10,12,10].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, wsSum, 'Récapitulatif');
+
+  const date = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `reserves-chantier-${date}.xlsx`);
+  toast('Excel exporté 📊', 'ok');
+}
+
+function exportCSV() {
+  if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
+  const esc = v => `"${String(v || '').replace(/"/g,'""')}"`;
+  const hdr = ['Code','Titre','Catégorie','Statut','Description','Lot','Localisation','Plan','Page','Date','Heure'].map(esc).join(',');
+  const rows = state.reserves.map(r =>
+    [r.code,r.title,CAT_LABEL[r.cat],STATUS_LABEL[r.status],r.desc||'',r.lot||'',r.loc||'',r.planName||'',r.page,r.date,r.time].map(esc).join(',')
+  );
+  const blob = new Blob([[hdr,...rows].join('\n')], { type:'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `reserves-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('CSV exporté', 'ok');
+}
+
+// ═══════════════════════════════════════════════════════
+// RAPPORT HTML (ouvre dans nouvel onglet → imprimer en PDF)
+// ═══════════════════════════════════════════════════════
+function exportReport(mode) {
+  let reserves = state.reserves;
+  if (mode === 'today') {
+    const today = new Date().toLocaleDateString('fr-FR');
+    reserves = reserves.filter(r => r.date === today);
+  }
+  if (!reserves.length) { toast('Aucune réserve à exporter', 'err'); return; }
+
+  const s = state.settings;
+  const date = new Date().toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const sMap = { todo:'#ef4444', wip:'#eab308', done:'#22c55e' };
+  const cMap = CAT_COLOR;
+
+  const cards = reserves.map(r => `
+    <div style="page-break-inside:avoid;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:14px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f9fafb;border-bottom:1px solid #e5e7eb">
+        <div style="background:${cMap[r.cat]};color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;font-family:monospace">${r.code}</div>
+        <div style="flex:1;font-size:14px;font-weight:600;color:#111">${r.title}</div>
+        <div style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid ${sMap[r.status]};color:${sMap[r.status]}">${STATUS_LABEL[r.status]}</div>
+      </div>
+      <div style="padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:12px;color:#374151">
+        ${r.desc ? `<div style="grid-column:1/-1"><strong>Description :</strong> ${r.desc}</div>` : ''}
+        ${r.lot ? `<div><strong>Lot :</strong> ${r.lot}</div>` : ''}
+        ${r.loc ? `<div><strong>Localisation :</strong> ${r.loc}</div>` : ''}
+        <div><strong>Plan :</strong> ${r.planName || '-'} — Page ${r.page}</div>
+        <div><strong>Date :</strong> ${r.date} à ${r.time}</div>
+      </div>
+      ${r.photo ? `<div style="padding:0 14px 12px"><img src="${r.photo}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px"></div>` : ''}
+    </div>`).join('');
+
+  const catSummary = ['SEC','FIN','NC','QUA','AVA'].map(c => {
+    const n = reserves.filter(r => r.cat === c).length;
+    if (!n) return '';
+    return `<span style="display:inline-flex;align-items:center;gap:5px;background:${cMap[c]}22;color:${cMap[c]};border:1px solid ${cMap[c]}44;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin:3px">● ${CAT_LABEL[c]} : ${n}</span>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport de chantier</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;background:#fff;padding:24px;max-width:800px;margin:0 auto}
+  @media print{body{padding:0}@page{margin:18mm}}</style></head><body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #f97316">
+    <div>
+      <div style="font-size:22px;font-weight:800;color:#111">${s.chantier || 'Rapport de chantier'}</div>
+      ${s.conducteur ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">Conducteur : <strong>${s.conducteur}</strong>${s.entreprise ? ' — ' + s.entreprise : ''}</div>` : ''}
+      <div style="font-size:12px;color:#9ca3af;margin-top:4px">${date}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:28px;font-weight:800;color:#f97316">${reserves.length}</div>
+      <div style="font-size:11px;color:#6b7280">${mode === 'today' ? 'réserves du jour' : 'réserves total'}</div>
+    </div>
+  </div>
+  <div style="margin-bottom:18px;display:flex;flex-wrap:wrap;gap:4px">${catSummary}</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px">
+    <div style="background:#fef2f2;border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#ef4444">${reserves.filter(r=>r.status==='todo').length}</div><div style="font-size:11px;color:#6b7280">À faire</div></div>
+    <div style="background:#fefce8;border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#ca8a04">${reserves.filter(r=>r.status==='wip').length}</div><div style="font-size:11px;color:#6b7280">En cours</div></div>
+    <div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#16a34a">${reserves.filter(r=>r.status==='done').length}</div><div style="font-size:11px;color:#6b7280">Levées</div></div>
+  </div>
+  <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Détail des réserves</div>
+  ${cards}
+  <div style="margin-top:24px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center">
+    Rapport généré le ${date} via ChantierView
+  </div>
+  </body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => { w.focus(); w.print(); }, 600);
+  toast('Rapport ouvert — imprimer en PDF 🖨️', 'info');
+}
+
+// ═══════════════════════════════════════════════════════
+// JSON BACKUP
+// ═══════════════════════════════════════════════════════
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `chantier-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('Sauvegarde exportée 💾', 'ok');
+}
+function importJSON(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.reserves && data.plans) {
+        state = data;
+        save();
+        renderPlansList(); renderReservesList(); updateBadge(); updateStats(); updateSettingVal();
+        toast(`✓ ${state.reserves.length} réserve(s) importées`, 'ok');
+        if (state.plans.length) {
+          document.getElementById('mainTabs').classList.add('show');
+          document.getElementById('scWelcome').classList.remove('on');
+          document.getElementById('scPlan').classList.add('on');
+          document.getElementById('planSwitchBtn').style.display = 'flex';
+          showEmptyPlan();
+          switchTab('scPlan');
+        }
+      } else { toast('Fichier invalide', 'err'); }
+    } catch { toast('Erreur de lecture', 'err'); }
+  };
+  r.readAsText(file);
+  e.target.value = '';
+}
+
+// ═══════════════════════════════════════════════════════
+// CLEAR ALL
+// ═══════════════════════════════════════════════════════
+function confirmClear() {
+  if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
+  document.getElementById('confirmTitle').textContent = 'Tout effacer';
+  document.getElementById('confirmMsg').textContent = `Supprimer les ${state.reserves.length} réserve(s) ? Cette action est irréversible.`;
+  document.getElementById('confirmOk').onclick = () => {
+    state.reserves = []; state.counter = { SEC:0,FIN:0,NC:0,QUA:0,AVA:0 };
+    save(); renderReservesList(); renderPins(); updateBadge(); updateStats();
+    toast('Tout effacé', 'ok');
+    closeOverlay('ovConfirm');
+  };
+  openOverlay('ovConfirm');
+}
+
+// ═══════════════════════════════════════════════════════
+// LIGHTBOX
+// ═══════════════════════════════════════════════════════
+function openLb(id) {
+  const r = state.reserves.find(x => x.id === id);
+  if (!r?.photo) return;
+  document.getElementById('lbImg').src = r.photo;
+  document.getElementById('lightbox').classList.add('on');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('on'); }
+
+// ═══════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════
+function switchTab(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.querySelector(`.tab[data-s="${id}"]`)?.classList.add('on');
+  if (id === 'scReserves') renderReservesList();
+  if (id === 'scPlans') renderPlansList();
+  if (id === 'scExport') updateStats();
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+let toastT;
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast on ' + type;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('on'), 2800);
+}
+
+// ═══════════════════════════════════════════════════════
+// CLOSE OVERLAY ON BACKDROP CLICK
+// ═══════════════════════════════════════════════════════
+document.querySelectorAll('.overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) closeOverlay(ov.id); });
+});
+
+// ═══════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>

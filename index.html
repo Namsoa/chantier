@@ -431,7 +431,7 @@ header{
       <div class="wlc-setting-arr">›</div>
     </div>
   </div>
-  <div style="font-size:11px;color:var(--text3);text-align:center">Vos données sont sauvegardées automatiquement sur cet appareil</div>
+  <div style="font-size:11px;color:var(--text3);text-align:center">Base de données en ligne synchronisée</div>
 </div>
 
 <div class="screen" id="scPlan">
@@ -542,8 +542,8 @@ header{
     <div class="exp-card" onclick="confirmClear()">
       <div class="exp-ico">🗑️</div>
       <div class="exp-info">
-        <div class="exp-title" style="color:var(--red)">Tout effacer</div>
-        <div class="exp-desc">Supprimer toutes les réserves</div>
+        <div class="exp-title" style="color:var(--red)">Tout effacer (Cloud)</div>
+        <div class="exp-desc">Supprimer toutes les réserves de la base</div>
       </div>
       <div class="exp-arr">›</div>
     </div>
@@ -556,6 +556,10 @@ header{
 // ═══════════════════════════════════════════════════════
 // Worker CDN — nécessite internet (Chrome/Safari avec accès web)
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// SUPABASE CONFIG
+const supabaseUrl = 'https://brdhlqqfhwjmnrbqemml.supabase.co';
+const supabaseKey = 'sb_publishable_RWcEYhkNNfffbFJs6qJgfg_IcOs-apL';
 
 const CAT_COLOR = { SEC:'#ef4444', FIN:'#a855f7', NC:'#eab308', QUA:'#3b82f6', AVA:'#22c55e' };
 const CAT_LABEL = { SEC:'Sécurité', FIN:'Finition', NC:'Non-conformité', QUA:'Qualité', AVA:'Avancement' };
@@ -573,7 +577,7 @@ let state = {
 };
 
 // PDF runtime (not persisted)
-let pdfs = {};            // planId -> pdfDoc
+let pdfs = {};             // planId -> pdfDoc
 let activePdf = null;
 let curPage = 1;
 let totalPages = 1;
@@ -588,6 +592,60 @@ let curPhoto = null;
 let pinFilter = 'all', resFilter = 'all';
 let statusTarget = null;
 let deleteTarget = null;
+
+// ═══════════════════════════════════════════════════════
+// SUPABASE SYNCHRONIZATION
+// ═══════════════════════════════════════════════════════
+
+async function uploadPhoto(base64Str) {
+  try {
+    const res = await fetch(base64Str);
+    const blob = await res.blob();
+    const nomFichier = `photo_${Date.now()}_${Math.floor(Math.random()*1000)}.jpg`;
+    const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/photos/${nomFichier}`, {
+      method: 'POST',
+      headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}`, 'Content-Type': 'image/jpeg' },
+      body: blob
+    });
+    if(uploadRes.ok) {
+       return `${supabaseUrl}/storage/v1/object/public/photos/${nomFichier}`;
+    }
+  } catch(e) { console.error("Erreur upload photo:", e); }
+  return base64Str; // fallback si échec
+}
+
+async function fetchReserves() {
+  try {
+    const res = await fetch(`${supabaseUrl}/rest/v1/reserves?select=*`, {
+      headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+    });
+    if(res.ok) {
+      const data = await res.json();
+      state.reserves = data.map(d => ({
+        id: d.id, code: d.code, cat: d.cat, status: d.status, title: d.title,
+        desc: d.description, lot: d.lot, loc: d.loc, photo: (d.photos && d.photos.length > 0) ? d.photos[0] : null,
+        pinX: d.pin_x, pinY: d.pin_y, planId: d.plan_id, planName: d.plan_name,
+        page: d.page, date: d.date, time: d.heure
+      }));
+      
+      // Update counters
+      state.counter = { SEC:0, FIN:0, NC:0, QUA:0, AVA:0 };
+      state.reserves.forEach(r => {
+         if(r.code && r.code.includes('-')) {
+            const num = parseInt(r.code.split('-')[1]);
+            if(num > (state.counter[r.cat] || 0)) state.counter[r.cat] = num;
+         }
+      });
+      
+      save(); // Save to localStorage as cache
+      renderReservesList(); renderPins(); updateBadge(); updateStats();
+    }
+  } catch(e) { 
+    console.error("Erreur de synchro distante:", e);
+    toast("Mode hors-ligne", "info");
+  }
+}
+
 
 // ═══════════════════════════════════════════════════════
 // INDEXEDDB — stockage des PDFs (binaire)
@@ -643,6 +701,10 @@ function loadState() {
 async function init() {
   await openDB();
   loadState();
+  
+  // Remplacer les réserves locales par celles de Supabase
+  await fetchReserves();
+  
   updateBadge();
   updateStats();
   updateSettingVal();
@@ -1079,51 +1141,81 @@ function openReserveModal(id = null) {
   setTimeout(() => document.getElementById('mTitleInp').focus(), 350);
 }
 
-function saveReserve() {
+async function saveReserve() {
   const title = document.getElementById('mTitleInp').value.trim();
   if (!title) { toast('Titre requis', 'err'); return; }
+  
+  toast('Synchronisation en cours...', 'info');
+
+  let rId = editId !== null ? editId : Date.now();
+  let code = '';
+  const now = new Date();
+  
+  let finalPinX = pendingX;
+  let finalPinY = pendingY;
+  let finalPlanId = state.activePlanId;
+  let finalPlanName = state.plans.find(p => p.id === state.activePlanId)?.name || '';
+  let finalPage = curPage;
 
   if (editId !== null) {
     const r = state.reserves.find(x => x.id === editId);
-    r.title = title;
-    r.desc = document.getElementById('mDesc').value.trim();
-    r.lot = document.getElementById('mLot').value.trim();
-    r.loc = document.getElementById('mLoc').value.trim();
-    r.cat = curCat; r.status = curStatus;
-    if (curPhoto) r.photo = curPhoto;
-    toast('Réserve modifiée ✓', 'ok');
+    code = r.code;
+    finalPinX = r.pinX;
+    finalPinY = r.pinY;
+    finalPlanId = r.planId;
+    finalPlanName = r.planName;
+    finalPage = r.page;
   } else {
     state.counter[curCat] = (state.counter[curCat] || 0) + 1;
     const num = String(state.counter[curCat]).padStart(3, '0');
-    const code = `${curCat}-${num}`;
-    const now = new Date();
-    const r = {
-      id: Date.now(),
-      code, cat: curCat, status: curStatus,
-      title,
-      desc: document.getElementById('mDesc').value.trim(),
-      lot: document.getElementById('mLot').value.trim(),
-      loc: document.getElementById('mLoc').value.trim(),
-      photo: curPhoto,
-      pinX: pendingX, pinY: pendingY,
-      planId: state.activePlanId,
-      planName: state.plans.find(p => p.id === state.activePlanId)?.name || '',
-      page: curPage,
-      date: now.toLocaleDateString('fr-FR'),
-      time: now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-      ts: now.toISOString()
-    };
-    state.reserves.push(r);
-    toast(`📍 ${code} ajoutée`, 'ok');
+    code = `${curCat}-${num}`;
   }
 
+  let finalPhoto = curPhoto;
+  if (finalPhoto && finalPhoto.startsWith('data:image')) {
+    finalPhoto = await uploadPhoto(finalPhoto);
+  }
+
+  const payload = {
+    id: rId,
+    code: code,
+    cat: curCat,
+    status: curStatus,
+    title: title,
+    description: document.getElementById('mDesc').value.trim(),
+    lot: document.getElementById('mLot').value.trim(),
+    loc: document.getElementById('mLoc').value.trim(),
+    photos: finalPhoto ? [finalPhoto] : [],
+    pin_x: finalPinX,
+    pin_y: finalPinY,
+    plan_id: finalPlanId,
+    plan_name: finalPlanName,
+    page: finalPage,
+    date: now.toLocaleDateString('fr-FR'),
+    heure: now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  };
+
+  try {
+    await fetch(`${supabaseUrl}/rest/v1/reserves`, {
+      method: 'POST',
+      headers: { 
+        'apikey': supabaseKey, 
+        'Authorization': `Bearer ${supabaseKey}`, 
+        'Content-Type': 'application/json', 
+        'Prefer': 'resolution=merge-duplicates' 
+      },
+      body: JSON.stringify(payload)
+    });
+  } catch(e) { 
+    console.error("Erreur de sauvegarde:", e); 
+  }
+
+  await fetchReserves(); // Récupère les données à jour
+  
   closeOverlay('ovReserve');
-  save();
   if (pinMode) togglePinMode();
   pendingX = null; pendingY = null;
-  renderPins();
-  updateBadge();
-  updateStats();
+  toast(`📍 ${code} enregistrée et synchronisée`, 'ok');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1164,10 +1256,22 @@ function openStatusModal(id) {
   statusTarget = id;
   openOverlay('ovStatus');
 }
-function applyStatus(s) {
+async function applyStatus(s) {
   if (!statusTarget) return;
-  const r = state.reserves.find(x => x.id === statusTarget);
-  if (r) { r.status = s; save(); renderReservesList(); updateStats(); toast('Statut mis à jour', 'ok'); }
+  
+  toast('Mise à jour...', 'info');
+  try {
+    await fetch(`${supabaseUrl}/rest/v1/reserves?id=eq.${statusTarget}`, {
+      method: 'PATCH',
+      headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: s })
+    });
+    await fetchReserves();
+    toast('Statut mis à jour', 'ok');
+  } catch (e) {
+    console.error(e);
+  }
+  
   closeOverlay('ovStatus');
   statusTarget = null;
 }
@@ -1179,11 +1283,19 @@ function confirmDelete(id) {
   deleteTarget = id;
   const r = state.reserves.find(x => x.id === id);
   document.getElementById('confirmTitle').textContent = 'Supprimer la réserve';
-  document.getElementById('confirmMsg').textContent = `Supprimer "${r.title}" (${r.code}) ? Cette action est irréversible.`;
-  document.getElementById('confirmOk').onclick = () => {
-    state.reserves = state.reserves.filter(x => x.id !== deleteTarget);
-    save(); renderReservesList(); renderPins(); updateBadge(); updateStats();
-    toast('Réserve supprimée', 'ok');
+  document.getElementById('confirmMsg').textContent = `Supprimer "${r.title}" (${r.code}) ? Cette action est irréversible et supprimera l'élément pour tous les utilisateurs.`;
+  document.getElementById('confirmOk').onclick = async () => {
+    toast('Suppression...', 'info');
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/reserves?id=eq.${deleteTarget}`, {
+        method: 'DELETE',
+        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+      });
+      await fetchReserves();
+      toast('Réserve supprimée', 'ok');
+    } catch (e) {
+      console.error(e);
+    }
     closeOverlay('ovConfirm');
   };
   openOverlay('ovConfirm');
@@ -1302,9 +1414,8 @@ function deletePlan(e, id) {
   e.stopPropagation();
   const plan = state.plans.find(p => p.id === id);
   const resCount = state.reserves.filter(r => r.planId === id).length;
-  if (!confirm(`Supprimer le plan "${plan.name}"${resCount ? ` et ses ${resCount} réserve(s)` : ''} ?`)) return;
+  if (!confirm(`Supprimer le plan "${plan.name}" localement ? (Les réserves resteront en ligne)`)) return;
   state.plans = state.plans.filter(p => p.id !== id);
-  state.reserves = state.reserves.filter(r => r.planId !== id);
   delete pdfs[id];
   idbDel(id).catch(() => {});
   if (state.activePlanId === id) {
@@ -1541,7 +1652,6 @@ function importJSON(e) {
           document.getElementById('scWelcome').classList.remove('on');
           document.getElementById('scPlan').classList.add('on');
           document.getElementById('planSwitchBtn').style.display = 'flex';
-          showEmptyPlan();
           switchTab('scPlan');
         }
       } else { toast('Fichier invalide', 'err'); }
@@ -1557,11 +1667,19 @@ function importJSON(e) {
 function confirmClear() {
   if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
   document.getElementById('confirmTitle').textContent = 'Tout effacer';
-  document.getElementById('confirmMsg').textContent = `Supprimer les ${state.reserves.length} réserve(s) ? Cette action est irréversible.`;
-  document.getElementById('confirmOk').onclick = () => {
-    state.reserves = []; state.counter = { SEC:0,FIN:0,NC:0,QUA:0,AVA:0 };
-    save(); renderReservesList(); renderPins(); updateBadge(); updateStats();
-    toast('Tout effacé', 'ok');
+  document.getElementById('confirmMsg').textContent = `Supprimer les ${state.reserves.length} réserve(s) ? Cette action est irréversible et effacera la base de données de tous les appareils.`;
+  document.getElementById('confirmOk').onclick = async () => {
+    toast('Nettoyage en cours...', 'info');
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/reserves?id=not.is.null`, {
+        method: 'DELETE',
+        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+      });
+      await fetchReserves();
+      toast('Tout a été effacé', 'ok');
+    } catch (e) {
+      console.error(e);
+    }
     closeOverlay('ovConfirm');
   };
   openOverlay('ovConfirm');

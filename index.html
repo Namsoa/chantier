@@ -539,6 +539,151 @@ header{
   </div>
 </div>
 
+
+// ═══════════════════════════════════════════════════════
+// SUPABASE SYNC — temps réel entre appareils
+// ═══════════════════════════════════════════════════════
+const SB_URL = 'https://brdhlqqfhwjmnrbqemml.supabase.co';
+const SB_KEY = 'sb_publishable_RWcEYhkNNfffbFJs6qJgfg_IcOs-apL';
+
+async function sbFetch(path, options = {}) {
+  const res = await fetch(SB_URL + '/rest/v1/' + path, {
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || 'return=representation',
+    },
+    ...options
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error('Supabase: ' + err);
+  }
+  return options.method === 'DELETE' ? null : res.json();
+}
+
+// Charge toutes les réserves depuis Supabase
+async function sbLoadReserves() {
+  try {
+    const rows = await sbFetch('reserves?order=ts.asc');
+    return rows.map(r => ({
+      id: r.id,
+      code: r.code,
+      cat: r.cat,
+      status: r.status,
+      title: r.title,
+      desc: r.description || '',
+      lot: r.lot || '',
+      loc: r.loc || '',
+      photos: [], // photos chargées depuis IndexedDB ensuite
+      pinX: r.pin_x,
+      pinY: r.pin_y,
+      planId: r.plan_id,
+      planName: r.plan_name || '',
+      page: r.page || 1,
+      date: r.date || '',
+      time: r.heure || '',
+      ts: r.ts
+    }));
+  } catch(e) {
+    console.warn('Sync impossible (hors ligne ?)', e);
+    return null;
+  }
+}
+
+// Pousse une réserve vers Supabase (upsert)
+async function sbSaveReserve(r) {
+  try {
+    await sbFetch('reserves', {
+      method: 'POST',
+      prefer: 'resolution=merge-duplicates,return=minimal',
+      body: JSON.stringify({
+        id: r.id,
+        code: r.code,
+        cat: r.cat,
+        status: r.status,
+        title: r.title,
+        description: r.desc || '',
+        lot: r.lot || '',
+        loc: r.loc || '',
+        pin_x: r.pinX,
+        pin_y: r.pinY,
+        plan_id: r.planId,
+        plan_name: r.planName || '',
+        page: r.page || 1,
+        date: r.date || '',
+        heure: r.time || '',
+      })
+    });
+  } catch(e) { console.warn('Erreur sync réserve:', e); }
+}
+
+// Supprime une réserve de Supabase
+async function sbDeleteReserve(id) {
+  try {
+    await sbFetch('reserves?id=eq.' + id, { method: 'DELETE', prefer: 'return=minimal' });
+  } catch(e) { console.warn('Erreur suppression sync:', e); }
+}
+
+// Charge les photos locales depuis IndexedDB et les réattache aux réserves
+async function reattachPhotos(reserves) {
+  for (const r of reserves) {
+    try {
+      const photos = await idbGet('photos_' + r.id);
+      if (photos) r.photos = photos;
+    } catch(e) {}
+  }
+  return reserves;
+}
+
+// Sauvegarde les photos d'une réserve en IndexedDB
+async function savePhotosLocally(reserveId, photos) {
+  if (photos && photos.length > 0) {
+    await idbSet('photos_' + reserveId, photos);
+  }
+}
+
+// Sync complète : charge depuis Supabase + réattache photos locales
+async function syncFromSupabase() {
+  const remote = await sbLoadReserves();
+  if (!remote) return; // hors ligne, on garde le local
+  
+  // Récupérer les photos locales pour chaque réserve remote
+  await reattachPhotos(remote);
+  
+  // Mettre à jour state avec les données remote
+  // Conserver les photos locales des réserves qui existent déjà
+  const localPhotosMap = {};
+  state.reserves.forEach(r => { if (r.photos && r.photos.length) localPhotosMap[r.id] = r.photos; });
+  
+  remote.forEach(r => {
+    if (!r.photos.length && localPhotosMap[r.id]) r.photos = localPhotosMap[r.id];
+  });
+  
+  state.reserves = remote;
+  
+  // Recalculer les compteurs
+  state.counter = { SEC:0, FIN:0, NC:0, QUA:0, AVA:0 };
+  state.reserves.forEach(r => {
+    const num = parseInt((r.code.split('-')[1] || '0'));
+    if (!isNaN(num)) state.counter[r.cat] = Math.max(state.counter[r.cat] || 0, num);
+  });
+  
+  await idbSet('app_state', state);
+  updateBadge();
+  updateStats();
+  renderReservesList();
+  renderPins();
+}
+
+// Sync automatique quand on revient sur l'app
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) syncFromSupabase();
+});
+window.addEventListener('focus', () => syncFromSupabase());
+
+
 <script>
 // ═══════════════════════════════════════════════════════
 // CONFIG
@@ -577,6 +722,7 @@ let curPhotos = [];
 
 let pinFilter = 'all', resFilter = 'all';
 let statusTarget = null;
+let lastSavedReserve = null;
 let deleteTarget = null;
 let planThumbs = {};
 
@@ -621,11 +767,18 @@ function idbDel(key) {
 // ═══════════════════════════════════════════════════════
 // PERSIST & INIT
 // ═══════════════════════════════════════════════════════
-function save() {
-  // Sauvegarde tout l'état dans IndexedDB sans limite de stockage
+function save(reserveToSync = null) {
+  // Sauvegarde en local
   idbSet('app_state', state).catch(e => console.error("Erreur de sauvegarde IndexedDB:", e));
-  // Nettoyage de l'ancien localStorage bugué pour gagner de la place
   try { localStorage.removeItem('cv_state'); } catch(e) {}
+  // Sync Supabase en arrière-plan
+  if (reserveToSync) {
+    sbSaveReserve(reserveToSync);
+    // Sauvegarde photos localement
+    if (reserveToSync.photos && reserveToSync.photos.length) {
+      savePhotosLocally(reserveToSync.id, reserveToSync.photos);
+    }
+  }
 }
 
 async function init() {
@@ -654,6 +807,24 @@ async function init() {
     }
   });
 
+  // Sync depuis Supabase au démarrage
+  toast('🔄 Synchronisation...', 'info');
+  await syncFromSupabase();
+
+  // ── SEED : pré-charger les réserves si Supabase vide ──
+  if (state.reserves.length === 0) {
+    const SEED = [{"id": 1700000000000, "code": "FIN-002", "cat": "FIN", "status": "todo", "title": "Logement 1112", "desc": "Il y a un gros trou dans la pièce derrière le plafond", "lot": "", "loc": "Logement 1112", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000001, "code": "QUA-001", "cat": "SEC", "status": "todo", "title": "Logement 1113", "desc": "Plusieurs tubes de garde corps à couper dans la pièce", "lot": "", "loc": "Logement 1113", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000002, "code": "QUA-002", "cat": "QUA", "status": "todo", "title": "Couloir 1113 et 12", "desc": "Nettoyage et couper la ferraille", "lot": "", "loc": "Couloir 1113 et 12", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000003, "code": "QUA-003", "cat": "QUA", "status": "todo", "title": "Bât 1 - 1112", "desc": "Nettoyage huisserie", "lot": "", "loc": "Bât 1 - 1112", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000004, "code": "SEC-003", "cat": "SEC", "status": "todo", "title": "Bât 1 - Logement 1111", "desc": "Il manque des finitions mur dans la pièce", "lot": "", "loc": "Bât 1 - Log. 1111", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000005, "code": "QUA-004", "cat": "QUA", "status": "todo", "title": "Logement 1111", "desc": "Il faudra nettoyer la pièce", "lot": "", "loc": "Logement 1111", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000006, "code": "FIN-003", "cat": "FIN", "status": "todo", "title": "Logement 1104", "desc": "Il manque de bout de mur en finition", "lot": "", "loc": "Logement 1104", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000007, "code": "FIN-004", "cat": "FIN", "status": "todo", "title": "Logement 1104", "desc": "Finition mur", "lot": "", "loc": "Logement 1104", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000008, "code": "FIN-005", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition poutre", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000009, "code": "FIN-006", "cat": "FIN", "status": "todo", "title": "Bât 1 - Escalier", "desc": "Finition mur escalier bâtiment 1", "lot": "", "loc": "Bât 1 - Escalier", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000010, "code": "NC-001", "cat": "NC", "status": "todo", "title": "Bât 1 - Escalier", "desc": "Finir le bout d'escalier", "lot": "", "loc": "Bât 1 - Escalier", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000011, "code": "QUA-005", "cat": "QUA", "status": "todo", "title": "Escalier Bât 1", "desc": "Nettoyer escalier", "lot": "", "loc": "Escalier Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000012, "code": "FIN-007", "cat": "FIN", "status": "todo", "title": "Bât 1 - Balcon", "desc": "Nettoyer le balcon", "lot": "", "loc": "Bât 1 - Balcon", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000013, "code": "FIN-008", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition bout de mur porte", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000014, "code": "FIN-009", "cat": "FIN", "status": "todo", "title": "Bât 1 - Couloir", "desc": "Finition plafond couloir", "lot": "", "loc": "Bât 1 - Couloir", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000015, "code": "AVA-001", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Finir les relevés", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000016, "code": "SEC-004", "cat": "SEC", "status": "todo", "title": "Bât 1", "desc": "Couper ferraille (intérieur)", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000017, "code": "SEC-005", "cat": "SEC", "status": "todo", "title": "Bât 1 - Terrasse", "desc": "Couper ferraille (terrasse)", "lot": "", "loc": "Bât 1 - Terrasse", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000018, "code": "FIN-010", "cat": "FIN", "status": "todo", "title": "Bât 1 - Ascenseur", "desc": "Finition poutre ascenseur", "lot": "", "loc": "Bât 1 - Ascenseur", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000019, "code": "FIN-011", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition du mur", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000020, "code": "AVA-002", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Mur à finir ou couper ferraille", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000021, "code": "SEC-006", "cat": "SEC", "status": "todo", "title": "Bât 1 - Ascenseur", "desc": "Grille ascenseur non conforme", "lot": "", "loc": "Bât 1 - Ascenseur", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000022, "code": "FIN-012", "cat": "FIN", "status": "todo", "title": "Bât 1 - Ascenseur", "desc": "Finition mur ascenseur", "lot": "", "loc": "Bât 1 - Ascenseur", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000023, "code": "AVA-003", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Finir de faire les relevés (RDC)", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000024, "code": "FIN-013", "cat": "FIN", "status": "todo", "title": "Bât 1 - NIV2", "desc": "Finition relevé NIV2", "lot": "", "loc": "Bât 1 - NIV2", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000025, "code": "13-FIN-004", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition plafond à finir", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000026, "code": "13-AVA-001", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Coffrage à retirer", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000027, "code": "13-AVA-002", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Étais de séchage à retirer", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000028, "code": "13-FIN-005", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition de toiture à finaliser", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000029, "code": "13-FIN-007", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition mur à faire", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000030, "code": "13-FIN-008", "cat": "FIN", "status": "todo", "title": "Bât 2", "desc": "Finition plafond Bât 2", "lot": "", "loc": "Bât 2", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000031, "code": "13-FIN-009", "cat": "FIN", "status": "todo", "title": "Bât 2", "desc": "Remplir les trous Bât 2", "lot": "", "loc": "Bât 2", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}];
+    const SEED_COUNTER = {"SEC": 5, "FIN": 17, "NC": 1, "QUA": 4, "AVA": 5};
+    // Pousser le seed vers Supabase
+    toast('📤 Chargement initial des réserves...', 'info');
+    for (const r of SEED) {
+      await sbSaveReserve(r);
+    }
+    await syncFromSupabase();
+  }
+  // ── FIN SEED ──
+
+  
   updateBadge();
   updateStats();
   updateSettingVal();
@@ -1097,6 +1268,7 @@ function saveReserve() {
     r.cat = curCat; r.status = curStatus;
     r.photos = [...curPhotos];
     toast('Réserve modifiée ✓', 'ok');
+    save(r); // sync la réserve modifiée
   } else {
     state.counter[curCat] = (state.counter[curCat] || 0) + 1;
     const num = String(state.counter[curCat]).padStart(3, '0');
@@ -1119,11 +1291,13 @@ function saveReserve() {
       ts: now.toISOString()
     };
     state.reserves.push(r);
+    lastSavedReserve = r;
     toast(`📍 ${code} ajoutée`, 'ok');
   }
 
   closeOverlay('ovReserve');
-  save();
+  save(lastSavedReserve);
+  lastSavedReserve = null;
   if (pinMode) togglePinMode();
   pendingX = null; pendingY = null;
   renderPins();
@@ -1340,7 +1514,7 @@ function openStatusModal(id) {
 function applyStatus(s) {
   if (!statusTarget) return;
   const r = state.reserves.find(x => x.id === statusTarget);
-  if (r) { r.status = s; save(); renderReservesList(); updateStats(); toast('Statut mis à jour', 'ok'); }
+  if (r) { r.status = s; save(r); renderReservesList(); updateStats(); toast('Statut mis à jour', 'ok'); }
   closeOverlay('ovStatus');
   statusTarget = null;
 }
@@ -1351,7 +1525,9 @@ function confirmDelete(id) {
   document.getElementById('confirmTitle').textContent = 'Supprimer la réserve';
   document.getElementById('confirmMsg').textContent = `Supprimer "${r.title}" (${r.code}) ? Cette action est irréversible.`;
   document.getElementById('confirmOk').onclick = () => {
-    state.reserves = state.reserves.filter(x => x.id !== deleteTarget);
+    const delId = deleteTarget;
+    state.reserves = state.reserves.filter(x => x.id !== delId);
+    sbDeleteReserve(delId);
     save(); renderReservesList(); renderPins(); updateBadge(); updateStats();
     toast('Réserve supprimée', 'ok');
     closeOverlay('ovConfirm');

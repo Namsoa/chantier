@@ -127,10 +127,12 @@ header{
 .add-plan-btn:active{background:var(--s2)}
 
 /* ── RESERVES SCREEN ── */
+#scReserves{overflow-y:auto}
 .res-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 .res-bar::-webkit-scrollbar{display:none}
+#resList{padding:12px;display:flex;flex-direction:column;gap:10px}
 
-.res-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:fadeUp .22s ease;flex-shrink:0}
+.res-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:fadeUp .22s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .res-card-head{display:flex;align-items:center;gap:10px;padding:11px 13px}
 .res-num{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;font-family:'IBM Plex Mono',monospace;line-height:1.1;text-align:center}
@@ -148,6 +150,9 @@ header{
 .ib.red{color:var(--red)}
 .res-card-body{padding:0 13px 11px}
 .res-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:7px}
+.res-photo{width:100%;max-height:160px;object-fit:cover;border-radius:8px;cursor:pointer}
+.res-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.res-tag{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:var(--s2);color:var(--text2)}
 
 /* ── EXPORT SCREEN ── */
 #scExport{overflow-y:auto;padding:12px;gap:10px}
@@ -180,6 +185,7 @@ header{
 .fi,.ft,.fs{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:inherit;font-size:14px;outline:none;width:100%;transition:border-color .18s}
 .fi:focus,.ft:focus,.fs:focus{border-color:var(--accent)}
 .ft{resize:none;min-height:72px}
+.fs option{background:var(--s2)}
 
 /* Cat pills */
 .cat-row{display:flex;gap:7px;flex-wrap:wrap}
@@ -195,6 +201,16 @@ header{
 .cp-qua.on{background:var(--blue);color:#fff}
 .cp-ava{background:rgba(34,197,94,.2);color:var(--green)}
 .cp-ava.on{background:var(--green);color:#0a2a10}
+
+/* Photo */
+.photo-drop{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;position:relative;transition:border-color .18s}
+.photo-drop:active{border-color:var(--accent)}
+.photo-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.photo-drop-ico{font-size:28px;margin-bottom:4px}
+.photo-drop-txt{font-size:12px;color:var(--text2)}
+.photo-prev-wrap{position:relative}
+.photo-prev{width:100%;border-radius:9px;max-height:180px;object-fit:cover}
+.photo-rem{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
 /* Status picker in modal */
 .status-row{display:flex;gap:7px}
@@ -212,14 +228,22 @@ header{
 .btn-acc{background:var(--accent);color:#fff}.btn-acc:active{background:var(--accent-d)}
 .btn-sec{background:var(--s2);color:var(--text);border:1px solid var(--border)}.btn-sec:active{background:var(--s3)}
 .btn-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}.btn-red:active{background:rgba(239,68,68,.2)}
+.btn-grn{background:var(--green);color:#071a0b}.btn-grn:active{filter:brightness(.9)}
+.btn-sm{padding:9px 14px;font-size:13px;border-radius:9px}
 
 /* Settings modal */
 #ovSettings .modal-body{gap:0}
 .setting-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-ico{font-size:22px;flex-shrink:0}
+.setting-label{font-size:14px;font-weight:500;flex:1}
+.setting-val{font-size:12px;color:var(--text2);font-family:'IBM Plex Mono',monospace}
 
 /* Plan selector modal */
 #ovPlanSel .modal-body{gap:0}
 .plan-sel-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.plan-sel-item:last-child{border-bottom:none}
+.plan-sel-item:active{opacity:.7}
 .plan-sel-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
 .plan-sel-item.on .plan-sel-check{background:var(--accent);border-color:var(--accent);color:#fff}
 
@@ -238,6 +262,9 @@ header{
 
 /* Misc */
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text2);padding:40px;text-align:center}
+.empty-ico{font-size:44px}
+.empty-ttl{font-size:16px;font-weight:600;color:var(--text)}
+.empty-sub{font-size:12px;line-height:1.6}
 .prog-wrap{width:100%;height:3px;background:var(--s2);border-radius:2px;overflow:hidden;display:none}
 .prog-wrap.on{display:block}
 .prog-bar{height:100%;background:var(--accent);transition:width .25s;border-radius:2px}
@@ -253,22 +280,6 @@ header{
   <img id="lbImg" src="" alt="">
 </div>
 
-<div class="overlay" id="ovAnnotate" style="z-index:200;">
-  <div class="modal" style="height:92dvh; display:flex; flex-direction:column; border-radius:18px 18px 0 0; overflow:hidden; padding:0">
-    <div class="modal-hdr" style="padding:14px 18px">
-      <div class="modal-title">Dessiner sur la photo</div>
-      <button class="ib" onclick="closeAnnotate()">✕</button>
-    </div>
-    <div class="modal-body" id="annotBody" style="flex:1; padding:0; background:#111; display:flex; align-items:center; justify-content:center; touch-action:none; position:relative; overflow:hidden">
-      <canvas id="annotCv" style="touch-action:none; border: 1px solid #333"></canvas>
-    </div>
-    <div class="modal-foot" style="padding:12px 18px max(16px, env(safe-area-inset-bottom)); display:flex; gap:10px; background:var(--s1); border-top:1px solid var(--border)">
-      <button class="btn btn-sec" onclick="clearAnnotate()" style="flex:1">Effacer</button>
-      <button class="btn btn-acc" onclick="saveAnnotate()" style="flex:2">✓ Valider</button>
-    </div>
-  </div>
-</div>
-
 <div class="overlay" id="ovReserve">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -279,7 +290,7 @@ header{
     <div class="modal-body">
       <div class="fg">
         <div class="fl">Titre *</div>
-        <input class="fi" id="mTitleInp" placeholder="Ex: Élément mal fini" maxlength="80">
+        <input class="fi" id="mTitleInp" placeholder="Ex: Poteau mal fini" maxlength="80">
       </div>
       <div class="fg">
         <div class="fl">Catégorie</div>
@@ -301,18 +312,18 @@ header{
       </div>
       <div class="fg">
         <div class="fl">Description</div>
-        <textarea class="ft" id="mDesc" placeholder="Décrivez le problème..."></textarea>
+        <textarea class="ft" id="mDesc" placeholder="Décrivez la réserve..."></textarea>
       </div>
       <div class="fg">
-        <div class="fl">Intervenant / Lot</div>
-        <input class="fi" id="mLot" placeholder="Ex: Peintre, Menuisier...">
+        <div class="fl">Lot / Corps de métier</div>
+        <input class="fi" id="mLot" placeholder="Ex: Gros œuvre, Menuiserie...">
       </div>
       <div class="fg">
         <div class="fl">Localisation (zone / repère)</div>
-        <input class="fi" id="mLoc" placeholder="Ex: Bâtiment A, Niveau 2...">
+        <input class="fi" id="mLoc" placeholder="Ex: Cage A, Niveau 2, Axe B3...">
       </div>
       <div class="fg">
-        <div class="fl">Photos</div>
+        <div class="fl">Photo</div>
         <div id="photoArea"></div>
       </div>
     </div>
@@ -327,16 +338,16 @@ header{
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-hdr">
-      <div class="modal-title">Paramètres du projet</div>
+      <div class="modal-title">Paramètres du chantier</div>
       <button class="ib" onclick="closeOverlay('ovSettings')">✕</button>
     </div>
     <div class="modal-body">
       <div class="fg">
-        <div class="fl">Nom du projet</div>
-        <input class="fi" id="sChantier" placeholder="Ex: Résidence Les Lilas">
+        <div class="fl">Nom du chantier</div>
+        <input class="fi" id="sChantier" placeholder="Ex: Résidence Igny – Bât A">
       </div>
       <div class="fg">
-        <div class="fl">Responsable</div>
+        <div class="fl">Conducteur de travaux</div>
         <input class="fi" id="sConducteur" placeholder="Votre nom">
       </div>
       <div class="fg">
@@ -414,8 +425,8 @@ header{
     <div class="wlc-setting-row" onclick="openOverlay('ovSettings')">
       <div class="wlc-setting-icon">⚙️</div>
       <div class="wlc-setting-info">
-        <div class="wlc-setting-title">Paramètres du projet</div>
-        <div class="wlc-setting-val" id="wlcSettingVal">Configurer le nom, responsable...</div>
+        <div class="wlc-setting-title">Paramètres du chantier</div>
+        <div class="wlc-setting-val" id="wlcSettingVal">Configurer le nom, conducteur...</div>
       </div>
       <div class="wlc-setting-arr">›</div>
     </div>
@@ -468,7 +479,7 @@ header{
     <button class="chip" data-f="wip" onclick="filterRes(this,'wip')">En cours</button>
     <button class="chip" data-f="done" onclick="filterRes(this,'done')">Levées</button>
   </div>
-  <div id="resList" style="overflow-y:auto; flex:1; min-height:0; padding:12px; padding-bottom:max(24px, env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:10px"></div>
+  <div id="resList" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:10px"></div>
 </div>
 
 <div class="screen" id="scExport">
@@ -479,7 +490,7 @@ header{
       <div class="exp-ico">📊</div>
       <div class="exp-info">
         <div class="exp-title">Export Excel (.xlsx)</div>
-        <div class="exp-desc">Toutes les réserves avec statut, catégorie, intervenant, position sur plan</div>
+        <div class="exp-desc">Toutes les réserves avec statut, catégorie, lot, dates, position sur plan</div>
       </div>
       <div class="exp-arr">›</div>
     </div>
@@ -497,7 +508,7 @@ header{
       <div class="exp-ico">📋</div>
       <div class="exp-info">
         <div class="exp-title">Rapport global (HTML → PDF)</div>
-        <div class="exp-desc">Toutes les réserves avec photos et localisation HD</div>
+        <div class="exp-desc">Toutes les réserves du chantier avec photos • À imprimer en PDF depuis Safari</div>
       </div>
       <div class="exp-arr">›</div>
     </div>
@@ -543,6 +554,7 @@ header{
 // ═══════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════
+// Worker CDN — nécessite internet (Chrome/Safari avec accès web)
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 const CAT_COLOR = { SEC:'#ef4444', FIN:'#a855f7', NC:'#eab308', QUA:'#3b82f6', AVA:'#22c55e' };
@@ -554,13 +566,14 @@ const STATUS_LABEL = { todo:'À faire', wip:'En cours', done:'Levée' };
 // ═══════════════════════════════════════════════════════
 let state = {
   settings: { chantier:'', conducteur:'', entreprise:'' },
-  plans: [],
+  plans: [],       // [{id, name, pages}] — no PDF data stored
   activePlanId: null,
-  reserves: [], 
+  reserves: [],    // [{id, num, code, title, cat, status, desc, lot, loc, photo, pinX, pinY, planId, page, date, time}]
   counter: { SEC:0, FIN:0, NC:0, QUA:0, AVA:0 }
 };
 
-let pdfs = {};
+// PDF runtime (not persisted)
+let pdfs = {};            // planId -> pdfDoc
 let activePdf = null;
 let curPage = 1;
 let totalPages = 1;
@@ -571,17 +584,13 @@ let pinMode = false;
 let editId = null;
 let pendingX = null, pendingY = null;
 let curCat = 'SEC', curStatus = 'todo';
-
-// SOLUTION 2 : ARRAY DE PHOTOS (Multi-photos)
-let curPhotos = [];
-
+let curPhoto = null;
 let pinFilter = 'all', resFilter = 'all';
 let statusTarget = null;
 let deleteTarget = null;
-let planThumbs = {};
 
 // ═══════════════════════════════════════════════════════
-// INDEXEDDB — SOLUTION 1 : Sauvegarde massive et fiable
+// INDEXEDDB — stockage des PDFs (binaire)
 // ═══════════════════════════════════════════════════════
 let db = null;
 function openDB() {
@@ -619,47 +628,28 @@ function idbDel(key) {
 }
 
 // ═══════════════════════════════════════════════════════
-// PERSIST & INIT
+// PERSIST (localStorage pour state, IndexedDB pour PDFs)
 // ═══════════════════════════════════════════════════════
 function save() {
-  // Sauvegarde tout l'état dans IndexedDB sans limite de stockage
-  idbSet('app_state', state).catch(e => console.error("Erreur de sauvegarde IndexedDB:", e));
-  // Nettoyage de l'ancien localStorage bugué pour gagner de la place
-  try { localStorage.removeItem('cv_state'); } catch(e) {}
+  try { localStorage.setItem('cv_state', JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem('cv_state');
+    if (raw) state = JSON.parse(raw);
+  } catch(e) {}
 }
 
 async function init() {
   await openDB();
-  
-  // Charge l'état depuis IndexedDB
-  try {
-    const savedState = await idbGet('app_state');
-    if (savedState) {
-      state = savedState;
-    } else {
-      // Si vide (1er lancement de cette version), on tente de récupérer le localStorage
-      const raw = localStorage.getItem('cv_state');
-      if (raw) {
-        state = JSON.parse(raw);
-        await idbSet('app_state', state); 
-      }
-    }
-  } catch(e) { console.error('Erreur chargement DB:', e); }
-
-  // Mise à jour de la compatibilité des anciennes données vers le format multi-photos
-  state.reserves.forEach(r => {
-    if (r.photo && !r.photos) {
-      r.photos = [r.photo];
-      delete r.photo;
-    }
-  });
-
+  loadState();
   updateBadge();
   updateStats();
   updateSettingVal();
   renderPlansList();
 
   if (state.plans.length > 0) {
+    // Tenter de charger tous les PDFs depuis IndexedDB
     let anyLoaded = false;
     for (const plan of state.plans) {
       try {
@@ -681,6 +671,7 @@ async function init() {
       const firstLoaded = state.plans.find(p => pdfs[p.id]);
       if (firstLoaded) await activatePlan(firstLoaded.id);
     } else {
+      // PDFs non disponibles en IndexedDB — afficher demande de rechargement
       showReloadPrompt();
       switchTab('scPlan');
     }
@@ -712,6 +703,7 @@ async function loadPDFs(e) {
         plan.pages = pdfDoc.numPages;
       }
       pdfs[plan.id] = pdfDoc;
+      // Sauvegarder le binaire dans IndexedDB
       await idbSet(plan.id, ab);
       loaded++;
     } catch(err) { console.error(err); toast('Erreur: ' + file.name, 'err'); }
@@ -720,6 +712,7 @@ async function loadPDFs(e) {
   save();
   renderPlansList();
   if (loaded > 0) {
+    // Activer le premier des plans nouvellement chargés
     const newPlan = state.plans.find(p => pdfs[p.id]);
     if (newPlan) await activatePlan(newPlan.id);
   }
@@ -737,6 +730,7 @@ async function activatePlan(planId) {
   const plan = state.plans.find(p => p.id === planId);
   if (!plan) return;
 
+  // Si PDF pas encore en mémoire, tenter de le charger depuis IndexedDB
   if (!pdfs[planId]) {
     try {
       const ab = await idbGet(planId);
@@ -756,11 +750,13 @@ async function activatePlan(planId) {
   const shortName = plan.name.length > 14 ? plan.name.slice(0, 14) + '…' : plan.name;
   document.getElementById('planSwitchBtn').textContent = shortName + ' ▾';
 
+  // 1. D'ABORD : Forcer l'affichage de l'onglet plan pour avoir les bonnes dimensions
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
   document.getElementById('scPlan').classList.add('on');
   document.querySelector('.tab[data-s="scPlan"]')?.classList.add('on');
 
+  // 2. ENSUITE SEULEMENT : Calcul et rendu du PDF
   if (activePdf) {
     await renderPage(curPage);
     document.getElementById('pageNav').style.display = totalPages > 1 ? 'flex' : 'none';
@@ -801,6 +797,7 @@ async function renderPage(num) {
   if (!activePdf) return;
   const page = await activePdf.getPage(num);
 
+  // Attendre que le wrapper ait une taille réelle
   const wrap = document.getElementById('cvWrap');
   let ww = wrap.clientWidth, wh = wrap.clientHeight;
   if (ww < 10 || wh < 10) {
@@ -818,6 +815,7 @@ async function renderPage(num) {
 
   const cv = document.getElementById('cv');
   
+  // Rendu haute résolution (limité sur mobile pour éviter l'écran noir)
   let HIRES = Math.min(Math.ceil(window.devicePixelRatio) * 2, 4);
   if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
     HIRES = 1.5;
@@ -833,6 +831,7 @@ async function renderPage(num) {
   ctx.clearRect(0, 0, cv.width, cv.height);
   await page.render({ canvasContext: ctx, viewport: renderVP }).promise;
 
+  // Appliquer dimensions CSS et position APRÈS le rendu
   cv.style.width = baseW + 'px';
   cv.style.height = baseH + 'px';
   cv.style.transform = `translate(${panX}px,${panY}px)`;
@@ -898,20 +897,13 @@ function zFit() {
 }
 
 // ═══════════════════════════════════════════════════════
-// TOUCH / PAN / ZOOM
+// TOUCH / PAN / ZOOM — rewritten for stability
 // ═══════════════════════════════════════════════════════
 const cvWrap = document.getElementById('cvWrap');
+
+// Touch state
 let touches = {};
 let gestureStart = null;
-let mouseDown = false, msx = 0, msy = 0;
-
-function resetTouches() {
-  touches = {};
-  gestureStart = null;
-  mouseDown = false;
-}
-
-cvWrap.addEventListener('touchcancel', resetTouches);
 
 cvWrap.addEventListener('touchstart', e => {
   e.preventDefault();
@@ -944,6 +936,7 @@ cvWrap.addEventListener('touchmove', e => {
   }
 
   if (ids.length === 2 && gestureStart) {
+    // Update both touch positions
     Array.from(e.changedTouches).forEach(t => { if (touches[t.identifier]) touches[t.identifier] = { x: t.clientX, y: t.clientY }; });
     const [id0, id1] = ids;
     const t0 = touches[id0], t1 = touches[id1];
@@ -968,13 +961,11 @@ cvWrap.addEventListener('touchend', e => {
   const wasSingle = Object.keys(touches).length === 1;
   const t = e.changedTouches[0];
   changedIds.forEach(id => delete touches[id]);
-  
-  if (Object.keys(touches).length < 2) {
-    gestureStart = null;
-  }
+  gestureStart = null;
 
-  if (pinMode && wasSingle && activePdf && t) {
-    const prev = { x: t.clientX, y: t.clientY }; 
+  // Pin tap — only on single touch, small movement
+  if (pinMode && wasSingle && activePdf) {
+    const prev = { x: t.clientX, y: t.clientY }; // approximate
     const rect = cvWrap.getBoundingClientRect();
     const cv = document.getElementById('cv');
     const cw = parseFloat(cv.style.width);
@@ -989,6 +980,8 @@ cvWrap.addEventListener('touchend', e => {
   }
 }, { passive: false });
 
+// Mouse support
+let mouseDown = false, msx = 0, msy = 0;
 cvWrap.addEventListener('mousedown', e => {
   if (pinMode) return;
   mouseDown = true; msx = e.clientX - panX; msy = e.clientY - panY;
@@ -1015,7 +1008,7 @@ cvWrap.addEventListener('click', e => {
 });
 
 // ═══════════════════════════════════════════════════════
-// PIN MODE & RENDER
+// PIN MODE
 // ═══════════════════════════════════════════════════════
 function togglePinMode() {
   if (!activePdf && !state.plans.length) { toast('Chargez d\'abord un PDF', 'err'); return; }
@@ -1025,6 +1018,9 @@ function togglePinMode() {
   cvWrap.classList.toggle('pin-mode', pinMode);
 }
 
+// ═══════════════════════════════════════════════════════
+// RENDER PINS
+// ═══════════════════════════════════════════════════════
 function renderPins() {
   const layer = document.getElementById('pinsLayer');
   const cv = document.getElementById('cv');
@@ -1040,6 +1036,7 @@ function renderPins() {
     .forEach(r => {
       const el = document.createElement('div');
       el.className = 'pin-m';
+      // SOLUTION : Utilisation des pourcentages pour que l'épingle suive le zoom en temps réel
       el.style.left = (r.pinX * 100) + '%';
       el.style.top = (r.pinY * 100) + '%';
       const color = CAT_COLOR[r.cat] || '#f97316';
@@ -1054,11 +1051,10 @@ function renderPins() {
 // RESERVE MODAL
 // ═══════════════════════════════════════════════════════
 function openReserveModal(id = null) {
-  resetTouches(); 
-
   editId = id;
-  curPhotos = [];
+  curPhoto = null;
   curCat = 'SEC'; curStatus = 'todo';
+  resetPhotoArea();
 
   if (id !== null) {
     const r = state.reserves.find(x => x.id === id);
@@ -1068,7 +1064,8 @@ function openReserveModal(id = null) {
     document.getElementById('mLot').value = r.lot || '';
     document.getElementById('mLoc').value = r.loc || '';
     curCat = r.cat; curStatus = r.status;
-    curPhotos = r.photos ? [...r.photos] : [];
+    curPhoto = r.photo || null;
+    if (r.photo) showPhoto(r.photo);
   } else {
     document.getElementById('mTitle').textContent = 'Nouvelle réserve';
     document.getElementById('mTitleInp').value = '';
@@ -1076,8 +1073,6 @@ function openReserveModal(id = null) {
     document.getElementById('mLot').value = '';
     document.getElementById('mLoc').value = '';
   }
-  
-  renderPhotoArea();
   pickCat(curCat);
   pickStatus(curStatus);
   openOverlay('ovReserve');
@@ -1095,7 +1090,7 @@ function saveReserve() {
     r.lot = document.getElementById('mLot').value.trim();
     r.loc = document.getElementById('mLoc').value.trim();
     r.cat = curCat; r.status = curStatus;
-    r.photos = [...curPhotos];
+    if (curPhoto) r.photo = curPhoto;
     toast('Réserve modifiée ✓', 'ok');
   } else {
     state.counter[curCat] = (state.counter[curCat] || 0) + 1;
@@ -1109,7 +1104,7 @@ function saveReserve() {
       desc: document.getElementById('mDesc').value.trim(),
       lot: document.getElementById('mLot').value.trim(),
       loc: document.getElementById('mLoc').value.trim(),
-      photos: [...curPhotos],
+      photo: curPhoto,
       pinX: pendingX, pinY: pendingY,
       planId: state.activePlanId,
       planName: state.plans.find(p => p.id === state.activePlanId)?.name || '',
@@ -1132,7 +1127,7 @@ function saveReserve() {
 }
 
 // ═══════════════════════════════════════════════════════
-// FORM HELPERS & DRAWING ANNOTATION
+// FORM HELPERS
 // ═══════════════════════════════════════════════════════
 function pickCat(c) {
   curCat = c;
@@ -1142,196 +1137,28 @@ function pickStatus(s) {
   curStatus = s;
   document.querySelectorAll('.stp').forEach(el => el.classList.toggle('on', el.dataset.s === s));
 }
-
-let annotImg = null;
-let annotCtx = null;
-let annotIsDrawing = false;
-let annotStrokes = [];
-let currentStroke = [];
-let rawPhotoData = null;
-
-// Gérer la photo avec compression optimale pour éviter le rapport à 19 Mo
+function triggerPhoto() { document.getElementById('photoFileInp')?.click(); }
 function handlePhoto(e) {
-  const file = e.target.files[0]; 
-  if (!file) return;
-  
+  const file = e.target.files[0]; if (!file) return;
   const r = new FileReader();
-  r.onload = ev => { 
-    const img = new Image();
-    img.onload = () => {
-      const cvs = document.createElement('canvas');
-      const MAX_SIZE = 800; // Légère baisse pour un fichier ultra léger
-      let w = img.width, h = img.height;
-      
-      if (w > h) { 
-        if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } 
-      } else { 
-        if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } 
-      }
-      
-      cvs.width = w; 
-      cvs.height = h;
-      cvs.getContext('2d').drawImage(img, 0, 0, w, h);
-      
-      // Compression JPEG très efficace (60%) pour le rapport
-      rawPhotoData = cvs.toDataURL('image/jpeg', 0.6);
-      openAnnotateModal();
-    };
-    img.src = ev.target.result;
-  };
+  r.onload = ev => { curPhoto = ev.target.result; showPhoto(curPhoto); };
   r.readAsDataURL(file);
-  e.target.value = ''; 
 }
-
-function openAnnotateModal() {
-  document.getElementById('ovAnnotate').classList.add('on');
-  const cv = document.getElementById('annotCv');
-  const container = document.getElementById('annotBody');
-  annotCtx = cv.getContext('2d');
-  annotStrokes = [];
-  
-  annotImg = new Image();
-  annotImg.onload = () => {
-    const cw = container.clientWidth;
-    const ch = container.clientHeight;
-    const ratio = Math.min(cw / annotImg.width, ch / annotImg.height);
-    cv.width = annotImg.width * ratio;
-    cv.height = annotImg.height * ratio;
-    cv.dataset.ratio = ratio;
-    
-    redrawAnnotate();
-  };
-  annotImg.src = rawPhotoData;
-  
-  cv.ontouchstart = annotStart;
-  cv.ontouchmove = annotMove;
-  cv.ontouchend = annotEnd;
-  cv.onmousedown = annotStart;
-  cv.onmousemove = annotMove;
-  cv.onmouseup = annotEnd;
+function showPhoto(src) {
+  document.getElementById('photoArea').innerHTML = `<div class="photo-prev-wrap"><img class="photo-prev" src="${src}"><button class="photo-rem" onclick="removePhoto()">✕</button></div>`;
 }
-
-function redrawAnnotate() {
-  const cv = document.getElementById('annotCv');
-  annotCtx.clearRect(0, 0, cv.width, cv.height);
-  annotCtx.drawImage(annotImg, 0, 0, cv.width, cv.height);
-  annotCtx.strokeStyle = '#ef4444'; 
-  annotCtx.lineWidth = 4;
-  annotCtx.lineCap = 'round';
-  annotCtx.lineJoin = 'round';
-  
-  for (const stroke of annotStrokes) {
-    if(!stroke.length) continue;
-    annotCtx.beginPath();
-    annotCtx.moveTo(stroke[0].x, stroke[0].y);
-    for (let i=1; i<stroke.length; i++) {
-      annotCtx.lineTo(stroke[i].x, stroke[i].y);
-    }
-    annotCtx.stroke();
-  }
-}
-
-function getAnnotPos(e) {
-  const cv = document.getElementById('annotCv');
-  const rect = cv.getBoundingClientRect();
-  const touch = e.touches ? e.touches[0] : e;
-  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-}
-
-function annotStart(e) {
-  e.preventDefault();
-  annotIsDrawing = true;
-  currentStroke = [getAnnotPos(e)];
-  annotStrokes.push(currentStroke);
-}
-
-function annotMove(e) {
-  if(!annotIsDrawing) return;
-  e.preventDefault();
-  currentStroke.push(getAnnotPos(e));
-  redrawAnnotate(); 
-}
-
-function annotEnd(e) {
-  if(!annotIsDrawing) return;
-  e.preventDefault();
-  annotIsDrawing = false;
-}
-
-function clearAnnotate() {
-  annotStrokes = [];
-  redrawAnnotate();
-}
-
-function closeAnnotate() {
-  document.getElementById('ovAnnotate').classList.remove('on');
-  annotStrokes = [];
-}
-
-function saveAnnotate() {
-  const offCv = document.createElement('canvas');
-  offCv.width = annotImg.width;
-  offCv.height = annotImg.height;
-  const offCtx = offCv.getContext('2d');
-  offCtx.drawImage(annotImg, 0, 0);
-  
-  offCtx.strokeStyle = '#ef4444';
-  offCtx.lineCap = 'round';
-  offCtx.lineJoin = 'round';
-  
-  const ratio = parseFloat(document.getElementById('annotCv').dataset.ratio || 1);
-  offCtx.lineWidth = 6 / ratio; 
-  
-  for (const stroke of annotStrokes) {
-    if(stroke.length < 2) continue;
-    offCtx.beginPath();
-    offCtx.moveTo(stroke[0].x / ratio, stroke[0].y / ratio);
-    for (let i=1; i<stroke.length; i++) {
-      offCtx.lineTo(stroke[i].x / ratio, stroke[i].y / ratio);
-    }
-    offCtx.stroke();
-  }
-  
-  // On pousse la photo terminée dans la liste des photos !
-  curPhotos.push(offCv.toDataURL('image/jpeg', 0.6));
-  renderPhotoArea();
-  closeAnnotate();
-}
-
-function renderPhotoArea() {
-  const area = document.getElementById('photoArea');
-  let html = '<div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;">';
-  
-  curPhotos.forEach((p, i) => {
-    html += `
-    <div style="position:relative; flex-shrink:0; height:80px; width:80px; border-radius:8px; border:1px solid var(--border); overflow:hidden;">
-      <img src="${p}" style="width:100%; height:100%; object-fit:cover;">
-      <button onclick="removePhoto(${i})" style="position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,.7); border:none; color:#fff; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+function removePhoto() { curPhoto = null; resetPhotoArea(); }
+function resetPhotoArea() {
+  document.getElementById('photoArea').innerHTML = `
+    <div class="photo-drop" onclick="triggerPhoto()">
+      <div class="photo-drop-ico">📷</div>
+      <div class="photo-drop-txt">Prendre une photo ou importer</div>
+      <input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="position:absolute;inset:0;opacity:0;cursor:pointer">
     </div>`;
-  });
-  
-  html += `
-    <div style="flex-shrink:0; height:80px; width:80px; display:flex; flex-direction:column; justify-content:center; padding:0; cursor:pointer; border:2px dashed var(--border); border-radius:10px; text-align:center; transition:border-color .18s" onclick="triggerPhoto()">
-      <div style="font-size:24px; margin-bottom:2px">📷</div>
-      <div style="font-size:10px; color:var(--text2)">Ajouter</div>
-    </div>
-  </div>`;
-  
-  // On ajoute l'input de manière invisible
-  area.innerHTML = html + `<input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="display:none">`;
-}
-
-function removePhoto(index) {
-  curPhotos.splice(index, 1);
-  renderPhotoArea();
-}
-
-function triggerPhoto() {
-  document.getElementById('photoFileInp').click();
 }
 
 // ═══════════════════════════════════════════════════════
-// STATUS CHANGE & DELETE
+// STATUS CHANGE
 // ═══════════════════════════════════════════════════════
 function openStatusModal(id) {
   statusTarget = id;
@@ -1345,6 +1172,9 @@ function applyStatus(s) {
   statusTarget = null;
 }
 
+// ═══════════════════════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════════════════════
 function confirmDelete(id) {
   deleteTarget = id;
   const r = state.reserves.find(x => x.id === id);
@@ -1374,10 +1204,7 @@ function renderReservesList() {
     return;
   }
   const sMap = { todo:'status-todo', wip:'status-wip', done:'status-done' };
-  
-  list.innerHTML = filtered.map(r => {
-    const photos = r.photos || [];
-    return `
+  list.innerHTML = filtered.map(r => `
     <div class="res-card" id="rc-${r.id}">
       <div class="res-card-head">
         <div class="res-num" style="background:${CAT_COLOR[r.cat]}">${r.code}</div>
@@ -1394,20 +1221,18 @@ function renderReservesList() {
           </div>
         </div>
       </div>
-      ${r.desc || photos.length || r.loc ? `<div class="res-card-body">
+      ${r.desc || r.photo || r.loc ? `<div class="res-card-body">
         ${r.loc ? `<div class="res-tags"><span class="res-tag">📍 ${r.loc}</span></div>` : ''}
         ${r.desc ? `<div class="res-desc">${r.desc}</div>` : ''}
-        ${photos.length ? `<div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-top:6px">
-          ${photos.map((p, i) => `<img src="${p}" style="height:60px; width:60px; object-fit:cover; border-radius:6px; cursor:pointer; flex-shrink:0; border:1px solid var(--border)" onclick="openLb(${r.id}, ${i})">`).join('')}
-        </div>` : ''}
+        ${r.photo ? `<img class="res-photo" src="${r.photo}" onclick="openLb(${r.id})">` : ''}
       </div>` : ''}
-    </div>`;
-  }).join('');
+    </div>`).join('');
 }
 
 function jumpTo(id) {
   const r = state.reserves.find(x => x.id === id);
   if (!r || r.pinX === null) { toast('Pas de position sur plan', 'err'); return; }
+  // Switch plan if needed
   const doJump = () => {
     const cv = document.getElementById('cv');
     const bw = parseFloat(cv.dataset.bw || baseW);
@@ -1491,6 +1316,9 @@ function deletePlan(e, id) {
   toast('Plan supprimé', 'ok');
 }
 
+// ═══════════════════════════════════════════════════════
+// PLAN SELECTOR (header button)
+// ═══════════════════════════════════════════════════════
 function openPlanSel() {
   const list = document.getElementById('planSelList');
   list.innerHTML = state.plans.map(p => `
@@ -1504,7 +1332,6 @@ function openPlanSel() {
     `<div style="padding-top:10px"><button class="btn btn-sec btn-sm" style="width:100%" onclick="closeOverlay('ovPlanSel');triggerPDF()">+ Ajouter un PDF</button></div>`;
   openOverlay('ovPlanSel');
 }
-
 async function selPlan(id) {
   closeOverlay('ovPlanSel');
   if (!pdfs[id]) { toast('PDF non chargé — rechargez le fichier', 'err'); return; }
@@ -1512,6 +1339,9 @@ async function selPlan(id) {
   renderPlansList();
 }
 
+// ═══════════════════════════════════════════════════════
+// PAGE NAV
+// ═══════════════════════════════════════════════════════
 async function goPage(d) {
   const np = curPage + d;
   if (np < 1 || np > totalPages) return;
@@ -1520,10 +1350,9 @@ async function goPage(d) {
 }
 
 // ═══════════════════════════════════════════════════════
-// SETTINGS / OVERLAYS
+// SETTINGS
 // ═══════════════════════════════════════════════════════
 function openOverlay(id) {
-  resetTouches(); 
   if (id === 'ovSettings') {
     document.getElementById('sChantier').value = state.settings.chantier;
     document.getElementById('sConducteur').value = state.settings.conducteur;
@@ -1531,9 +1360,7 @@ function openOverlay(id) {
   }
   document.getElementById(id).classList.add('on');
 }
-
 function closeOverlay(id) { document.getElementById(id).classList.remove('on'); }
-
 function saveSettings() {
   state.settings.chantier = document.getElementById('sChantier').value.trim();
   state.settings.conducteur = document.getElementById('sConducteur').value.trim();
@@ -1541,52 +1368,49 @@ function saveSettings() {
   save(); updateSettingVal(); closeOverlay('ovSettings');
   toast('Paramètres sauvegardés', 'ok');
 }
-
 function updateSettingVal() {
-  const v = state.settings.chantier || state.settings.conducteur || 'Configurer le nom, responsable...';
+  const v = state.settings.chantier || state.settings.conducteur || 'Configurer le nom, conducteur...';
   document.getElementById('wlcSettingVal').textContent = v;
 }
 
+// ═══════════════════════════════════════════════════════
+// STATS & BADGE
+// ═══════════════════════════════════════════════════════
 function updateBadge() {
   const n = state.reserves.length;
   const b = document.getElementById('resBadge');
   b.textContent = n; b.style.display = n ? 'inline' : 'none';
 }
-
 function updateStats() {
   const r = state.reserves;
   document.getElementById('statsGrid').innerHTML = `
-    <div class="stat-box" style="grid-column: 1 / -1; background:rgba(249,115,22,0.1); border-color:var(--accent)"><div class="stat-n" style="color:var(--accent)">${r.length}</div><div class="stat-l">Total Réserves</div></div>
-    
+    <div class="stat-box"><div class="stat-n" style="color:var(--accent)">${r.length}</div><div class="stat-l">Total</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.cat==='SEC').length}</div><div class="stat-l">Sécurité</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--purple)">${r.filter(x=>x.cat==='FIN').length}</div><div class="stat-l">Finition</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.cat==='NC').length}</div><div class="stat-l">Non-conf.</div></div>
-    
-    <div class="stat-box"><div class="stat-n" style="color:var(--blue)">${r.filter(x=>x.cat==='QUA').length}</div><div class="stat-l">Qualité</div></div>
-    <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.cat==='AVA').length}</div><div class="stat-l">Avanc.</div></div>
-    <div class="stat-box"><div class="stat-n" style="color:var(--text2)">-</div><div class="stat-l">-</div></div>
-
     <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.status==='todo').length}</div><div class="stat-l">À faire</div></div>
-    <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.status==='wip').length}</div><div class="stat-l">En cours</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.status==='done').length}</div><div class="stat-l">Levées</div></div>`;
 }
 
 // ═══════════════════════════════════════════════════════
-// EXPORTS
+// EXPORT EXCEL
 // ═══════════════════════════════════════════════════════
 function exportXLSX() {
   if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
   const wb = XLSX.utils.book_new();
-  const hdr = ['Code','Titre','Catégorie','Statut','Description','Intervenant/Lot','Localisation','Plan','Page','Date','Heure'];
+  // Main sheet
+  const hdr = ['Code','Titre','Catégorie','Statut','Description','Lot','Localisation','Plan','Page','Date','Heure'];
   const rows = state.reserves.map(r => [
     r.code, r.title, CAT_LABEL[r.cat] || r.cat, STATUS_LABEL[r.status],
     r.desc || '', r.lot || '', r.loc || '', r.planName || '', r.page, r.date, r.time
   ]);
   const ws = XLSX.utils.aoa_to_sheet([hdr, ...rows]);
   ws['!cols'] = [10,35,15,12,45,20,20,25,6,12,8].map(w => ({ wch: w }));
+  // Color header row
   if (!ws['!rows']) ws['!rows'] = [];
   XLSX.utils.book_append_sheet(wb, ws, 'Réserves');
 
+  // Summary per category
   const cats = ['SEC','FIN','NC','QUA','AVA'];
   const sumHdr = ['Catégorie','Total','À faire','En cours','Levées'];
   const sumRows = cats.map(c => {
@@ -1597,14 +1421,15 @@ function exportXLSX() {
   wsSum['!cols'] = [18,8,10,12,10].map(w => ({ wch: w }));
   XLSX.utils.book_append_sheet(wb, wsSum, 'Récapitulatif');
 
-  XLSX.writeFile(wb, `reserves-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  const date = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, `reserves-chantier-${date}.xlsx`);
   toast('Excel exporté 📊', 'ok');
 }
 
 function exportCSV() {
   if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
   const esc = v => `"${String(v || '').replace(/"/g,'""')}"`;
-  const hdr = ['Code','Titre','Catégorie','Statut','Description','Intervenant','Localisation','Plan','Page','Date','Heure'].map(esc).join(',');
+  const hdr = ['Code','Titre','Catégorie','Statut','Description','Lot','Localisation','Plan','Page','Date','Heure'].map(esc).join(',');
   const rows = state.reserves.map(r =>
     [r.code,r.title,CAT_LABEL[r.cat],STATUS_LABEL[r.status],r.desc||'',r.lot||'',r.loc||'',r.planName||'',r.page,r.date,r.time].map(esc).join(',')
   );
@@ -1616,69 +1441,10 @@ function exportCSV() {
   toast('CSV exporté', 'ok');
 }
 
-// L'OUTIL MAGIQUE PDF.JS POUR LA VRAIE NETTETÉ !
-// On ne crée pas une image géante, on demande à l'outil de cadrer *directement* la zone du PDF et de la calculer en HD 
-async function getPlanThumb(planId, pageNum, pinX, pinY, catColor) {
-  let pdf = pdfs[planId];
-  if (!pdf) {
-    try {
-      const ab = await idbGet(planId);
-      if (ab) pdf = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
-    } catch(e) {}
-  }
-  if (!pdf) return null;
-
-  try {
-    const p = await pdf.getPage(pageNum);
-    const vp1 = p.getViewport({ scale: 1 });
-    
-    // Le carré parfait du rapport
-    const SIZE = 500; 
-    
-    // Le niveau de zoom (4x plus grand que l'écran complet)
-    const scale = (SIZE * 4) / Math.max(vp1.width, vp1.height); 
-    
-    const px = pinX * vp1.width * scale;
-    const py = pinY * vp1.height * scale;
-    
-    // On recadre nativement dans le PDF (qualité vectorielle) !
-    const cropVp = p.getViewport({ 
-      scale: scale, 
-      offsetX: (SIZE / 2) - px, 
-      offsetY: (SIZE / 2) - py 
-    });
-
-    const c = document.createElement('canvas');
-    c.width = SIZE; 
-    c.height = SIZE;
-    const ctx = c.getContext('2d');
-    
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, SIZE, SIZE);
-
-    await p.render({ canvasContext: ctx, viewport: cropVp }).promise;
-    
-    // On dessine la cible au centre parfait
-    ctx.beginPath();
-    ctx.arc(SIZE/2, SIZE/2, 14, 0, 2 * Math.PI);
-    ctx.fillStyle = catColor || '#f97316';
-    ctx.fill();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = '#ffffff';
-    ctx.stroke();
-    
-    // Compression 60% pour le poids du fichier, la netteté vient du calcul vectoriel juste avant !
-    return c.toDataURL('image/jpeg', 0.6); 
-  } catch(e) {
-    console.error(e);
-    return null;
-  }
-}
-
 // ═══════════════════════════════════════════════════════
-// RAPPORT HTML
+// RAPPORT HTML (ouvre dans nouvel onglet → imprimer en PDF)
 // ═══════════════════════════════════════════════════════
-async function exportReport(mode) {
+function exportReport(mode) {
   let reserves = state.reserves;
   if (mode === 'today') {
     const today = new Date().toLocaleDateString('fr-FR');
@@ -1686,22 +1452,12 @@ async function exportReport(mode) {
   }
   if (!reserves.length) { toast('Aucune réserve à exporter', 'err'); return; }
 
-  toast('Génération du plan net HD, veuillez patienter...', 'info');
-
-  for (const r of reserves) {
-    if (r.pinX !== null && !r._thumb) {
-      r._thumb = await getPlanThumb(r.planId, r.page, r.pinX, r.pinY, CAT_COLOR[r.cat]);
-    }
-  }
-
   const s = state.settings;
   const date = new Date().toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   const sMap = { todo:'#ef4444', wip:'#eab308', done:'#22c55e' };
   const cMap = CAT_COLOR;
 
-  const cards = reserves.map(r => {
-    const photos = r.photos || [];
-    return `
+  const cards = reserves.map(r => `
     <div style="page-break-inside:avoid;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:14px;overflow:hidden">
       <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f9fafb;border-bottom:1px solid #e5e7eb">
         <div style="background:${cMap[r.cat]};color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;font-family:monospace">${r.code}</div>
@@ -1710,33 +1466,13 @@ async function exportReport(mode) {
       </div>
       <div style="padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:12px;color:#374151">
         ${r.desc ? `<div style="grid-column:1/-1"><strong>Description :</strong> ${r.desc}</div>` : ''}
-        ${r.lot ? `<div><strong>Intervenant :</strong> ${r.lot}</div>` : ''}
+        ${r.lot ? `<div><strong>Lot :</strong> ${r.lot}</div>` : ''}
         ${r.loc ? `<div><strong>Localisation :</strong> ${r.loc}</div>` : ''}
         <div><strong>Plan :</strong> ${r.planName || '-'} — Page ${r.page}</div>
         <div><strong>Date :</strong> ${r.date} à ${r.time}</div>
       </div>
-      
-      ${(photos.length || (r.pinX !== null && r._thumb)) ? `
-      <div style="padding:0 14px 12px; display:flex; flex-direction:column; gap:12px">
-        
-        ${(r.pinX !== null && r._thumb) ? `
-        <div style="width:100%">
-          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase;">Localisation sur Plan</div>
-          <img src="${r._thumb}" style="width:100%; max-width:400px; border-radius:8px; border:1px solid #e5e7eb; display:block;">
-        </div>` : ''}
-        
-        ${(photos.length) ? `
-        <div style="width:100%">
-          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Photos (${photos.length})</div>
-          <div style="display:flex; flex-wrap:wrap; gap:8px;">
-            ${photos.map(p => `<img src="${p}" style="max-width:100%; max-height:280px; object-fit:contain; border-radius:8px; border:1px solid #e5e7eb; background:#f9fafb">`).join('')}
-          </div>
-        </div>` : ''}
-
-      </div>` : ''}
-
-    </div>`;
-  }).join('');
+      ${r.photo ? `<div style="padding:0 14px 12px"><img src="${r.photo}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px"></div>` : ''}
+    </div>`).join('');
 
   const catSummary = ['SEC','FIN','NC','QUA','AVA'].map(c => {
     const n = reserves.filter(r => r.cat === c).length;
@@ -1744,18 +1480,18 @@ async function exportReport(mode) {
     return `<span style="display:inline-flex;align-items:center;gap:5px;background:${cMap[c]}22;color:${cMap[c]};border:1px solid ${cMap[c]}44;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin:3px">● ${CAT_LABEL[c]} : ${n}</span>`;
   }).join('');
 
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport de Projet</title>
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport de chantier</title>
   <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;background:#fff;padding:24px;max-width:800px;margin:0 auto}
   @media print{body{padding:0}@page{margin:18mm}}</style></head><body>
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #f97316">
     <div>
-      <div style="font-size:22px;font-weight:800;color:#111">${s.chantier || 'Rapport de suivi'}</div>
-      ${s.conducteur ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">Responsable : <strong>${s.conducteur}</strong>${s.entreprise ? ' — ' + s.entreprise : ''}</div>` : ''}
+      <div style="font-size:22px;font-weight:800;color:#111">${s.chantier || 'Rapport de chantier'}</div>
+      ${s.conducteur ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">Conducteur : <strong>${s.conducteur}</strong>${s.entreprise ? ' — ' + s.entreprise : ''}</div>` : ''}
       <div style="font-size:12px;color:#9ca3af;margin-top:4px">${date}</div>
     </div>
     <div style="text-align:right">
       <div style="font-size:28px;font-weight:800;color:#f97316">${reserves.length}</div>
-      <div style="font-size:11px;color:#6b7280">${mode === 'today' ? 'réserves du jour' : 'réserves au total'}</div>
+      <div style="font-size:11px;color:#6b7280">${mode === 'today' ? 'réserves du jour' : 'réserves total'}</div>
     </div>
   </div>
   <div style="margin-bottom:18px;display:flex;flex-wrap:wrap;gap:4px">${catSummary}</div>
@@ -1767,15 +1503,15 @@ async function exportReport(mode) {
   <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Détail des réserves</div>
   ${cards}
   <div style="margin-top:24px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center">
-    Généré le ${date} via ChantierView
+    Rapport généré le ${date} via ChantierView
   </div>
   </body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
   w.document.close();
-  setTimeout(() => { w.focus(); w.print(); }, 800);
-  toast('Rapport ouvert — prêt à imprimer 🖨️', 'ok');
+  setTimeout(() => { w.focus(); w.print(); }, 600);
+  toast('Rapport ouvert — imprimer en PDF 🖨️', 'info');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1785,11 +1521,10 @@ function exportJSON() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `chantier-backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   toast('Sauvegarde exportée 💾', 'ok');
 }
-
 function importJSON(e) {
   const file = e.target.files[0]; if (!file) return;
   const r = new FileReader();
@@ -1806,6 +1541,7 @@ function importJSON(e) {
           document.getElementById('scWelcome').classList.remove('on');
           document.getElementById('scPlan').classList.add('on');
           document.getElementById('planSwitchBtn').style.display = 'flex';
+          showEmptyPlan();
           switchTab('scPlan');
         }
       } else { toast('Fichier invalide', 'err'); }
@@ -1815,6 +1551,9 @@ function importJSON(e) {
   e.target.value = '';
 }
 
+// ═══════════════════════════════════════════════════════
+// CLEAR ALL
+// ═══════════════════════════════════════════════════════
 function confirmClear() {
   if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
   document.getElementById('confirmTitle').textContent = 'Tout effacer';
@@ -1828,14 +1567,20 @@ function confirmClear() {
   openOverlay('ovConfirm');
 }
 
-function openLb(id, idx = 0) {
+// ═══════════════════════════════════════════════════════
+// LIGHTBOX
+// ═══════════════════════════════════════════════════════
+function openLb(id) {
   const r = state.reserves.find(x => x.id === id);
-  if (!r || !r.photos || !r.photos[idx]) return;
-  document.getElementById('lbImg').src = r.photos[idx];
+  if (!r?.photo) return;
+  document.getElementById('lbImg').src = r.photo;
   document.getElementById('lightbox').classList.add('on');
 }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('on'); }
 
+// ═══════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════
 function switchTab(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
@@ -1846,6 +1591,9 @@ function switchTab(id) {
   if (id === 'scExport') updateStats();
 }
 
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
 let toastT;
 function toast(msg, type='') {
   const t = document.getElementById('toast');
@@ -1854,10 +1602,16 @@ function toast(msg, type='') {
   toastT = setTimeout(() => t.classList.remove('on'), 2800);
 }
 
+// ═══════════════════════════════════════════════════════
+// CLOSE OVERLAY ON BACKDROP CLICK
+// ═══════════════════════════════════════════════════════
 document.querySelectorAll('.overlay').forEach(ov => {
   ov.addEventListener('click', e => { if (e.target === ov) closeOverlay(ov.id); });
 });
 
+// ═══════════════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════════════
 init();
 </script>
 </body>

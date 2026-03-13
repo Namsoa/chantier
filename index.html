@@ -37,7 +37,6 @@
 html,body{height:100%;overflow:hidden}
 body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100dvh}
 
-/* ── HEADER ── */
 header{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 14px;
@@ -49,7 +48,6 @@ header{
 .logo em{color:var(--accent);font-style:normal}
 .hdr-btns{display:flex;gap:6px}
 
-/* ── TABS ── */
 .tabs{display:none;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--border)}
 .tabs.show{display:flex}
 .tab{flex:1;padding:9px 4px 7px;text-align:center;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;user-select:none}
@@ -57,11 +55,9 @@ header{
 .ti{font-size:17px;display:block;margin-bottom:1px}
 .badge{background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:3px;vertical-align:middle}
 
-/* ── SCREENS ── */
 .screen{display:none;flex:1;overflow:hidden;flex-direction:column}
 .screen.on{display:flex}
 
-/* ── WELCOME SCREEN ── */
 #scWelcome{align-items:center;justify-content:center;gap:16px;padding:32px 24px;text-align:center;overflow-y:auto}
 .wlc-logo{font-size:64px;line-height:1}
 .wlc-title{font-size:24px;font-weight:700}.wlc-title em{color:var(--accent);font-style:normal}
@@ -80,7 +76,6 @@ header{
 .wlc-setting-val{font-size:11px;color:var(--text2);margin-top:1px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wlc-setting-arr{color:var(--text3)}
 
-/* ── PLAN SCREEN ── */
 #scPlan{position:relative}
 .plan-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 .plan-bar::-webkit-scrollbar{display:none}
@@ -94,7 +89,6 @@ header{
 #cv{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;touch-action:none}
 .pins-layer{position:absolute;top:0;left:0;pointer-events:none;transform-origin:0 0}
 
-/* Pin marker */
 .pin-m{position:absolute;pointer-events:all;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%);cursor:pointer;z-index:10}
 .pin-m:active{opacity:.7}
 .pin-drop{width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.25);box-shadow:0 3px 12px rgba(0,0,0,.5)}
@@ -112,7 +106,6 @@ header{
 .pin-banner{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;z-index:40;display:none;white-space:nowrap;box-shadow:var(--shadow)}
 .pin-banner.on{display:block}
 
-/* ── PLANS SCREEN ── */
 #scPlans{overflow-y:auto;padding:12px;gap:10px}
 .plan-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:background .15s}
 .plan-card:active{background:var(--s2)}
@@ -126,13 +119,10 @@ header{
 .add-plan-btn{width:100%;padding:14px;border-radius:var(--r);background:var(--s1);border:1.5px dashed var(--border);color:var(--text2);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
 .add-plan-btn:active{background:var(--s2)}
 
-/* ── RESERVES SCREEN ── */
-#scReserves{overflow-y:auto}
 .res-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 .res-bar::-webkit-scrollbar{display:none}
-#resList{padding:12px;display:flex;flex-direction:column;gap:10px}
 
-.res-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:fadeUp .22s ease}
+.res-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:fadeUp .22s ease;flex-shrink:0}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .res-card-head{display:flex;align-items:center;gap:10px;padding:11px 13px}
 .res-num{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;font-family:'IBM Plex Mono',monospace;line-height:1.1;text-align:center}
@@ -150,11 +140,7 @@ header{
 .ib.red{color:var(--red)}
 .res-card-body{padding:0 13px 11px}
 .res-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:7px}
-.res-photo{width:100%;max-height:160px;object-fit:cover;border-radius:8px;cursor:pointer}
-.res-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
-.res-tag{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;background:var(--s2);color:var(--text2)}
 
-/* ── EXPORT SCREEN ── */
 #scExport{overflow-y:auto;padding:12px;gap:10px}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stat-box{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
@@ -169,7 +155,6 @@ header{
 .exp-arr{color:var(--text3);font-size:16px}
 .section-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;padding:4px 0 6px}
 
-/* ── MODAL ── */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:none;align-items:flex-end;backdrop-filter:blur(5px)}
 .overlay.on{display:flex}
 .modal{width:100%;background:var(--s1);border-radius:18px 18px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 max(16px,env(safe-area-inset-bottom));animation:slideUp .28s ease;max-height:94dvh;display:flex;flex-direction:column}
@@ -187,7 +172,6 @@ header{
 .ft{resize:none;min-height:72px}
 .fs option{background:var(--s2)}
 
-/* Cat pills */
 .cat-row{display:flex;gap:7px;flex-wrap:wrap}
 .cp{padding:7px 12px;border-radius:20px;font-size:12px;font-weight:600;border:2px solid transparent;cursor:pointer;transition:all .15s;opacity:.45}
 .cp.on{opacity:1;border-color:rgba(255,255,255,.35)!important}
@@ -202,7 +186,6 @@ header{
 .cp-ava{background:rgba(34,197,94,.2);color:var(--green)}
 .cp-ava.on{background:var(--green);color:#0a2a10}
 
-/* Photo */
 .photo-drop{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;position:relative;transition:border-color .18s}
 .photo-drop:active{border-color:var(--accent)}
 .photo-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
@@ -212,7 +195,6 @@ header{
 .photo-prev{width:100%;border-radius:9px;max-height:180px;object-fit:cover}
 .photo-rem{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
-/* Status picker in modal */
 .status-row{display:flex;gap:7px}
 .stp{flex:1;padding:8px 4px;border-radius:9px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .15s;opacity:.45}
 .stp.on{opacity:1;border-color:rgba(255,255,255,.3)!important}
@@ -223,7 +205,6 @@ header{
 .stp-done{background:rgba(34,197,94,.15);color:var(--green)}
 .stp-done.on{background:var(--green);color:#071a0b}
 
-/* Buttons */
 .btn{padding:13px 18px;border-radius:11px;font-size:15px;font-weight:600;font-family:inherit;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
 .btn-acc{background:var(--accent);color:#fff}.btn-acc:active{background:var(--accent-d)}
 .btn-sec{background:var(--s2);color:var(--text);border:1px solid var(--border)}.btn-sec:active{background:var(--s3)}
@@ -231,7 +212,6 @@ header{
 .btn-grn{background:var(--green);color:#071a0b}.btn-grn:active{filter:brightness(.9)}
 .btn-sm{padding:9px 14px;font-size:13px;border-radius:9px}
 
-/* Settings modal */
 #ovSettings .modal-body{gap:0}
 .setting-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
 .setting-row:last-child{border-bottom:none}
@@ -239,7 +219,6 @@ header{
 .setting-label{font-size:14px;font-weight:500;flex:1}
 .setting-val{font-size:12px;color:var(--text2);font-family:'IBM Plex Mono',monospace}
 
-/* Plan selector modal */
 #ovPlanSel .modal-body{gap:0}
 .plan-sel-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer}
 .plan-sel-item:last-child{border-bottom:none}
@@ -247,20 +226,17 @@ header{
 .plan-sel-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
 .plan-sel-item.on .plan-sel-check{background:var(--accent);border-color:var(--accent);color:#fff}
 
-/* Lightbox */
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:200;display:none;align-items:center;justify-content:center;flex-direction:column}
 .lightbox.on{display:flex}
 .lightbox img{max-width:100%;max-height:82dvh;object-fit:contain;border-radius:8px}
 .lb-close{position:absolute;top:max(18px,env(safe-area-inset-top));right:18px;width:38px;height:38px;border-radius:50%;background:var(--s2);border:1px solid var(--border);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
-/* Toast */
 .toast{position:fixed;top:max(56px,calc(env(safe-area-inset-top)+46px));left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:9px 15px;font-size:13px;font-weight:500;z-index:999;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap;box-shadow:var(--shadow)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:var(--green);color:var(--green)}
 .toast.err{border-color:var(--red);color:var(--red)}
 .toast.info{border-color:var(--blue);color:var(--blue)}
 
-/* Misc */
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text2);padding:40px;text-align:center}
 .empty-ico{font-size:44px}
 .empty-ttl{font-size:16px;font-weight:600;color:var(--text)}
@@ -280,6 +256,22 @@ header{
   <img id="lbImg" src="" alt="">
 </div>
 
+<div class="overlay" id="ovAnnotate" style="z-index:200;">
+  <div class="modal" style="height:92dvh; display:flex; flex-direction:column; border-radius:18px 18px 0 0; overflow:hidden; padding:0">
+    <div class="modal-hdr" style="padding:14px 18px">
+      <div class="modal-title">Dessiner sur la photo</div>
+      <button class="ib" onclick="closeAnnotate()">✕</button>
+    </div>
+    <div class="modal-body" id="annotBody" style="flex:1; padding:0; background:#111; display:flex; align-items:center; justify-content:center; touch-action:none; position:relative; overflow:hidden">
+      <canvas id="annotCv" style="touch-action:none; border: 1px solid #333"></canvas>
+    </div>
+    <div class="modal-foot" style="padding:12px 18px max(16px, env(safe-area-inset-bottom)); display:flex; gap:10px; background:var(--s1); border-top:1px solid var(--border)">
+      <button class="btn btn-sec" onclick="clearAnnotate()" style="flex:1">Effacer</button>
+      <button class="btn btn-acc" onclick="saveAnnotate()" style="flex:2">✓ Valider</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="ovReserve">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -290,7 +282,7 @@ header{
     <div class="modal-body">
       <div class="fg">
         <div class="fl">Titre *</div>
-        <input class="fi" id="mTitleInp" placeholder="Ex: Poteau mal fini" maxlength="80">
+        <input class="fi" id="mTitleInp" placeholder="Ex: Élément mal fini" maxlength="80">
       </div>
       <div class="fg">
         <div class="fl">Catégorie</div>
@@ -312,18 +304,18 @@ header{
       </div>
       <div class="fg">
         <div class="fl">Description</div>
-        <textarea class="ft" id="mDesc" placeholder="Décrivez la réserve..."></textarea>
+        <textarea class="ft" id="mDesc" placeholder="Décrivez le problème..."></textarea>
       </div>
       <div class="fg">
-        <div class="fl">Lot / Corps de métier</div>
-        <input class="fi" id="mLot" placeholder="Ex: Gros œuvre, Menuiserie...">
+        <div class="fl">Intervenant / Lot</div>
+        <input class="fi" id="mLot" placeholder="Ex: Peintre, Menuisier...">
       </div>
       <div class="fg">
         <div class="fl">Localisation (zone / repère)</div>
-        <input class="fi" id="mLoc" placeholder="Ex: Cage A, Niveau 2, Axe B3...">
+        <input class="fi" id="mLoc" placeholder="Ex: Bâtiment A, Niveau 2...">
       </div>
       <div class="fg">
-        <div class="fl">Photo</div>
+        <div class="fl">Photos</div>
         <div id="photoArea"></div>
       </div>
     </div>
@@ -338,16 +330,16 @@ header{
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-hdr">
-      <div class="modal-title">Paramètres du chantier</div>
+      <div class="modal-title">Paramètres du projet</div>
       <button class="ib" onclick="closeOverlay('ovSettings')">✕</button>
     </div>
     <div class="modal-body">
       <div class="fg">
-        <div class="fl">Nom du chantier</div>
-        <input class="fi" id="sChantier" placeholder="Ex: Résidence Igny – Bât A">
+        <div class="fl">Nom du projet</div>
+        <input class="fi" id="sChantier" placeholder="Ex: Résidence Les Lilas">
       </div>
       <div class="fg">
-        <div class="fl">Conducteur de travaux</div>
+        <div class="fl">Responsable</div>
         <input class="fi" id="sConducteur" placeholder="Votre nom">
       </div>
       <div class="fg">
@@ -425,13 +417,13 @@ header{
     <div class="wlc-setting-row" onclick="openOverlay('ovSettings')">
       <div class="wlc-setting-icon">⚙️</div>
       <div class="wlc-setting-info">
-        <div class="wlc-setting-title">Paramètres du chantier</div>
-        <div class="wlc-setting-val" id="wlcSettingVal">Configurer le nom, conducteur...</div>
+        <div class="wlc-setting-title">Paramètres du projet</div>
+        <div class="wlc-setting-val" id="wlcSettingVal">Configurer le nom, responsable...</div>
       </div>
       <div class="wlc-setting-arr">›</div>
     </div>
   </div>
-  <div style="font-size:11px;color:var(--text3);text-align:center">Base de données en ligne synchronisée</div>
+  <div style="font-size:11px;color:var(--text3);text-align:center">Vos données sont synchronisées sur le serveur</div>
 </div>
 
 <div class="screen" id="scPlan">
@@ -479,7 +471,7 @@ header{
     <button class="chip" data-f="wip" onclick="filterRes(this,'wip')">En cours</button>
     <button class="chip" data-f="done" onclick="filterRes(this,'done')">Levées</button>
   </div>
-  <div id="resList" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:10px"></div>
+  <div id="resList" style="overflow-y:auto; flex:1; min-height:0; padding:12px; padding-bottom:max(24px, env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:10px"></div>
 </div>
 
 <div class="screen" id="scExport">
@@ -490,7 +482,7 @@ header{
       <div class="exp-ico">📊</div>
       <div class="exp-info">
         <div class="exp-title">Export Excel (.xlsx)</div>
-        <div class="exp-desc">Toutes les réserves avec statut, catégorie, lot, dates, position sur plan</div>
+        <div class="exp-desc">Toutes les réserves avec statut, catégorie, intervenant, position sur plan</div>
       </div>
       <div class="exp-arr">›</div>
     </div>
@@ -508,7 +500,7 @@ header{
       <div class="exp-ico">📋</div>
       <div class="exp-info">
         <div class="exp-title">Rapport global (HTML → PDF)</div>
-        <div class="exp-desc">Toutes les réserves du chantier avec photos • À imprimer en PDF depuis Safari</div>
+        <div class="exp-desc">Toutes les réserves avec photos et localisation HD</div>
       </div>
       <div class="exp-arr">›</div>
     </div>
@@ -552,14 +544,142 @@ header{
 
 <script>
 // ═══════════════════════════════════════════════════════
+// SUPABASE SYNC — temps réel entre appareils
+// ═══════════════════════════════════════════════════════
+const SB_URL = 'https://brdhlqqfhwjmnrbqemml.supabase.co';
+const SB_KEY = 'sb_publishable_RWcEYhkNNfffbFJs6qJgfg_IcOs-apL';
+
+async function sbFetch(path, options = {}) {
+  const res = await fetch(SB_URL + '/rest/v1/' + path, {
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || 'return=representation',
+    },
+    ...options
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error('Supabase: ' + err);
+  }
+  return options.method === 'DELETE' ? null : res.json();
+}
+
+async function sbLoadReserves() {
+  try {
+    const rows = await sbFetch('reserves?order=ts.asc');
+    return rows.map(r => ({
+      id: r.id,
+      code: r.code,
+      cat: r.cat,
+      status: r.status,
+      title: r.title,
+      desc: r.description || '',
+      lot: r.lot || '',
+      loc: r.loc || '',
+      photos: r.photos || [], 
+      pinX: r.pin_x,
+      pinY: r.pin_y,
+      planId: r.plan_id,
+      planName: r.plan_name || '',
+      page: r.page || 1,
+      date: r.date || '',
+      time: r.heure || '',
+      ts: r.ts
+    }));
+  } catch(e) {
+    console.warn('Sync impossible (hors ligne ?)', e);
+    return null;
+  }
+}
+
+async function uploadPhotosVersSupabase(photosArray) {
+  if (!photosArray || photosArray.length === 0) return [];
+  const urlsPubliques = [];
+  for (let photo of photosArray) {
+    if (photo.startsWith('http')) { urlsPubliques.push(photo); continue; }
+    try {
+      const res = await fetch(photo);
+      const blob = await res.blob();
+      const nomFichier = `photo_${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
+      const uploadReponse = await fetch(`${SB_URL}/storage/v1/object/photos/${nomFichier}`, {
+        method: 'POST',
+        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'image/jpeg' },
+        body: blob
+      });
+      if (uploadReponse.ok) {
+        urlsPubliques.push(`${SB_URL}/storage/v1/object/public/photos/${nomFichier}`);
+      } else {
+        urlsPubliques.push(photo);
+      }
+    } catch (err) {
+      urlsPubliques.push(photo);
+    }
+  }
+  return urlsPubliques;
+}
+
+async function sbSaveReserve(r) {
+  try {
+    await sbFetch('reserves', {
+      method: 'POST',
+      prefer: 'resolution=merge-duplicates,return=minimal',
+      body: JSON.stringify({
+        id: r.id,
+        code: r.code,
+        cat: r.cat,
+        status: r.status,
+        title: r.title,
+        description: r.desc || '',
+        lot: r.lot || '',
+        loc: r.loc || '',
+        photos: r.photos || [],
+        pin_x: r.pinX,
+        pin_y: r.pinY,
+        plan_id: r.planId,
+        plan_name: r.planName || '',
+        page: r.page || 1,
+        date: r.date || '',
+        heure: r.time || '',
+      })
+    });
+  } catch(e) { console.warn('Erreur sync réserve:', e); }
+}
+
+async function sbDeleteReserve(id) {
+  try {
+    await sbFetch('reserves?id=eq.' + id, { method: 'DELETE', prefer: 'return=minimal' });
+  } catch(e) { console.warn('Erreur suppression sync:', e); }
+}
+
+async function syncFromSupabase() {
+  const remote = await sbLoadReserves();
+  if (!remote) return; 
+  
+  state.reserves = remote;
+  state.counter = { SEC:0, FIN:0, NC:0, QUA:0, AVA:0 };
+  state.reserves.forEach(r => {
+    const num = parseInt((r.code.split('-')[1] || '0'));
+    if (!isNaN(num)) state.counter[r.cat] = Math.max(state.counter[r.cat] || 0, num);
+  });
+  
+  await idbSet('app_state', state);
+  updateBadge();
+  updateStats();
+  renderReservesList();
+  renderPins();
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) syncFromSupabase();
+});
+window.addEventListener('focus', () => syncFromSupabase());
+
+// ═══════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════
-// Worker CDN — nécessite internet (Chrome/Safari avec accès web)
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-// SUPABASE CONFIG
-const supabaseUrl = 'https://brdhlqqfhwjmnrbqemml.supabase.co';
-const supabaseKey = 'sb_publishable_RWcEYhkNNfffbFJs6qJgfg_IcOs-apL';
 
 const CAT_COLOR = { SEC:'#ef4444', FIN:'#a855f7', NC:'#eab308', QUA:'#3b82f6', AVA:'#22c55e' };
 const CAT_LABEL = { SEC:'Sécurité', FIN:'Finition', NC:'Non-conformité', QUA:'Qualité', AVA:'Avancement' };
@@ -570,14 +690,13 @@ const STATUS_LABEL = { todo:'À faire', wip:'En cours', done:'Levée' };
 // ═══════════════════════════════════════════════════════
 let state = {
   settings: { chantier:'', conducteur:'', entreprise:'' },
-  plans: [],       // [{id, name, pages}] — no PDF data stored
+  plans: [],
   activePlanId: null,
-  reserves: [],    // [{id, num, code, title, cat, status, desc, lot, loc, photo, pinX, pinY, planId, page, date, time}]
+  reserves: [], 
   counter: { SEC:0, FIN:0, NC:0, QUA:0, AVA:0 }
 };
 
-// PDF runtime (not persisted)
-let pdfs = {};             // planId -> pdfDoc
+let pdfs = {};
 let activePdf = null;
 let curPage = 1;
 let totalPages = 1;
@@ -588,67 +707,17 @@ let pinMode = false;
 let editId = null;
 let pendingX = null, pendingY = null;
 let curCat = 'SEC', curStatus = 'todo';
-let curPhoto = null;
+
+let curPhotos = [];
+
 let pinFilter = 'all', resFilter = 'all';
 let statusTarget = null;
+let lastSavedReserve = null;
 let deleteTarget = null;
+let planThumbs = {};
 
 // ═══════════════════════════════════════════════════════
-// SUPABASE SYNCHRONIZATION
-// ═══════════════════════════════════════════════════════
-
-async function uploadPhoto(base64Str) {
-  try {
-    const res = await fetch(base64Str);
-    const blob = await res.blob();
-    const nomFichier = `photo_${Date.now()}_${Math.floor(Math.random()*1000)}.jpg`;
-    const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/photos/${nomFichier}`, {
-      method: 'POST',
-      headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}`, 'Content-Type': 'image/jpeg' },
-      body: blob
-    });
-    if(uploadRes.ok) {
-       return `${supabaseUrl}/storage/v1/object/public/photos/${nomFichier}`;
-    }
-  } catch(e) { console.error("Erreur upload photo:", e); }
-  return base64Str; // fallback si échec
-}
-
-async function fetchReserves() {
-  try {
-    const res = await fetch(`${supabaseUrl}/rest/v1/reserves?select=*`, {
-      headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
-    });
-    if(res.ok) {
-      const data = await res.json();
-      state.reserves = data.map(d => ({
-        id: d.id, code: d.code, cat: d.cat, status: d.status, title: d.title,
-        desc: d.description, lot: d.lot, loc: d.loc, photo: (d.photos && d.photos.length > 0) ? d.photos[0] : null,
-        pinX: d.pin_x, pinY: d.pin_y, planId: d.plan_id, planName: d.plan_name,
-        page: d.page, date: d.date, time: d.heure
-      }));
-      
-      // Update counters
-      state.counter = { SEC:0, FIN:0, NC:0, QUA:0, AVA:0 };
-      state.reserves.forEach(r => {
-         if(r.code && r.code.includes('-')) {
-            const num = parseInt(r.code.split('-')[1]);
-            if(num > (state.counter[r.cat] || 0)) state.counter[r.cat] = num;
-         }
-      });
-      
-      save(); // Save to localStorage as cache
-      renderReservesList(); renderPins(); updateBadge(); updateStats();
-    }
-  } catch(e) { 
-    console.error("Erreur de synchro distante:", e);
-    toast("Mode hors-ligne", "info");
-  }
-}
-
-
-// ═══════════════════════════════════════════════════════
-// INDEXEDDB — stockage des PDFs (binaire)
+// INDEXEDDB
 // ═══════════════════════════════════════════════════════
 let db = null;
 function openDB() {
@@ -686,32 +755,66 @@ function idbDel(key) {
 }
 
 // ═══════════════════════════════════════════════════════
-// PERSIST (localStorage pour state, IndexedDB pour PDFs)
+// PERSIST & INIT
 // ═══════════════════════════════════════════════════════
-function save() {
-  try { localStorage.setItem('cv_state', JSON.stringify(state)); } catch(e) {}
-}
-function loadState() {
-  try {
-    const raw = localStorage.getItem('cv_state');
-    if (raw) state = JSON.parse(raw);
-  } catch(e) {}
+function save(reserveToSync = null) {
+  idbSet('app_state', state).catch(e => console.error("Erreur de sauvegarde IndexedDB:", e));
+  try { localStorage.removeItem('cv_state'); } catch(e) {}
+  
+  if (reserveToSync) {
+    // Process en arrière-plan pour ne pas bloquer l'interface
+    (async () => {
+      reserveToSync.photos = await uploadPhotosVersSupabase(reserveToSync.photos);
+      await sbSaveReserve(reserveToSync);
+      await syncFromSupabase();
+    })();
+  }
 }
 
 async function init() {
   await openDB();
-  loadState();
   
-  // Remplacer les réserves locales par celles de Supabase
-  await fetchReserves();
-  
+  try {
+    const savedState = await idbGet('app_state');
+    if (savedState) {
+      state = savedState;
+    } else {
+      const raw = localStorage.getItem('cv_state');
+      if (raw) {
+        state = JSON.parse(raw);
+        await idbSet('app_state', state); 
+      }
+    }
+  } catch(e) { console.error('Erreur chargement DB:', e); }
+
+  state.reserves.forEach(r => {
+    if (r.photo && !r.photos) {
+      r.photos = [r.photo];
+      delete r.photo;
+    }
+  });
+
+  toast('🔄 Synchronisation...', 'info');
+  await syncFromSupabase();
+
+  // ── SEED : pré-charger les réserves si Supabase vide ──
+  if (state.reserves.length === 0) {
+    const SEED = [{"id": 1700000000000, "code": "FIN-002", "cat": "FIN", "status": "todo", "title": "Logement 1112", "desc": "Il y a un gros trou dans la pièce derrière le plafond", "lot": "", "loc": "Logement 1112", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000001, "code": "QUA-001", "cat": "SEC", "status": "todo", "title": "Logement 1113", "desc": "Plusieurs tubes de garde corps à couper dans la pièce", "lot": "", "loc": "Logement 1113", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000002, "code": "QUA-002", "cat": "QUA", "status": "todo", "title": "Couloir 1113 et 12", "desc": "Nettoyage et couper la ferraille", "lot": "", "loc": "Couloir 1113 et 12", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000003, "code": "QUA-003", "cat": "QUA", "status": "todo", "title": "Bât 1 - 1112", "desc": "Nettoyage huisserie", "lot": "", "loc": "Bât 1 - 1112", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000004, "code": "SEC-003", "cat": "SEC", "status": "todo", "title": "Bât 1 - Logement 1111", "desc": "Il manque des finitions mur dans la pièce", "lot": "", "loc": "Bât 1 - Log. 1111", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000005, "code": "QUA-004", "cat": "QUA", "status": "todo", "title": "Logement 1111", "desc": "Il faudra nettoyer la pièce", "lot": "", "loc": "Logement 1111", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000006, "code": "FIN-003", "cat": "FIN", "status": "todo", "title": "Logement 1104", "desc": "Il manque de bout de mur en finition", "lot": "", "loc": "Logement 1104", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000007, "code": "FIN-004", "cat": "FIN", "status": "todo", "title": "Logement 1104", "desc": "Finition mur", "lot": "", "loc": "Logement 1104", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000008, "code": "FIN-005", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition poutre", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000009, "code": "FIN-006", "cat": "FIN", "status": "todo", "title": "Bât 1 - Escalier", "desc": "Finition mur escalier bâtiment 1", "lot": "", "loc": "Bât 1 - Escalier", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000010, "code": "NC-001", "cat": "NC", "status": "todo", "title": "Bât 1 - Escalier", "desc": "Finir le bout d'escalier", "lot": "", "loc": "Bât 1 - Escalier", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000011, "code": "QUA-005", "cat": "QUA", "status": "todo", "title": "Escalier Bât 1", "desc": "Nettoyer escalier", "lot": "", "loc": "Escalier Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000012, "code": "FIN-007", "cat": "FIN", "status": "todo", "title": "Bât 1 - Balcon", "desc": "Nettoyer le balcon", "lot": "", "loc": "Bât 1 - Balcon", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000013, "code": "FIN-008", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition bout de mur porte", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000014, "code": "FIN-009", "cat": "FIN", "status": "todo", "title": "Bât 1 - Couloir", "desc": "Finition plafond couloir", "lot": "", "loc": "Bât 1 - Couloir", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000015, "code": "AVA-001", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Finir les relevés", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000016, "code": "SEC-004", "cat": "SEC", "status": "todo", "title": "Bât 1", "desc": "Couper ferraille (intérieur)", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000017, "code": "SEC-005", "cat": "SEC", "status": "todo", "title": "Bât 1 - Terrasse", "desc": "Couper ferraille (terrasse)", "lot": "", "loc": "Bât 1 - Terrasse", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000018, "code": "FIN-010", "cat": "FIN", "status": "todo", "title": "Bât 1 - Ascenseur", "desc": "Finition poutre ascenseur", "lot": "", "loc": "Bât 1 - Ascenseur", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000019, "code": "FIN-011", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition du mur", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000020, "code": "AVA-002", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Mur à finir ou couper ferraille", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000021, "code": "SEC-006", "cat": "SEC", "status": "todo", "title": "Bât 1 - Ascenseur", "desc": "Grille ascenseur non conforme", "lot": "", "loc": "Bât 1 - Ascenseur", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000022, "code": "FIN-012", "cat": "FIN", "status": "todo", "title": "Bât 1 - Ascenseur", "desc": "Finition mur ascenseur", "lot": "", "loc": "Bât 1 - Ascenseur", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000023, "code": "AVA-003", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Finir de faire les relevés (RDC)", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000024, "code": "FIN-013", "cat": "FIN", "status": "todo", "title": "Bât 1 - NIV2", "desc": "Finition relevé NIV2", "lot": "", "loc": "Bât 1 - NIV2", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000025, "code": "13-FIN-004", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition plafond à finir", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000026, "code": "13-AVA-001", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Coffrage à retirer", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000027, "code": "13-AVA-002", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Étais de séchage à retirer", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000028, "code": "13-FIN-005", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition de toiture à finaliser", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000029, "code": "13-FIN-007", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition mur à faire", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000030, "code": "13-FIN-008", "cat": "FIN", "status": "todo", "title": "Bât 2", "desc": "Finition plafond Bât 2", "lot": "", "loc": "Bât 2", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000031, "code": "13-FIN-009", "cat": "FIN", "status": "todo", "title": "Bât 2", "desc": "Remplir les trous Bât 2", "lot": "", "loc": "Bât 2", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}];
+    
+    toast('📤 Chargement initial des réserves...', 'info');
+    for (const r of SEED) {
+      await sbSaveReserve(r);
+    }
+    await syncFromSupabase();
+  }
+  // ── FIN SEED ──
+
   updateBadge();
   updateStats();
   updateSettingVal();
   renderPlansList();
 
   if (state.plans.length > 0) {
-    // Tenter de charger tous les PDFs depuis IndexedDB
     let anyLoaded = false;
     for (const plan of state.plans) {
       try {
@@ -733,7 +836,6 @@ async function init() {
       const firstLoaded = state.plans.find(p => pdfs[p.id]);
       if (firstLoaded) await activatePlan(firstLoaded.id);
     } else {
-      // PDFs non disponibles en IndexedDB — afficher demande de rechargement
       showReloadPrompt();
       switchTab('scPlan');
     }
@@ -765,7 +867,6 @@ async function loadPDFs(e) {
         plan.pages = pdfDoc.numPages;
       }
       pdfs[plan.id] = pdfDoc;
-      // Sauvegarder le binaire dans IndexedDB
       await idbSet(plan.id, ab);
       loaded++;
     } catch(err) { console.error(err); toast('Erreur: ' + file.name, 'err'); }
@@ -774,13 +875,12 @@ async function loadPDFs(e) {
   save();
   renderPlansList();
   if (loaded > 0) {
-    // Activer le premier des plans nouvellement chargés
     const newPlan = state.plans.find(p => pdfs[p.id]);
     if (newPlan) await activatePlan(newPlan.id);
   }
   setTimeout(() => document.getElementById('progWrap').classList.remove('on'), 600);
   e.target.value = '';
-  toast(`✓ ${loaded} plan(s) chargé(s) et sauvegardé(s)`, 'ok');
+  toast(`✓ ${loaded} plan(s) chargé(s)`, 'ok');
 }
 
 function setProgress(v) {
@@ -792,7 +892,6 @@ async function activatePlan(planId) {
   const plan = state.plans.find(p => p.id === planId);
   if (!plan) return;
 
-  // Si PDF pas encore en mémoire, tenter de le charger depuis IndexedDB
   if (!pdfs[planId]) {
     try {
       const ab = await idbGet(planId);
@@ -812,13 +911,11 @@ async function activatePlan(planId) {
   const shortName = plan.name.length > 14 ? plan.name.slice(0, 14) + '…' : plan.name;
   document.getElementById('planSwitchBtn').textContent = shortName + ' ▾';
 
-  // 1. D'ABORD : Forcer l'affichage de l'onglet plan pour avoir les bonnes dimensions
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
   document.getElementById('scPlan').classList.add('on');
   document.querySelector('.tab[data-s="scPlan"]')?.classList.add('on');
 
-  // 2. ENSUITE SEULEMENT : Calcul et rendu du PDF
   if (activePdf) {
     await renderPage(curPage);
     document.getElementById('pageNav').style.display = totalPages > 1 ? 'flex' : 'none';
@@ -859,7 +956,6 @@ async function renderPage(num) {
   if (!activePdf) return;
   const page = await activePdf.getPage(num);
 
-  // Attendre que le wrapper ait une taille réelle
   const wrap = document.getElementById('cvWrap');
   let ww = wrap.clientWidth, wh = wrap.clientHeight;
   if (ww < 10 || wh < 10) {
@@ -877,7 +973,6 @@ async function renderPage(num) {
 
   const cv = document.getElementById('cv');
   
-  // Rendu haute résolution (limité sur mobile pour éviter l'écran noir)
   let HIRES = Math.min(Math.ceil(window.devicePixelRatio) * 2, 4);
   if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
     HIRES = 1.5;
@@ -893,7 +988,6 @@ async function renderPage(num) {
   ctx.clearRect(0, 0, cv.width, cv.height);
   await page.render({ canvasContext: ctx, viewport: renderVP }).promise;
 
-  // Appliquer dimensions CSS et position APRÈS le rendu
   cv.style.width = baseW + 'px';
   cv.style.height = baseH + 'px';
   cv.style.transform = `translate(${panX}px,${panY}px)`;
@@ -907,7 +1001,7 @@ async function renderPage(num) {
 }
 
 // ═══════════════════════════════════════════════════════
-// TRANSFORM — RAF-based, fluide
+// TRANSFORM
 // ═══════════════════════════════════════════════════════
 let rafId = null;
 function applyT() {
@@ -959,13 +1053,20 @@ function zFit() {
 }
 
 // ═══════════════════════════════════════════════════════
-// TOUCH / PAN / ZOOM — rewritten for stability
+// TOUCH / PAN / ZOOM
 // ═══════════════════════════════════════════════════════
 const cvWrap = document.getElementById('cvWrap');
-
-// Touch state
 let touches = {};
 let gestureStart = null;
+let mouseDown = false, msx = 0, msy = 0;
+
+function resetTouches() {
+  touches = {};
+  gestureStart = null;
+  mouseDown = false;
+}
+
+cvWrap.addEventListener('touchcancel', resetTouches);
 
 cvWrap.addEventListener('touchstart', e => {
   e.preventDefault();
@@ -998,7 +1099,6 @@ cvWrap.addEventListener('touchmove', e => {
   }
 
   if (ids.length === 2 && gestureStart) {
-    // Update both touch positions
     Array.from(e.changedTouches).forEach(t => { if (touches[t.identifier]) touches[t.identifier] = { x: t.clientX, y: t.clientY }; });
     const [id0, id1] = ids;
     const t0 = touches[id0], t1 = touches[id1];
@@ -1023,11 +1123,12 @@ cvWrap.addEventListener('touchend', e => {
   const wasSingle = Object.keys(touches).length === 1;
   const t = e.changedTouches[0];
   changedIds.forEach(id => delete touches[id]);
-  gestureStart = null;
+  
+  if (Object.keys(touches).length < 2) {
+    gestureStart = null;
+  }
 
-  // Pin tap — only on single touch, small movement
-  if (pinMode && wasSingle && activePdf) {
-    const prev = { x: t.clientX, y: t.clientY }; // approximate
+  if (pinMode && wasSingle && activePdf && t) {
     const rect = cvWrap.getBoundingClientRect();
     const cv = document.getElementById('cv');
     const cw = parseFloat(cv.style.width);
@@ -1042,8 +1143,6 @@ cvWrap.addEventListener('touchend', e => {
   }
 }, { passive: false });
 
-// Mouse support
-let mouseDown = false, msx = 0, msy = 0;
 cvWrap.addEventListener('mousedown', e => {
   if (pinMode) return;
   mouseDown = true; msx = e.clientX - panX; msy = e.clientY - panY;
@@ -1070,7 +1169,7 @@ cvWrap.addEventListener('click', e => {
 });
 
 // ═══════════════════════════════════════════════════════
-// PIN MODE
+// PIN MODE & RENDER
 // ═══════════════════════════════════════════════════════
 function togglePinMode() {
   if (!activePdf && !state.plans.length) { toast('Chargez d\'abord un PDF', 'err'); return; }
@@ -1080,9 +1179,6 @@ function togglePinMode() {
   cvWrap.classList.toggle('pin-mode', pinMode);
 }
 
-// ═══════════════════════════════════════════════════════
-// RENDER PINS
-// ═══════════════════════════════════════════════════════
 function renderPins() {
   const layer = document.getElementById('pinsLayer');
   const cv = document.getElementById('cv');
@@ -1098,7 +1194,6 @@ function renderPins() {
     .forEach(r => {
       const el = document.createElement('div');
       el.className = 'pin-m';
-      // SOLUTION : Utilisation des pourcentages pour que l'épingle suive le zoom en temps réel
       el.style.left = (r.pinX * 100) + '%';
       el.style.top = (r.pinY * 100) + '%';
       const color = CAT_COLOR[r.cat] || '#f97316';
@@ -1113,10 +1208,11 @@ function renderPins() {
 // RESERVE MODAL
 // ═══════════════════════════════════════════════════════
 function openReserveModal(id = null) {
+  resetTouches(); 
+
   editId = id;
-  curPhoto = null;
+  curPhotos = [];
   curCat = 'SEC'; curStatus = 'todo';
-  resetPhotoArea();
 
   if (id !== null) {
     const r = state.reserves.find(x => x.id === id);
@@ -1126,8 +1222,7 @@ function openReserveModal(id = null) {
     document.getElementById('mLot').value = r.lot || '';
     document.getElementById('mLoc').value = r.loc || '';
     curCat = r.cat; curStatus = r.status;
-    curPhoto = r.photo || null;
-    if (r.photo) showPhoto(r.photo);
+    curPhotos = r.photos ? [...r.photos] : [];
   } else {
     document.getElementById('mTitle').textContent = 'Nouvelle réserve';
     document.getElementById('mTitleInp').value = '';
@@ -1135,91 +1230,76 @@ function openReserveModal(id = null) {
     document.getElementById('mLot').value = '';
     document.getElementById('mLoc').value = '';
   }
+  
+  renderPhotoArea();
   pickCat(curCat);
   pickStatus(curStatus);
   openOverlay('ovReserve');
   setTimeout(() => document.getElementById('mTitleInp').focus(), 350);
 }
 
-async function saveReserve() {
+function saveReserve() {
   const title = document.getElementById('mTitleInp').value.trim();
   if (!title) { toast('Titre requis', 'err'); return; }
-  
-  toast('Synchronisation en cours...', 'info');
-
-  let rId = editId !== null ? editId : Date.now();
-  let code = '';
-  const now = new Date();
-  
-  let finalPinX = pendingX;
-  let finalPinY = pendingY;
-  let finalPlanId = state.activePlanId;
-  let finalPlanName = state.plans.find(p => p.id === state.activePlanId)?.name || '';
-  let finalPage = curPage;
 
   if (editId !== null) {
     const r = state.reserves.find(x => x.id === editId);
-    code = r.code;
-    finalPinX = r.pinX;
-    finalPinY = r.pinY;
-    finalPlanId = r.planId;
-    finalPlanName = r.planName;
-    finalPage = r.page;
+    r.title = title;
+    r.desc = document.getElementById('mDesc').value.trim();
+    r.lot = document.getElementById('mLot').value.trim();
+    r.loc = document.getElementById('mLoc').value.trim();
+    r.cat = curCat; r.status = curStatus;
+    r.photos = [...curPhotos];
+    
+    // Si l'épingle n'avait pas été posée, on la pose maintenant si on est en mode édition avec coordonnées
+    if (pendingX !== null && pendingY !== null) {
+      r.pinX = pendingX;
+      r.pinY = pendingY;
+      r.planId = state.activePlanId;
+      r.planName = state.plans.find(p => p.id === state.activePlanId)?.name || '';
+      r.page = curPage;
+    }
+    
+    toast('Réserve modifiée ✓', 'ok');
+    save(r); 
   } else {
     state.counter[curCat] = (state.counter[curCat] || 0) + 1;
     const num = String(state.counter[curCat]).padStart(3, '0');
-    code = `${curCat}-${num}`;
+    const code = `${curCat}-${num}`;
+    const now = new Date();
+    const r = {
+      id: Date.now(),
+      code, cat: curCat, status: curStatus,
+      title,
+      desc: document.getElementById('mDesc').value.trim(),
+      lot: document.getElementById('mLot').value.trim(),
+      loc: document.getElementById('mLoc').value.trim(),
+      photos: [...curPhotos],
+      pinX: pendingX, pinY: pendingY,
+      planId: state.activePlanId,
+      planName: state.plans.find(p => p.id === state.activePlanId)?.name || '',
+      page: curPage,
+      date: now.toLocaleDateString('fr-FR'),
+      time: now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      ts: now.toISOString()
+    };
+    state.reserves.push(r);
+    lastSavedReserve = r;
+    toast(`📍 ${code} ajoutée`, 'ok');
+    save(lastSavedReserve);
   }
 
-  let finalPhoto = curPhoto;
-  if (finalPhoto && finalPhoto.startsWith('data:image')) {
-    finalPhoto = await uploadPhoto(finalPhoto);
-  }
-
-  const payload = {
-    id: rId,
-    code: code,
-    cat: curCat,
-    status: curStatus,
-    title: title,
-    description: document.getElementById('mDesc').value.trim(),
-    lot: document.getElementById('mLot').value.trim(),
-    loc: document.getElementById('mLoc').value.trim(),
-    photos: finalPhoto ? [finalPhoto] : [],
-    pin_x: finalPinX,
-    pin_y: finalPinY,
-    plan_id: finalPlanId,
-    plan_name: finalPlanName,
-    page: finalPage,
-    date: now.toLocaleDateString('fr-FR'),
-    heure: now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-  };
-
-  try {
-    await fetch(`${supabaseUrl}/rest/v1/reserves`, {
-      method: 'POST',
-      headers: { 
-        'apikey': supabaseKey, 
-        'Authorization': `Bearer ${supabaseKey}`, 
-        'Content-Type': 'application/json', 
-        'Prefer': 'resolution=merge-duplicates' 
-      },
-      body: JSON.stringify(payload)
-    });
-  } catch(e) { 
-    console.error("Erreur de sauvegarde:", e); 
-  }
-
-  await fetchReserves(); // Récupère les données à jour
-  
   closeOverlay('ovReserve');
+  
   if (pinMode) togglePinMode();
   pendingX = null; pendingY = null;
-  toast(`📍 ${code} enregistrée et synchronisée`, 'ok');
+  renderPins();
+  updateBadge();
+  updateStats();
 }
 
 // ═══════════════════════════════════════════════════════
-// FORM HELPERS
+// FORM HELPERS & DRAWING ANNOTATION
 // ═══════════════════════════════════════════════════════
 function pickCat(c) {
   curCat = c;
@@ -1229,73 +1309,216 @@ function pickStatus(s) {
   curStatus = s;
   document.querySelectorAll('.stp').forEach(el => el.classList.toggle('on', el.dataset.s === s));
 }
-function triggerPhoto() { document.getElementById('photoFileInp')?.click(); }
+
+let annotImg = null;
+let annotCtx = null;
+let annotIsDrawing = false;
+let annotStrokes = [];
+let currentStroke = [];
+let rawPhotoData = null;
+
 function handlePhoto(e) {
-  const file = e.target.files[0]; if (!file) return;
+  const file = e.target.files[0]; 
+  if (!file) return;
+  
   const r = new FileReader();
-  r.onload = ev => { curPhoto = ev.target.result; showPhoto(curPhoto); };
+  r.onload = ev => { 
+    const img = new Image();
+    img.onload = () => {
+      const cvs = document.createElement('canvas');
+      const MAX_SIZE = 800; 
+      let w = img.width, h = img.height;
+      
+      if (w > h) { 
+        if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } 
+      } else { 
+        if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } 
+      }
+      
+      cvs.width = w; 
+      cvs.height = h;
+      cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+      
+      rawPhotoData = cvs.toDataURL('image/jpeg', 0.6);
+      openAnnotateModal();
+    };
+    img.src = ev.target.result;
+  };
   r.readAsDataURL(file);
+  e.target.value = ''; 
 }
-function showPhoto(src) {
-  document.getElementById('photoArea').innerHTML = `<div class="photo-prev-wrap"><img class="photo-prev" src="${src}"><button class="photo-rem" onclick="removePhoto()">✕</button></div>`;
+
+function openAnnotateModal() {
+  document.getElementById('ovAnnotate').classList.add('on');
+  const cv = document.getElementById('annotCv');
+  const container = document.getElementById('annotBody');
+  annotCtx = cv.getContext('2d');
+  annotStrokes = [];
+  
+  annotImg = new Image();
+  annotImg.onload = () => {
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+    const ratio = Math.min(cw / annotImg.width, ch / annotImg.height);
+    cv.width = annotImg.width * ratio;
+    cv.height = annotImg.height * ratio;
+    cv.dataset.ratio = ratio;
+    
+    redrawAnnotate();
+  };
+  annotImg.src = rawPhotoData;
+  
+  cv.ontouchstart = annotStart;
+  cv.ontouchmove = annotMove;
+  cv.ontouchend = annotEnd;
+  cv.onmousedown = annotStart;
+  cv.onmousemove = annotMove;
+  cv.onmouseup = annotEnd;
 }
-function removePhoto() { curPhoto = null; resetPhotoArea(); }
-function resetPhotoArea() {
-  document.getElementById('photoArea').innerHTML = `
-    <div class="photo-drop" onclick="triggerPhoto()">
-      <div class="photo-drop-ico">📷</div>
-      <div class="photo-drop-txt">Prendre une photo ou importer</div>
-      <input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+
+function redrawAnnotate() {
+  const cv = document.getElementById('annotCv');
+  annotCtx.clearRect(0, 0, cv.width, cv.height);
+  annotCtx.drawImage(annotImg, 0, 0, cv.width, cv.height);
+  annotCtx.strokeStyle = '#ef4444'; 
+  annotCtx.lineWidth = 4;
+  annotCtx.lineCap = 'round';
+  annotCtx.lineJoin = 'round';
+  
+  for (const stroke of annotStrokes) {
+    if(!stroke.length) continue;
+    annotCtx.beginPath();
+    annotCtx.moveTo(stroke[0].x, stroke[0].y);
+    for (let i=1; i<stroke.length; i++) {
+      annotCtx.lineTo(stroke[i].x, stroke[i].y);
+    }
+    annotCtx.stroke();
+  }
+}
+
+function getAnnotPos(e) {
+  const cv = document.getElementById('annotCv');
+  const rect = cv.getBoundingClientRect();
+  const touch = e.touches ? e.touches[0] : e;
+  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+}
+
+function annotStart(e) {
+  e.preventDefault();
+  annotIsDrawing = true;
+  currentStroke = [getAnnotPos(e)];
+  annotStrokes.push(currentStroke);
+}
+
+function annotMove(e) {
+  if(!annotIsDrawing) return;
+  e.preventDefault();
+  currentStroke.push(getAnnotPos(e));
+  redrawAnnotate(); 
+}
+
+function annotEnd(e) {
+  if(!annotIsDrawing) return;
+  e.preventDefault();
+  annotIsDrawing = false;
+}
+
+function clearAnnotate() {
+  annotStrokes = [];
+  redrawAnnotate();
+}
+
+function closeAnnotate() {
+  document.getElementById('ovAnnotate').classList.remove('on');
+  annotStrokes = [];
+}
+
+function saveAnnotate() {
+  const offCv = document.createElement('canvas');
+  offCv.width = annotImg.width;
+  offCv.height = annotImg.height;
+  const offCtx = offCv.getContext('2d');
+  offCtx.drawImage(annotImg, 0, 0);
+  
+  offCtx.strokeStyle = '#ef4444';
+  offCtx.lineCap = 'round';
+  offCtx.lineJoin = 'round';
+  
+  const ratio = parseFloat(document.getElementById('annotCv').dataset.ratio || 1);
+  offCtx.lineWidth = 6 / ratio; 
+  
+  for (const stroke of annotStrokes) {
+    if(stroke.length < 2) continue;
+    offCtx.beginPath();
+    offCtx.moveTo(stroke[0].x / ratio, stroke[0].y / ratio);
+    for (let i=1; i<stroke.length; i++) {
+      offCtx.lineTo(stroke[i].x / ratio, stroke[i].y / ratio);
+    }
+    offCtx.stroke();
+  }
+  
+  curPhotos.push(offCv.toDataURL('image/jpeg', 0.6));
+  renderPhotoArea();
+  closeAnnotate();
+}
+
+function renderPhotoArea() {
+  const area = document.getElementById('photoArea');
+  let html = '<div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;">';
+  
+  curPhotos.forEach((p, i) => {
+    html += `
+    <div style="position:relative; flex-shrink:0; height:80px; width:80px; border-radius:8px; border:1px solid var(--border); overflow:hidden;">
+      <img src="${p}" style="width:100%; height:100%; object-fit:cover;">
+      <button onclick="removePhoto(${i})" style="position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,.7); border:none; color:#fff; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
     </div>`;
+  });
+  
+  html += `
+    <div style="flex-shrink:0; height:80px; width:80px; display:flex; flex-direction:column; justify-content:center; padding:0; cursor:pointer; border:2px dashed var(--border); border-radius:10px; text-align:center; transition:border-color .18s" onclick="triggerPhoto()">
+      <div style="font-size:24px; margin-bottom:2px">📷</div>
+      <div style="font-size:10px; color:var(--text2)">Ajouter</div>
+    </div>
+  </div>`;
+  
+  area.innerHTML = html + `<input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="display:none">`;
+}
+
+function removePhoto(index) {
+  curPhotos.splice(index, 1);
+  renderPhotoArea();
+}
+
+function triggerPhoto() {
+  document.getElementById('photoFileInp').click();
 }
 
 // ═══════════════════════════════════════════════════════
-// STATUS CHANGE
+// STATUS CHANGE & DELETE
 // ═══════════════════════════════════════════════════════
 function openStatusModal(id) {
   statusTarget = id;
   openOverlay('ovStatus');
 }
-async function applyStatus(s) {
+function applyStatus(s) {
   if (!statusTarget) return;
-  
-  toast('Mise à jour...', 'info');
-  try {
-    await fetch(`${supabaseUrl}/rest/v1/reserves?id=eq.${statusTarget}`, {
-      method: 'PATCH',
-      headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: s })
-    });
-    await fetchReserves();
-    toast('Statut mis à jour', 'ok');
-  } catch (e) {
-    console.error(e);
-  }
-  
+  const r = state.reserves.find(x => x.id === statusTarget);
+  if (r) { r.status = s; save(r); renderReservesList(); updateStats(); toast('Statut mis à jour', 'ok'); }
   closeOverlay('ovStatus');
   statusTarget = null;
 }
 
-// ═══════════════════════════════════════════════════════
-// DELETE
-// ═══════════════════════════════════════════════════════
 function confirmDelete(id) {
   deleteTarget = id;
   const r = state.reserves.find(x => x.id === id);
   document.getElementById('confirmTitle').textContent = 'Supprimer la réserve';
-  document.getElementById('confirmMsg').textContent = `Supprimer "${r.title}" (${r.code}) ? Cette action est irréversible et supprimera l'élément pour tous les utilisateurs.`;
-  document.getElementById('confirmOk').onclick = async () => {
-    toast('Suppression...', 'info');
-    try {
-      await fetch(`${supabaseUrl}/rest/v1/reserves?id=eq.${deleteTarget}`, {
-        method: 'DELETE',
-        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
-      });
-      await fetchReserves();
-      toast('Réserve supprimée', 'ok');
-    } catch (e) {
-      console.error(e);
-    }
+  document.getElementById('confirmMsg').textContent = `Supprimer "${r.title}" (${r.code}) ? Cette action est irréversible.`;
+  document.getElementById('confirmOk').onclick = () => {
+    const delId = deleteTarget;
+    state.reserves = state.reserves.filter(x => x.id !== delId);
+    sbDeleteReserve(delId);
+    save(); renderReservesList(); renderPins(); updateBadge(); updateStats();
+    toast('Réserve supprimée', 'ok');
     closeOverlay('ovConfirm');
   };
   openOverlay('ovConfirm');
@@ -1316,7 +1539,10 @@ function renderReservesList() {
     return;
   }
   const sMap = { todo:'status-todo', wip:'status-wip', done:'status-done' };
-  list.innerHTML = filtered.map(r => `
+  
+  list.innerHTML = filtered.map(r => {
+    const photos = r.photos || [];
+    return `
     <div class="res-card" id="rc-${r.id}">
       <div class="res-card-head">
         <div class="res-num" style="background:${CAT_COLOR[r.cat]}">${r.code}</div>
@@ -1333,18 +1559,20 @@ function renderReservesList() {
           </div>
         </div>
       </div>
-      ${r.desc || r.photo || r.loc ? `<div class="res-card-body">
+      ${r.desc || photos.length || r.loc ? `<div class="res-card-body">
         ${r.loc ? `<div class="res-tags"><span class="res-tag">📍 ${r.loc}</span></div>` : ''}
         ${r.desc ? `<div class="res-desc">${r.desc}</div>` : ''}
-        ${r.photo ? `<img class="res-photo" src="${r.photo}" onclick="openLb(${r.id})">` : ''}
+        ${photos.length ? `<div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-top:6px">
+          ${photos.map((p, i) => `<img src="${p}" style="height:60px; width:60px; object-fit:cover; border-radius:6px; cursor:pointer; flex-shrink:0; border:1px solid var(--border)" onclick="openLb(${r.id}, ${i})">`).join('')}
+        </div>` : ''}
       </div>` : ''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function jumpTo(id) {
   const r = state.reserves.find(x => x.id === id);
   if (!r || r.pinX === null) { toast('Pas de position sur plan', 'err'); return; }
-  // Switch plan if needed
   const doJump = () => {
     const cv = document.getElementById('cv');
     const bw = parseFloat(cv.dataset.bw || baseW);
@@ -1414,8 +1642,9 @@ function deletePlan(e, id) {
   e.stopPropagation();
   const plan = state.plans.find(p => p.id === id);
   const resCount = state.reserves.filter(r => r.planId === id).length;
-  if (!confirm(`Supprimer le plan "${plan.name}" localement ? (Les réserves resteront en ligne)`)) return;
+  if (!confirm(`Supprimer le plan "${plan.name}"${resCount ? ` et ses ${resCount} réserve(s)` : ''} ?`)) return;
   state.plans = state.plans.filter(p => p.id !== id);
+  state.reserves = state.reserves.filter(r => r.planId !== id);
   delete pdfs[id];
   idbDel(id).catch(() => {});
   if (state.activePlanId === id) {
@@ -1427,9 +1656,6 @@ function deletePlan(e, id) {
   toast('Plan supprimé', 'ok');
 }
 
-// ═══════════════════════════════════════════════════════
-// PLAN SELECTOR (header button)
-// ═══════════════════════════════════════════════════════
 function openPlanSel() {
   const list = document.getElementById('planSelList');
   list.innerHTML = state.plans.map(p => `
@@ -1443,6 +1669,7 @@ function openPlanSel() {
     `<div style="padding-top:10px"><button class="btn btn-sec btn-sm" style="width:100%" onclick="closeOverlay('ovPlanSel');triggerPDF()">+ Ajouter un PDF</button></div>`;
   openOverlay('ovPlanSel');
 }
+
 async function selPlan(id) {
   closeOverlay('ovPlanSel');
   if (!pdfs[id]) { toast('PDF non chargé — rechargez le fichier', 'err'); return; }
@@ -1450,9 +1677,6 @@ async function selPlan(id) {
   renderPlansList();
 }
 
-// ═══════════════════════════════════════════════════════
-// PAGE NAV
-// ═══════════════════════════════════════════════════════
 async function goPage(d) {
   const np = curPage + d;
   if (np < 1 || np > totalPages) return;
@@ -1461,9 +1685,10 @@ async function goPage(d) {
 }
 
 // ═══════════════════════════════════════════════════════
-// SETTINGS
+// SETTINGS / OVERLAYS
 // ═══════════════════════════════════════════════════════
 function openOverlay(id) {
+  resetTouches(); 
   if (id === 'ovSettings') {
     document.getElementById('sChantier').value = state.settings.chantier;
     document.getElementById('sConducteur').value = state.settings.conducteur;
@@ -1471,7 +1696,9 @@ function openOverlay(id) {
   }
   document.getElementById(id).classList.add('on');
 }
+
 function closeOverlay(id) { document.getElementById(id).classList.remove('on'); }
+
 function saveSettings() {
   state.settings.chantier = document.getElementById('sChantier').value.trim();
   state.settings.conducteur = document.getElementById('sConducteur').value.trim();
@@ -1479,49 +1706,52 @@ function saveSettings() {
   save(); updateSettingVal(); closeOverlay('ovSettings');
   toast('Paramètres sauvegardés', 'ok');
 }
+
 function updateSettingVal() {
-  const v = state.settings.chantier || state.settings.conducteur || 'Configurer le nom, conducteur...';
+  const v = state.settings.chantier || state.settings.conducteur || 'Configurer le nom, responsable...';
   document.getElementById('wlcSettingVal').textContent = v;
 }
 
-// ═══════════════════════════════════════════════════════
-// STATS & BADGE
-// ═══════════════════════════════════════════════════════
 function updateBadge() {
   const n = state.reserves.length;
   const b = document.getElementById('resBadge');
   b.textContent = n; b.style.display = n ? 'inline' : 'none';
 }
+
 function updateStats() {
   const r = state.reserves;
   document.getElementById('statsGrid').innerHTML = `
-    <div class="stat-box"><div class="stat-n" style="color:var(--accent)">${r.length}</div><div class="stat-l">Total</div></div>
+    <div class="stat-box" style="grid-column: 1 / -1; background:rgba(249,115,22,0.1); border-color:var(--accent)"><div class="stat-n" style="color:var(--accent)">${r.length}</div><div class="stat-l">Total Réserves</div></div>
+    
     <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.cat==='SEC').length}</div><div class="stat-l">Sécurité</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--purple)">${r.filter(x=>x.cat==='FIN').length}</div><div class="stat-l">Finition</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.cat==='NC').length}</div><div class="stat-l">Non-conf.</div></div>
+    
+    <div class="stat-box"><div class="stat-n" style="color:var(--blue)">${r.filter(x=>x.cat==='QUA').length}</div><div class="stat-l">Qualité</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.cat==='AVA').length}</div><div class="stat-l">Avanc.</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--text2)">-</div><div class="stat-l">-</div></div>
+
     <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.status==='todo').length}</div><div class="stat-l">À faire</div></div>
+    <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.status==='wip').length}</div><div class="stat-l">En cours</div></div>
     <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.status==='done').length}</div><div class="stat-l">Levées</div></div>`;
 }
 
 // ═══════════════════════════════════════════════════════
-// EXPORT EXCEL
+// EXPORTS
 // ═══════════════════════════════════════════════════════
 function exportXLSX() {
   if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
   const wb = XLSX.utils.book_new();
-  // Main sheet
-  const hdr = ['Code','Titre','Catégorie','Statut','Description','Lot','Localisation','Plan','Page','Date','Heure'];
+  const hdr = ['Code','Titre','Catégorie','Statut','Description','Intervenant/Lot','Localisation','Plan','Page','Date','Heure'];
   const rows = state.reserves.map(r => [
     r.code, r.title, CAT_LABEL[r.cat] || r.cat, STATUS_LABEL[r.status],
     r.desc || '', r.lot || '', r.loc || '', r.planName || '', r.page, r.date, r.time
   ]);
   const ws = XLSX.utils.aoa_to_sheet([hdr, ...rows]);
   ws['!cols'] = [10,35,15,12,45,20,20,25,6,12,8].map(w => ({ wch: w }));
-  // Color header row
   if (!ws['!rows']) ws['!rows'] = [];
   XLSX.utils.book_append_sheet(wb, ws, 'Réserves');
 
-  // Summary per category
   const cats = ['SEC','FIN','NC','QUA','AVA'];
   const sumHdr = ['Catégorie','Total','À faire','En cours','Levées'];
   const sumRows = cats.map(c => {
@@ -1532,15 +1762,14 @@ function exportXLSX() {
   wsSum['!cols'] = [18,8,10,12,10].map(w => ({ wch: w }));
   XLSX.utils.book_append_sheet(wb, wsSum, 'Récapitulatif');
 
-  const date = new Date().toISOString().slice(0, 10);
-  XLSX.writeFile(wb, `reserves-chantier-${date}.xlsx`);
+  XLSX.writeFile(wb, `reserves-${new Date().toISOString().slice(0, 10)}.xlsx`);
   toast('Excel exporté 📊', 'ok');
 }
 
 function exportCSV() {
   if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
   const esc = v => `"${String(v || '').replace(/"/g,'""')}"`;
-  const hdr = ['Code','Titre','Catégorie','Statut','Description','Lot','Localisation','Plan','Page','Date','Heure'].map(esc).join(',');
+  const hdr = ['Code','Titre','Catégorie','Statut','Description','Intervenant','Localisation','Plan','Page','Date','Heure'].map(esc).join(',');
   const rows = state.reserves.map(r =>
     [r.code,r.title,CAT_LABEL[r.cat],STATUS_LABEL[r.status],r.desc||'',r.lot||'',r.loc||'',r.planName||'',r.page,r.date,r.time].map(esc).join(',')
   );
@@ -1552,10 +1781,58 @@ function exportCSV() {
   toast('CSV exporté', 'ok');
 }
 
-// ═══════════════════════════════════════════════════════
-// RAPPORT HTML (ouvre dans nouvel onglet → imprimer en PDF)
-// ═══════════════════════════════════════════════════════
-function exportReport(mode) {
+async function getPlanThumb(planId, pageNum, pinX, pinY, catColor) {
+  let pdf = pdfs[planId];
+  if (!pdf) {
+    try {
+      const ab = await idbGet(planId);
+      if (ab) pdf = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
+    } catch(e) {}
+  }
+  if (!pdf) return null;
+
+  try {
+    const p = await pdf.getPage(pageNum);
+    const vp1 = p.getViewport({ scale: 1 });
+    
+    const SIZE = 500; 
+    const scale = (SIZE * 4) / Math.max(vp1.width, vp1.height); 
+    
+    const px = pinX * vp1.width * scale;
+    const py = pinY * vp1.height * scale;
+    
+    const cropVp = p.getViewport({ 
+      scale: scale, 
+      offsetX: (SIZE / 2) - px, 
+      offsetY: (SIZE / 2) - py 
+    });
+
+    const c = document.createElement('canvas');
+    c.width = SIZE; 
+    c.height = SIZE;
+    const ctx = c.getContext('2d');
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    await p.render({ canvasContext: ctx, viewport: cropVp }).promise;
+    
+    ctx.beginPath();
+    ctx.arc(SIZE/2, SIZE/2, 14, 0, 2 * Math.PI);
+    ctx.fillStyle = catColor || '#f97316';
+    ctx.fill();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+    
+    return c.toDataURL('image/jpeg', 0.6); 
+  } catch(e) {
+    console.error(e);
+    return null;
+  }
+}
+
+async function exportReport(mode) {
   let reserves = state.reserves;
   if (mode === 'today') {
     const today = new Date().toLocaleDateString('fr-FR');
@@ -1563,12 +1840,22 @@ function exportReport(mode) {
   }
   if (!reserves.length) { toast('Aucune réserve à exporter', 'err'); return; }
 
+  toast('Génération du plan net HD, veuillez patienter...', 'info');
+
+  for (const r of reserves) {
+    if (r.pinX !== null && !r._thumb) {
+      r._thumb = await getPlanThumb(r.planId, r.page, r.pinX, r.pinY, CAT_COLOR[r.cat]);
+    }
+  }
+
   const s = state.settings;
   const date = new Date().toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   const sMap = { todo:'#ef4444', wip:'#eab308', done:'#22c55e' };
   const cMap = CAT_COLOR;
 
-  const cards = reserves.map(r => `
+  const cards = reserves.map(r => {
+    const photos = r.photos || [];
+    return `
     <div style="page-break-inside:avoid;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:14px;overflow:hidden">
       <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f9fafb;border-bottom:1px solid #e5e7eb">
         <div style="background:${cMap[r.cat]};color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;font-family:monospace">${r.code}</div>
@@ -1577,13 +1864,33 @@ function exportReport(mode) {
       </div>
       <div style="padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:12px;color:#374151">
         ${r.desc ? `<div style="grid-column:1/-1"><strong>Description :</strong> ${r.desc}</div>` : ''}
-        ${r.lot ? `<div><strong>Lot :</strong> ${r.lot}</div>` : ''}
+        ${r.lot ? `<div><strong>Intervenant :</strong> ${r.lot}</div>` : ''}
         ${r.loc ? `<div><strong>Localisation :</strong> ${r.loc}</div>` : ''}
         <div><strong>Plan :</strong> ${r.planName || '-'} — Page ${r.page}</div>
         <div><strong>Date :</strong> ${r.date} à ${r.time}</div>
       </div>
-      ${r.photo ? `<div style="padding:0 14px 12px"><img src="${r.photo}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px"></div>` : ''}
-    </div>`).join('');
+      
+      ${(photos.length || (r.pinX !== null && r._thumb)) ? `
+      <div style="padding:0 14px 12px; display:flex; flex-direction:column; gap:12px">
+        
+        ${(r.pinX !== null && r._thumb) ? `
+        <div style="width:100%">
+          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase;">Localisation sur Plan</div>
+          <img src="${r._thumb}" style="width:100%; max-width:400px; border-radius:8px; border:1px solid #e5e7eb; display:block;">
+        </div>` : ''}
+        
+        ${(photos.length) ? `
+        <div style="width:100%">
+          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Photos (${photos.length})</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            ${photos.map(p => `<img src="${p}" style="max-width:100%; max-height:280px; object-fit:contain; border-radius:8px; border:1px solid #e5e7eb; background:#f9fafb">`).join('')}
+          </div>
+        </div>` : ''}
+
+      </div>` : ''}
+
+    </div>`;
+  }).join('');
 
   const catSummary = ['SEC','FIN','NC','QUA','AVA'].map(c => {
     const n = reserves.filter(r => r.cat === c).length;
@@ -1591,18 +1898,18 @@ function exportReport(mode) {
     return `<span style="display:inline-flex;align-items:center;gap:5px;background:${cMap[c]}22;color:${cMap[c]};border:1px solid ${cMap[c]}44;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin:3px">● ${CAT_LABEL[c]} : ${n}</span>`;
   }).join('');
 
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport de chantier</title>
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport de Projet</title>
   <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;background:#fff;padding:24px;max-width:800px;margin:0 auto}
   @media print{body{padding:0}@page{margin:18mm}}</style></head><body>
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #f97316">
     <div>
-      <div style="font-size:22px;font-weight:800;color:#111">${s.chantier || 'Rapport de chantier'}</div>
-      ${s.conducteur ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">Conducteur : <strong>${s.conducteur}</strong>${s.entreprise ? ' — ' + s.entreprise : ''}</div>` : ''}
+      <div style="font-size:22px;font-weight:800;color:#111">${s.chantier || 'Rapport de suivi'}</div>
+      ${s.conducteur ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">Responsable : <strong>${s.conducteur}</strong>${s.entreprise ? ' — ' + s.entreprise : ''}</div>` : ''}
       <div style="font-size:12px;color:#9ca3af;margin-top:4px">${date}</div>
     </div>
     <div style="text-align:right">
       <div style="font-size:28px;font-weight:800;color:#f97316">${reserves.length}</div>
-      <div style="font-size:11px;color:#6b7280">${mode === 'today' ? 'réserves du jour' : 'réserves total'}</div>
+      <div style="font-size:11px;color:#6b7280">${mode === 'today' ? 'réserves du jour' : 'réserves au total'}</div>
     </div>
   </div>
   <div style="margin-bottom:18px;display:flex;flex-wrap:wrap;gap:4px">${catSummary}</div>
@@ -1614,28 +1921,26 @@ function exportReport(mode) {
   <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Détail des réserves</div>
   ${cards}
   <div style="margin-top:24px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center">
-    Rapport généré le ${date} via ChantierView
+    Généré le ${date} via ChantierView
   </div>
   </body></html>`;
 
   const w = window.open('', '_blank');
   w.document.write(html);
   w.document.close();
-  setTimeout(() => { w.focus(); w.print(); }, 600);
-  toast('Rapport ouvert — imprimer en PDF 🖨️', 'info');
+  setTimeout(() => { w.focus(); w.print(); }, 800);
+  toast('Rapport ouvert — prêt à imprimer 🖨️', 'ok');
 }
 
-// ═══════════════════════════════════════════════════════
-// JSON BACKUP
-// ═══════════════════════════════════════════════════════
 function exportJSON() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `chantier-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   toast('Sauvegarde exportée 💾', 'ok');
 }
+
 function importJSON(e) {
   const file = e.target.files[0]; if (!file) return;
   const r = new FileReader();
@@ -1661,44 +1966,27 @@ function importJSON(e) {
   e.target.value = '';
 }
 
-// ═══════════════════════════════════════════════════════
-// CLEAR ALL
-// ═══════════════════════════════════════════════════════
 function confirmClear() {
   if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
   document.getElementById('confirmTitle').textContent = 'Tout effacer';
-  document.getElementById('confirmMsg').textContent = `Supprimer les ${state.reserves.length} réserve(s) ? Cette action est irréversible et effacera la base de données de tous les appareils.`;
-  document.getElementById('confirmOk').onclick = async () => {
-    toast('Nettoyage en cours...', 'info');
-    try {
-      await fetch(`${supabaseUrl}/rest/v1/reserves?id=not.is.null`, {
-        method: 'DELETE',
-        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
-      });
-      await fetchReserves();
-      toast('Tout a été effacé', 'ok');
-    } catch (e) {
-      console.error(e);
-    }
+  document.getElementById('confirmMsg').textContent = `Supprimer les ${state.reserves.length} réserve(s) ? Cette action est irréversible.`;
+  document.getElementById('confirmOk').onclick = () => {
+    state.reserves = []; state.counter = { SEC:0,FIN:0,NC:0,QUA:0,AVA:0 };
+    save(); renderReservesList(); renderPins(); updateBadge(); updateStats();
+    toast('Tout effacé', 'ok');
     closeOverlay('ovConfirm');
   };
   openOverlay('ovConfirm');
 }
 
-// ═══════════════════════════════════════════════════════
-// LIGHTBOX
-// ═══════════════════════════════════════════════════════
-function openLb(id) {
+function openLb(id, idx = 0) {
   const r = state.reserves.find(x => x.id === id);
-  if (!r?.photo) return;
-  document.getElementById('lbImg').src = r.photo;
+  if (!r || !r.photos || !r.photos[idx]) return;
+  document.getElementById('lbImg').src = r.photos[idx];
   document.getElementById('lightbox').classList.add('on');
 }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('on'); }
 
-// ═══════════════════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════════════════
 function switchTab(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
@@ -1709,9 +1997,6 @@ function switchTab(id) {
   if (id === 'scExport') updateStats();
 }
 
-// ═══════════════════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════════════════
 let toastT;
 function toast(msg, type='') {
   const t = document.getElementById('toast');
@@ -1720,16 +2005,10 @@ function toast(msg, type='') {
   toastT = setTimeout(() => t.classList.remove('on'), 2800);
 }
 
-// ═══════════════════════════════════════════════════════
-// CLOSE OVERLAY ON BACKDROP CLICK
-// ═══════════════════════════════════════════════════════
 document.querySelectorAll('.overlay').forEach(ov => {
   ov.addEventListener('click', e => { if (e.target === ov) closeOverlay(ov.id); });
 });
 
-// ═══════════════════════════════════════════════════════
-// START
-// ═══════════════════════════════════════════════════════
 init();
 </script>
 </body>

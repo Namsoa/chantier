@@ -321,6 +321,7 @@ header{
     </div>
     <div class="modal-foot">
       <button class="btn btn-acc" onclick="saveReserve()">✓ Enregistrer</button>
+      <button class="btn btn-sec" id="btnReposition" onclick="startReposition()" style="display:none">📍 Repositionner sur le plan</button>
       <button class="btn btn-sec" onclick="closeOverlay('ovReserve')">Annuler</button>
     </div>
   </div>
@@ -470,6 +471,10 @@ header{
     <button class="chip" data-f="todo" onclick="filterRes(this,'todo')">À faire</button>
     <button class="chip" data-f="wip" onclick="filterRes(this,'wip')">En cours</button>
     <button class="chip" data-f="done" onclick="filterRes(this,'done')">Levées</button>
+    <div class="sep"></div>
+    <button class="chip" data-f="today" onclick="filterRes(this,'today')">📅 Aujourd'hui</button>
+    <button class="chip" data-f="yesterday" onclick="filterRes(this,'yesterday')">📅 Hier</button>
+    <div id="extraDateChips"></div>
   </div>
   <div id="resList" style="overflow-y:auto; flex:1; min-height:0; padding:12px; padding-bottom:max(24px, env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:10px"></div>
 </div>
@@ -653,6 +658,112 @@ async function sbDeleteReserve(id) {
   } catch(e) { console.warn('Erreur suppression sync:', e); }
 }
 
+// ── PLANS SYNC ──────────────────────────────────────────
+
+async function sbLoadPlans() {
+  try {
+    return await sbFetch('plans?order=created_at.asc');
+  } catch(e) {
+    console.warn('Impossible de charger les plans distants', e);
+    return null;
+  }
+}
+
+async function sbSavePlan(plan) {
+  try {
+    await sbFetch('plans', {
+      method: 'POST',
+      prefer: 'resolution=merge-duplicates,return=minimal',
+      body: JSON.stringify({
+        id: plan.id,
+        name: plan.name,
+        pages: plan.pages,
+        pdf_url: plan.pdfUrl || null,
+      })
+    });
+  } catch(e) { console.warn('Erreur sync plan:', e); }
+}
+
+async function sbDeletePlan(id) {
+  try {
+    await sbFetch('plans?id=eq.' + id, { method: 'DELETE', prefer: 'return=minimal' });
+  } catch(e) { console.warn('Erreur suppression plan:', e); }
+}
+
+async function uploadPDFVersSupabase(planId, arrayBuffer) {
+  try {
+    const nomFichier = `${planId}.pdf`;
+    const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+    const res = await fetch(`${SB_URL}/storage/v1/object/plans/${nomFichier}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/pdf',
+        'x-upsert': 'true',
+      },
+      body: blob
+    });
+    if (res.ok) {
+      return `${SB_URL}/storage/v1/object/public/plans/${nomFichier}`;
+    }
+    console.warn('Upload PDF échoué:', await res.text());
+    return null;
+  } catch(e) {
+    console.warn('Erreur upload PDF:', e);
+    return null;
+  }
+}
+
+async function downloadPDFFromSupabase(pdfUrl) {
+  try {
+    const res = await fetch(pdfUrl);
+    if (!res.ok) return null;
+    return await res.arrayBuffer();
+  } catch(e) {
+    console.warn('Erreur download PDF:', e);
+    return null;
+  }
+}
+
+async function syncPlansFromSupabase() {
+  const remotePlans = await sbLoadPlans();
+  if (!remotePlans) return;
+
+  // Ajouter les plans distants qui manquent localement
+  for (const rp of remotePlans) {
+    const existing = state.plans.find(p => p.id === rp.id);
+    if (!existing) {
+      state.plans.push({ id: rp.id, name: rp.name, pages: rp.pages, pdfUrl: rp.pdf_url });
+    } else {
+      existing.pdfUrl = rp.pdf_url;
+      existing.pages = rp.pages;
+    }
+  }
+  await idbSet('app_state', state);
+  renderPlansList();
+}
+
+async function downloadPlanLocalement(planId) {
+  const plan = state.plans.find(p => p.id === planId);
+  if (!plan || !plan.pdfUrl) { toast('Pas de PDF distant pour ce plan', 'err'); return; }
+  toast(`⬇️ Téléchargement de ${plan.name}...`, 'info');
+  const ab = await downloadPDFFromSupabase(plan.pdfUrl);
+  if (!ab) { toast('Échec du téléchargement', 'err'); return; }
+  try {
+    const pdfDoc = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
+    pdfs[plan.id] = pdfDoc;
+    await idbSet(plan.id, ab);
+    toast(`✓ ${plan.name} téléchargé`, 'ok');
+    renderPlansList();
+    await activatePlan(plan.id);
+  } catch(e) {
+    toast('Fichier PDF invalide', 'err');
+  }
+}
+
+// ── FIN PLANS SYNC ──────────────────────────────────────
+
 async function syncFromSupabase() {
   const remote = await sbLoadReserves();
   if (!remote) return; 
@@ -669,6 +780,8 @@ async function syncFromSupabase() {
   updateStats();
   renderReservesList();
   renderPins();
+  // Sync plans aussi (métadonnées uniquement, pas les PDFs)
+  await syncPlansFromSupabase();
 }
 
 document.addEventListener('visibilitychange', () => {
@@ -684,6 +797,17 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 const CAT_COLOR = { SEC:'#ef4444', FIN:'#a855f7', NC:'#eab308', QUA:'#3b82f6', AVA:'#22c55e' };
 const CAT_LABEL = { SEC:'Sécurité', FIN:'Finition', NC:'Non-conformité', QUA:'Qualité', AVA:'Avancement' };
 const STATUS_LABEL = { todo:'À faire', wip:'En cours', done:'Levée' };
+
+// ═══════════════════════════════════════════════════════
+// HELPERS DATE
+// ═══════════════════════════════════════════════════════
+function frDateSlug() {
+  const d = new Date();
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const yyyy = d.getFullYear();
+  return `${dd}-${mm}-${yyyy}`;
+}
 
 // ═══════════════════════════════════════════════════════
 // STATE
@@ -710,11 +834,12 @@ let curCat = 'SEC', curStatus = 'todo';
 
 let curPhotos = [];
 
-let pinFilter = 'all', resFilter = 'all';
+let pinFilter = 'all', resFilter = 'all', dateFilter = '';
 let statusTarget = null;
 let lastSavedReserve = null;
 let deleteTarget = null;
 let planThumbs = {};
+let repositionId = null;
 
 // ═══════════════════════════════════════════════════════
 // INDEXEDDB
@@ -762,7 +887,6 @@ function save(reserveToSync = null) {
   try { localStorage.removeItem('cv_state'); } catch(e) {}
   
   if (reserveToSync) {
-    // Process en arrière-plan pour ne pas bloquer l'interface
     (async () => {
       reserveToSync.photos = await uploadPhotosVersSupabase(reserveToSync.photos);
       await sbSaveReserve(reserveToSync);
@@ -855,7 +979,7 @@ async function loadPDFs(e) {
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     try {
-      setProgress(5 + (i / files.length) * 85);
+      setProgress(5 + (i / files.length) * 70);
       const ab = await file.arrayBuffer();
       const pdfDoc = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
       const planName = file.name.replace(/\.pdf$/i, '');
@@ -869,6 +993,17 @@ async function loadPDFs(e) {
       pdfs[plan.id] = pdfDoc;
       await idbSet(plan.id, ab);
       loaded++;
+      // Upload vers Supabase en arrière-plan
+      setProgress(70 + (i / files.length) * 25);
+      toast(`⬆️ Upload de ${planName} vers le cloud...`, 'info');
+      const pdfUrl = await uploadPDFVersSupabase(plan.id, ab);
+      if (pdfUrl) {
+        plan.pdfUrl = pdfUrl;
+        toast(`✓ ${planName} synchronisé`, 'ok');
+      } else {
+        toast(`⚠️ ${planName} chargé localement (upload échoué)`, 'info');
+      }
+      await sbSavePlan(plan);
     } catch(err) { console.error(err); toast('Erreur: ' + file.name, 'err'); }
   }
   setProgress(100);
@@ -1138,7 +1273,11 @@ cvWrap.addEventListener('touchend', e => {
     pendingX = (x - panX) / cw;
     pendingY = (y - panY) / ch;
     if (pendingX >= 0 && pendingX <= 1 && pendingY >= 0 && pendingY <= 1) {
-      openReserveModal();
+      if (repositionId !== null) {
+        applyReposition();
+      } else {
+        openReserveModal();
+      }
     }
   }
 }, { passive: false });
@@ -1165,21 +1304,74 @@ cvWrap.addEventListener('click', e => {
   const cw = parseFloat(cv.style.width), ch = parseFloat(cv.style.height);
   pendingX = (e.clientX - rect.left - panX) / cw;
   pendingY = (e.clientY - rect.top - panY) / ch;
-  if (pendingX >= 0 && pendingX <= 1 && pendingY >= 0 && pendingY <= 1) openReserveModal();
+  if (pendingX >= 0 && pendingX <= 1 && pendingY >= 0 && pendingY <= 1) {
+    if (repositionId !== null) {
+      applyReposition();
+    } else {
+      openReserveModal();
+    }
+  }
 });
 
 // ═══════════════════════════════════════════════════════
 // PIN MODE & RENDER
 // ═══════════════════════════════════════════════════════
-function togglePinMode() {
+function togglePinMode(forReposition = false) {
   if (!activePdf && !state.plans.length) { toast('Chargez d\'abord un PDF', 'err'); return; }
   pinMode = !pinMode;
   document.getElementById('pinBtn').classList.toggle('pin-active', pinMode);
-  document.getElementById('pinBanner').classList.toggle('on', pinMode);
+  const banner = document.getElementById('pinBanner');
+  banner.textContent = forReposition
+    ? '📍 Touchez le plan pour repositionner la réserve'
+    : '📍 Touchez le plan pour placer la réserve';
+  banner.classList.toggle('on', pinMode);
   cvWrap.classList.toggle('pin-mode', pinMode);
 }
 
-function renderPins() {
+function startReposition() {
+  const title = document.getElementById('mTitleInp').value.trim();
+  if (!title) { toast('Titre requis avant de repositionner', 'err'); return; }
+  // Sauvegarder les champs en cours sans sync
+  if (editId !== null) {
+    const r = state.reserves.find(x => x.id === editId);
+    if (r) {
+      r.title = title;
+      r.desc = document.getElementById('mDesc').value.trim();
+      r.lot = document.getElementById('mLot').value.trim();
+      r.loc = document.getElementById('mLoc').value.trim();
+      r.cat = curCat; r.status = curStatus;
+      r.photos = [...curPhotos];
+    }
+  }
+  repositionId = editId;
+  closeOverlay('ovReserve');
+  switchTab('scPlan');
+  if (!pinMode) togglePinMode(true);
+  else {
+    document.getElementById('pinBanner').textContent = '📍 Touchez le plan pour repositionner la réserve';
+    document.getElementById('pinBanner').classList.add('on');
+  }
+  toast('Touchez l\'endroit exact sur le plan', 'info');
+}
+
+function applyReposition() {
+  const r = state.reserves.find(x => x.id === repositionId);
+  if (r && pendingX !== null) {
+    r.pinX = pendingX;
+    r.pinY = pendingY;
+    r.planId = state.activePlanId;
+    r.planName = state.plans.find(p => p.id === state.activePlanId)?.name || '';
+    r.page = curPage;
+    save(r);
+    renderPins();
+    toast(`📍 ${r.code} repositionnée ✓`, 'ok');
+  }
+  repositionId = null;
+  pendingX = null; pendingY = null;
+  if (pinMode) togglePinMode();
+}
+
+
   const layer = document.getElementById('pinsLayer');
   const cv = document.getElementById('cv');
   const cw = parseFloat(cv.style.width || cv.dataset.bw || 100);
@@ -1223,12 +1415,15 @@ function openReserveModal(id = null) {
     document.getElementById('mLoc').value = r.loc || '';
     curCat = r.cat; curStatus = r.status;
     curPhotos = r.photos ? [...r.photos] : [];
+    // Afficher le bouton repositionner si on est sur un plan chargé
+    document.getElementById('btnReposition').style.display = activePdf ? 'flex' : 'none';
   } else {
     document.getElementById('mTitle').textContent = 'Nouvelle réserve';
     document.getElementById('mTitleInp').value = '';
     document.getElementById('mDesc').value = '';
     document.getElementById('mLot').value = '';
     document.getElementById('mLoc').value = '';
+    document.getElementById('btnReposition').style.display = 'none';
   }
   
   renderPhotoArea();
@@ -1251,7 +1446,6 @@ function saveReserve() {
     r.cat = curCat; r.status = curStatus;
     r.photos = [...curPhotos];
     
-    // Si l'épingle n'avait pas été posée, on la pose maintenant si on est en mode édition avec coordonnées
     if (pendingX !== null && pendingY !== null) {
       r.pinX = pendingX;
       r.pinY = pendingY;
@@ -1481,7 +1675,7 @@ function renderPhotoArea() {
     </div>
   </div>`;
   
-  area.innerHTML = html + `<input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="display:none">`;
+  area.innerHTML = html + `<input type="file" id="photoFileInp" accept="image/*" onchange="handlePhoto(event)" style="display:none">`;
 }
 
 function removePhoto(index) {
@@ -1527,12 +1721,44 @@ function confirmDelete(id) {
 // ═══════════════════════════════════════════════════════
 // RESERVES LIST
 // ═══════════════════════════════════════════════════════
+function buildDateChips() {
+  // Collecter les dates uniques triées décroissant
+  const today = new Date().toLocaleDateString('fr-FR');
+  const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('fr-FR');
+  const allDates = [...new Set(state.reserves.map(r => r.date).filter(Boolean))].sort((a,b) => {
+    // Convertir dd/mm/yyyy en comparaison
+    const toNum = d => d.split('/').reverse().join('');
+    return toNum(b).localeCompare(toNum(a));
+  });
+  // Dates autres qu'aujourd'hui et hier
+  const extraDates = allDates.filter(d => d !== today && d !== yesterday);
+  const container = document.getElementById('extraDateChips');
+  if (!container) return;
+  container.innerHTML = extraDates.map(d =>
+    `<button class="chip" data-f="date:${d}" onclick="filterRes(this,'date:${d}')" style="margin-left:4px">${d}</button>`
+  ).join('');
+}
+
 function renderReservesList() {
+  buildDateChips();
   const list = document.getElementById('resList');
   let filtered = state.reserves;
+
+  // Filtre catégorie / statut
   if (resFilter !== 'all') {
     if (['todo','wip','done'].includes(resFilter)) filtered = filtered.filter(r => r.status === resFilter);
-    else filtered = filtered.filter(r => r.cat === resFilter);
+    else if (resFilter === 'today') {
+      const today = new Date().toLocaleDateString('fr-FR');
+      filtered = filtered.filter(r => r.date === today);
+    } else if (resFilter === 'yesterday') {
+      const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('fr-FR');
+      filtered = filtered.filter(r => r.date === yesterday);
+    } else if (resFilter.startsWith('date:')) {
+      const d = resFilter.slice(5);
+      filtered = filtered.filter(r => r.date === d);
+    } else {
+      filtered = filtered.filter(r => r.cat === resFilter);
+    }
   }
   if (!filtered.length) {
     list.innerHTML = `<div class="empty"><div class="empty-ico">📋</div><div class="empty-ttl">Aucune réserve</div><div class="empty-sub">Chargez un plan et utilisez le mode 📍 Épingler pour ajouter des réserves.</div></div>`;
@@ -1618,22 +1844,39 @@ function renderPlansList() {
     return;
   }
   const reserveCount = id => state.reserves.filter(r => r.planId === id).length;
-  list.innerHTML = state.plans.map(p => `
+  list.innerHTML = state.plans.map(p => {
+    const loaded = !!pdfs[p.id];
+    const hasRemote = !!p.pdfUrl;
+    let actionBtn = '';
+    if (!loaded && hasRemote) {
+      actionBtn = `<div class="ib" onclick="downloadPlanLocalement('${p.id}')" title="Télécharger" style="color:var(--accent);width:auto;padding:0 8px;font-size:11px;font-weight:600;gap:4px">⬇️ DL</div>`;
+    }
+    return `
     <div class="plan-card ${p.id === state.activePlanId ? 'active-plan' : ''}" onclick="selectPlanFromList('${p.id}')">
-      <div class="plan-icon">${pdfs[p.id] ? '🗺️' : '📄'}</div>
+      <div class="plan-icon">${loaded ? '🗺️' : hasRemote ? '☁️' : '📄'}</div>
       <div class="plan-info">
         <div class="plan-name">${p.name}</div>
-        <div class="plan-meta">${p.pages} page(s) · ${reserveCount(p.id)} réserve(s)${!pdfs[p.id] ? ' · ⚠️ PDF non chargé' : ''}</div>
+        <div class="plan-meta">${p.pages} page(s) · ${reserveCount(p.id)} réserve(s) · ${loaded ? '✓ local' : hasRemote ? '☁️ cloud' : '⚠️ non chargé'}</div>
       </div>
       <div class="plan-actions">
+        ${actionBtn}
         <div class="ib red" onclick="deletePlan(event,'${p.id}')">🗑️</div>
       </div>
-    </div>`).join('') +
-    `<button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un plan PDF</button>`;
+    </div>`;
+  }).join('') +
+    `<button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un PDF</button>`;
 }
 
 async function selectPlanFromList(id) {
-  if (!pdfs[id]) { toast('PDF non chargé — rechargez le fichier', 'err'); return; }
+  if (!pdfs[id]) {
+    const plan = state.plans.find(p => p.id === id);
+    if (plan?.pdfUrl) {
+      await downloadPlanLocalement(id);
+    } else {
+      toast('PDF non chargé — rechargez le fichier', 'err');
+    }
+    return;
+  }
   await activatePlan(id);
   renderPlansList();
 }
@@ -1647,6 +1890,7 @@ function deletePlan(e, id) {
   state.reserves = state.reserves.filter(r => r.planId !== id);
   delete pdfs[id];
   idbDel(id).catch(() => {});
+  sbDeletePlan(id);
   if (state.activePlanId === id) {
     state.activePlanId = state.plans[0]?.id || null;
     if (state.activePlanId) activatePlan(state.activePlanId);
@@ -1672,7 +1916,15 @@ function openPlanSel() {
 
 async function selPlan(id) {
   closeOverlay('ovPlanSel');
-  if (!pdfs[id]) { toast('PDF non chargé — rechargez le fichier', 'err'); return; }
+  if (!pdfs[id]) {
+    const plan = state.plans.find(p => p.id === id);
+    if (plan?.pdfUrl) {
+      await downloadPlanLocalement(id);
+    } else {
+      toast('PDF non chargé — rechargez le fichier', 'err');
+    }
+    return;
+  }
   await activatePlan(id);
   renderPlansList();
 }
@@ -1762,7 +2014,7 @@ function exportXLSX() {
   wsSum['!cols'] = [18,8,10,12,10].map(w => ({ wch: w }));
   XLSX.utils.book_append_sheet(wb, wsSum, 'Récapitulatif');
 
-  XLSX.writeFile(wb, `reserves-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  XLSX.writeFile(wb, `Reserves_${frDateSlug()}.xlsx`);
   toast('Excel exporté 📊', 'ok');
 }
 
@@ -1776,7 +2028,7 @@ function exportCSV() {
   const blob = new Blob([[hdr,...rows].join('\n')], { type:'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `reserves-${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = `Reserves_${frDateSlug()}.csv`;
   a.click();
   toast('CSV exporté', 'ok');
 }
@@ -1849,6 +2101,7 @@ async function exportReport(mode) {
   }
 
   const s = state.settings;
+  const slug = frDateSlug();
   const date = new Date().toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   const sMap = { todo:'#ef4444', wip:'#eab308', done:'#22c55e' };
   const cMap = CAT_COLOR;
@@ -1898,9 +2151,18 @@ async function exportReport(mode) {
     return `<span style="display:inline-flex;align-items:center;gap:5px;background:${cMap[c]}22;color:${cMap[c]};border:1px solid ${cMap[c]}44;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin:3px">● ${CAT_LABEL[c]} : ${n}</span>`;
   }).join('');
 
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport de Projet</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;background:#fff;padding:24px;max-width:800px;margin:0 auto}
-  @media print{body{padding:0}@page{margin:18mm}}</style></head><body>
+  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport ChantierView ${slug}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;background:#fff;padding:24px;max-width:800px;margin:0 auto}
+    @media print{
+      body{padding:0}
+      @page{margin:18mm; @bottom-center { content: "Page " counter(page) " / " counter(pages); font-size:10px; color:#9ca3af; }}
+      @page :first { @bottom-center { content: none; } }
+      .no-break{page-break-inside:avoid}
+    }
+    @counter-style decimal-leading-zero {}
+  </style></head><body>
   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #f97316">
     <div>
       <div style="font-size:22px;font-weight:800;color:#111">${s.chantier || 'Rapport de suivi'}</div>
@@ -1936,7 +2198,7 @@ function exportJSON() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `Sauvegarde_ChantierView_${frDateSlug()}.json`;
   a.click();
   toast('Sauvegarde exportée 💾', 'ok');
 }

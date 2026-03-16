@@ -399,14 +399,14 @@ header{
   </div>
 </header>
 
-<div class="tabs" id="mainTabs">
-  <div class="tab on" data-s="scPlan" onclick="switchTab('scPlan')"><span class="ti">🗺️</span>Plan</div>
+<div class="tabs show" id="mainTabs">
+  <div class="tab" data-s="scPlan" onclick="switchTab('scPlan')"><span class="ti">🗺️</span>Plan</div>
   <div class="tab" data-s="scPlans" onclick="switchTab('scPlans')"><span class="ti">📂</span>Plans</div>
-  <div class="tab" data-s="scReserves" onclick="switchTab('scReserves')"><span class="ti">📋</span>Réserves<span class="badge" id="resBadge" style="display:none">0</span></div>
+  <div class="tab on" data-s="scReserves" onclick="switchTab('scReserves')"><span class="ti">📋</span>Réserves<span class="badge" id="resBadge" style="display:none">0</span></div>
   <div class="tab" data-s="scExport" onclick="switchTab('scExport')"><span class="ti">📤</span>Export</div>
 </div>
 
-<div class="screen on" id="scWelcome">
+<div class="screen" id="scWelcome" style="display:none">
   <div class="wlc-logo">🏗️</div>
   <div class="wlc-title">Chantier<em>View</em></div>
   <div class="wlc-sub">Chargez vos plans PDF, épinglez vos réserves directement sur le plan, et exportez un rapport professionnel en fin de journée.</div>
@@ -459,7 +459,7 @@ header{
   <div id="plansList" style="padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1"></div>
 </div>
 
-<div class="screen" id="scReserves">
+<div class="screen on" id="scReserves">
   <div class="res-bar" id="resBar">
     <button class="chip on" data-f="all" onclick="filterRes(this,'all')">Tous</button>
     <button class="chip" data-f="SEC" onclick="filterRes(this,'SEC')">🔴 Sécu</button>
@@ -727,21 +727,25 @@ async function downloadPDFFromSupabase(pdfUrl) {
 }
 
 async function syncPlansFromSupabase() {
-  const remotePlans = await sbLoadPlans();
-  if (!remotePlans) return;
+  try {
+    const remotePlans = await sbLoadPlans();
+    if (!remotePlans) return;
 
-  // Ajouter les plans distants qui manquent localement
-  for (const rp of remotePlans) {
-    const existing = state.plans.find(p => p.id === rp.id);
-    if (!existing) {
-      state.plans.push({ id: rp.id, name: rp.name, pages: rp.pages, pdfUrl: rp.pdf_url });
-    } else {
-      existing.pdfUrl = rp.pdf_url;
-      existing.pages = rp.pages;
+    for (const rp of remotePlans) {
+      const existing = state.plans.find(p => p.id === rp.id);
+      if (!existing) {
+        state.plans.push({ id: rp.id, name: rp.name, pages: rp.pages, pdfUrl: rp.pdf_url });
+      } else {
+        existing.pdfUrl = rp.pdf_url;
+        existing.pages = rp.pages;
+      }
     }
+    await idbSet('app_state', state);
+    renderPlansList();
+  } catch(e) {
+    // Table plans pas encore créée ou autre erreur — silencieux
+    console.warn('syncPlansFromSupabase ignoré:', e);
   }
-  await idbSet('app_state', state);
-  renderPlansList();
 }
 
 async function downloadPlanLocalement(planId) {
@@ -780,8 +784,8 @@ async function syncFromSupabase() {
   updateStats();
   renderReservesList();
   renderPins();
-  // Sync plans aussi (métadonnées uniquement, pas les PDFs)
-  await syncPlansFromSupabase();
+  // Sync plans en arrière-plan, erreur silencieuse si table pas encore créée
+  try { await syncPlansFromSupabase(); } catch(e) {}
 }
 
 document.addEventListener('visibilitychange', () => {
@@ -938,32 +942,35 @@ async function init() {
   updateSettingVal();
   renderPlansList();
 
+  // Toujours afficher l'interface — plus de page d'accueil
+  document.getElementById('mainTabs').classList.add('show');
+  document.getElementById('planSwitchBtn').style.display = 'flex';
+  document.getElementById('scWelcome').classList.remove('on');
+
+  // Charger les PDFs depuis IndexedDB si disponibles
   if (state.plans.length > 0) {
-    let anyLoaded = false;
     for (const plan of state.plans) {
       try {
         const ab = await idbGet(plan.id);
         if (ab) {
           const pdfDoc = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
           pdfs[plan.id] = pdfDoc;
-          anyLoaded = true;
         }
       } catch(e) {}
     }
-    document.getElementById('mainTabs').classList.add('show');
-    document.getElementById('planSwitchBtn').style.display = 'flex';
-    document.getElementById('scWelcome').classList.remove('on');
-
     if (state.activePlanId && pdfs[state.activePlanId]) {
       await activatePlan(state.activePlanId);
-    } else if (anyLoaded) {
-      const firstLoaded = state.plans.find(p => pdfs[p.id]);
-      if (firstLoaded) await activatePlan(firstLoaded.id);
-    } else {
-      showReloadPrompt();
-      switchTab('scPlan');
+      return; // activatePlan gère le switchTab
+    }
+    const firstLoaded = state.plans.find(p => pdfs[p.id]);
+    if (firstLoaded) {
+      await activatePlan(firstLoaded.id);
+      return;
     }
   }
+
+  // Pas de plan chargé → aller sur Réserves directement
+  switchTab('scReserves');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1894,7 +1901,7 @@ function deletePlan(e, id) {
   if (state.activePlanId === id) {
     state.activePlanId = state.plans[0]?.id || null;
     if (state.activePlanId) activatePlan(state.activePlanId);
-    else { document.getElementById('mainTabs').classList.remove('show'); document.getElementById('scWelcome').classList.add('on'); }
+    else switchTab('scReserves');
   }
   save(); renderPlansList(); updateBadge(); updateStats();
   toast('Plan supprimé', 'ok');

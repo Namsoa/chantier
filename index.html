@@ -1378,7 +1378,7 @@ function applyReposition() {
   if (pinMode) togglePinMode();
 }
 
-
+function renderPins() {
   const layer = document.getElementById('pinsLayer');
   const cv = document.getElementById('cv');
   const cw = parseFloat(cv.style.width || cv.dataset.bw || 100);

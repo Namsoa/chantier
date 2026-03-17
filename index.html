@@ -1471,7 +1471,38 @@ function filterRes(el,f){resFilter=f;document.querySelectorAll('#resBar .chip[da
 // ═══════════════════════════════════════════════════════
 // PLANS LIST
 // ═══════════════════════════════════════════════════════
-function renderPlansList(){const list=document.getElementById('plansList');if(!state.plans.length){list.innerHTML=`<div class="empty"><div class="empty-ico">📂</div><div class="empty-ttl">Aucun plan</div><div class="empty-sub">Chargez vos plans PDF.</div></div><button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un plan PDF</button>`;return;}const reserveCount=id=>state.reserves.filter(r=>r.planId===id).length;list.innerHTML=state.plans.map(p=>{const loaded=!!pdfs[p.id];const hasRemote=!!p.pdfUrl;let actionBtn='';if(!loaded&&hasRemote)actionBtn=`<div class="ib" onclick="downloadPlanLocalement('${p.id}')" style="color:var(--accent);width:auto;padding:0 8px;font-size:11px;font-weight:600">⬇️ DL</div>`;return`<div class="plan-card ${p.id===state.activePlanId?'active-plan':''}" onclick="selectPlanFromList('${p.id}')"><div class="plan-icon">${loaded?'🗺️':hasRemote?'☁️':'📄'}</div><div class="plan-info"><div class="plan-name">${p.name}</div><div class="plan-meta">${p.pages}p · ${reserveCount(p.id)} rés. · ${loaded?'✓ local':hasRemote?'☁️ cloud':'⚠️ non chargé'}</div></div><div class="plan-actions">${actionBtn}<div class="ib red" onclick="deletePlan(event,'${p.id}')">🗑️</div></div></div>`;}).join('')+`<button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un PDF</button>`;}
+function renderPlansList(){
+  const list=document.getElementById('plansList');
+  if(!state.plans.length){
+    list.innerHTML=`<div class="empty"><div class="empty-ico">📂</div><div class="empty-ttl">Aucun plan</div><div class="empty-sub">Chargez vos plans PDF.</div></div><button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un plan PDF</button>`;
+    return;
+  }
+  const reserveCount=id=>state.reserves.filter(r=>r.planId===id).length;
+  const hasLocalOnly = state.plans.some(p=>pdfs[p.id]&&!p.pdfUrl);
+  
+  let topBtn = hasLocalOnly
+    ? `<button class="btn btn-acc btn-sm" style="margin-bottom:12px;background:var(--accent)" onclick="uploadAllPlans()">⬆️ Synchroniser tous les plans vers le cloud</button>`
+    : '';
+  
+  list.innerHTML = topBtn + state.plans.map(p=>{
+    const loaded=!!pdfs[p.id];
+    const hasRemote=!!p.pdfUrl;
+    let actionBtn='';
+    if(!loaded&&hasRemote) actionBtn=`<div class="ib" onclick="downloadPlanLocalement('${p.id}')" style="color:var(--accent);width:auto;padding:0 8px;font-size:11px;font-weight:600">⬇️</div>`;
+    if(loaded&&!hasRemote) actionBtn=`<div class="ib" onclick="uploadPlanToCloud('${p.id}')" style="color:var(--blue);width:auto;padding:0 8px;font-size:11px;font-weight:600">⬆️</div>`;
+    const statusTxt = loaded&&hasRemote ? '✓ local + ☁️' : loaded ? '⚠️ local seulement' : hasRemote ? '☁️ cloud' : '⚠️ non chargé';
+    const statusColor = loaded&&hasRemote ? 'var(--green)' : loaded&&!hasRemote ? 'var(--yellow)' : 'var(--text2)';
+    return `<div class="plan-card ${p.id===state.activePlanId?'active-plan':''}" onclick="selectPlanFromList('${p.id}')">
+      <div class="plan-icon">${loaded?'🗺️':hasRemote?'☁️':'📄'}</div>
+      <div class="plan-info">
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-meta" style="color:${statusColor}">${p.pages}p · ${reserveCount(p.id)} rés. · ${statusTxt}</div>
+      </div>
+      <div class="plan-actions">${actionBtn}<div class="ib red" onclick="deletePlan(event,'${p.id}')">🗑️</div></div>
+    </div>`;
+  }).join('') + `<button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un PDF</button>`;
+}
+
 async function selectPlanFromList(id){if(!pdfs[id]){const plan=state.plans.find(p=>p.id===id);if(plan?.pdfUrl){await downloadPlanLocalement(id);}else{toast('PDF non chargé — rechargez','err');}return;}await activatePlan(id);renderPlansList();}
 function deletePlan(e,id){e.stopPropagation();const plan=state.plans.find(p=>p.id===id);const resCount=state.reserves.filter(r=>r.planId===id).length;if(!confirm(`Supprimer "${plan.name}"${resCount?` et ses ${resCount} réserve(s)`:''}?`))return;state.plans=state.plans.filter(p=>p.id!==id);state.reserves=state.reserves.filter(r=>r.planId!==id);delete pdfs[id];idbDel(id).catch(()=>{});sbDeletePlan(id);if(state.activePlanId===id){state.activePlanId=state.plans[0]?.id||null;if(state.activePlanId)activatePlan(state.activePlanId);else switchTab('scReserves');}save();renderPlansList();updateBadge();updateStats();toast('Plan supprimé','ok');}
 function openPlanSel(){const list=document.getElementById('planSelList');list.innerHTML=state.plans.map(p=>`<div class="plan-sel-item ${p.id===state.activePlanId?'on':''}" onclick="selPlan('${p.id}')"><div class="plan-sel-check">${p.id===state.activePlanId?'✓':''}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div><div style="font-size:11px;color:var(--text2)">${p.pages}p · ${state.reserves.filter(r=>r.planId===p.id).length} rés.${!pdfs[p.id]?' · ⚠️':''}</div></div></div>`).join('')+`<div style="padding-top:10px"><button class="btn btn-sec btn-sm" style="width:100%" onclick="closeOverlay('ovPlanSel');triggerPDF()">+ Ajouter un PDF</button></div>`;openOverlay('ovPlanSel');}
@@ -1504,6 +1535,38 @@ function switchTab(id){document.querySelectorAll('.screen').forEach(s=>s.classLi
 let toastT;
 function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast on '+type;clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800);}
 document.querySelectorAll('.overlay').forEach(ov=>{ov.addEventListener('click',e=>{if(e.target===ov)closeOverlay(ov.id);});});
+async function uploadPlanToCloud(planId) {
+  const plan = state.plans.find(p=>p.id===planId);
+  if(!plan || !pdfs[planId]) { toast('Plan non chargé localement', 'err'); return; }
+  toast('⬆️ Upload de ' + plan.name + '...', 'info');
+  try {
+    const ab = await idbGet(planId);
+    if(!ab) { toast('Données locales introuvables', 'err'); return; }
+    const pdfUrl = await uploadPDFVersSupabase(planId, ab);
+    if(pdfUrl) {
+      plan.pdfUrl = pdfUrl;
+      await sbSavePlan(plan);
+      await idbSet('app_state', state);
+      toast('✓ ' + plan.name + ' synchronisé ☁️', 'ok');
+      renderPlansList();
+    } else {
+      toast('⚠️ Échec upload ' + plan.name, 'err');
+    }
+  } catch(e) {
+    toast('Erreur : ' + e.message, 'err');
+  }
+}
+
+async function uploadAllPlans() {
+  const localOnly = state.plans.filter(p=>pdfs[p.id]&&!p.pdfUrl);
+  if(!localOnly.length) { toast('Tous les plans sont déjà dans le cloud', 'ok'); return; }
+  toast('⬆️ Upload de ' + localOnly.length + ' plan(s)...', 'info');
+  for(const plan of localOnly) {
+    await uploadPlanToCloud(plan.id);
+  }
+  toast('✓ Tous les plans synchronisés', 'ok');
+}
+
 function quickFill(title, cat) {
   document.getElementById('mTitleInp').value = title;
   pickCat(cat);

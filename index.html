@@ -11,53 +11,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
-
-:root {
-  --bg: #111214;
-  --s1: #1c1d20;
-  --s2: #25262b;
-  --s3: #2e2f35;
-  --border: #363740;
-  --text: #e8e9f0;
-  --text2: #7c7d8a;
-  --text3: #4e4f5c;
-  --accent: #f97316;
-  --accent-d: #c45d10;
-  --blue: #3b82f6;
-  --green: #22c55e;
-  --red: #ef4444;
-  --yellow: #eab308;
-  --purple: #a855f7;
-  --teal: #14b8a6;
-  --r: 12px;
-  --shadow: 0 8px 32px rgba(0,0,0,.6);
-}
-
+:root{--bg:#111214;--s1:#1c1d20;--s2:#25262b;--s3:#2e2f35;--border:#363740;--text:#e8e9f0;--text2:#7c7d8a;--text3:#4e4f5c;--accent:#f97316;--accent-d:#c45d10;--blue:#3b82f6;--green:#22c55e;--red:#ef4444;--yellow:#eab308;--purple:#a855f7;--teal:#14b8a6;--r:12px;--shadow:0 8px 32px rgba(0,0,0,.6)}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
 body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100dvh}
-
-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;
-  padding-top:max(10px,env(safe-area-inset-top));
-  background:var(--s1);border-bottom:1px solid var(--border);
-  flex-shrink:0;z-index:50;
-}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;z-index:50}
 .logo{font-size:17px;font-weight:700;letter-spacing:-.3px}
 .logo em{color:var(--accent);font-style:normal}
 .hdr-btns{display:flex;gap:6px}
-
 .tabs{display:none;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--border)}
 .tabs.show{display:flex}
 .tab{flex:1;padding:9px 4px 7px;text-align:center;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;user-select:none}
 .tab.on{color:var(--accent);border-bottom-color:var(--accent)}
 .ti{font-size:17px;display:block;margin-bottom:1px}
 .badge{background:var(--accent);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:3px;vertical-align:middle}
-
 .screen{display:none;flex:1;overflow:hidden;flex-direction:column}
 .screen.on{display:flex}
-
 #scWelcome{align-items:center;justify-content:center;gap:16px;padding:32px 24px;text-align:center;overflow-y:auto}
 .wlc-logo{font-size:64px;line-height:1}
 .wlc-title{font-size:24px;font-weight:700}.wlc-title em{color:var(--accent);font-style:normal}
@@ -75,7 +44,6 @@ header{
 .wlc-setting-title{font-size:14px;font-weight:500}
 .wlc-setting-val{font-size:11px;color:var(--text2);margin-top:1px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wlc-setting-arr{color:var(--text3)}
-
 #scPlan{position:relative}
 .plan-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 .plan-bar::-webkit-scrollbar{display:none}
@@ -83,29 +51,23 @@ header{
 .chip.on{border-color:var(--accent);color:var(--accent);background:rgba(249,115,22,.1)}
 .chip.pin-active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
-
 .cv-wrap{flex:1;overflow:hidden;position:relative;background:#141416;touch-action:none}
 .cv-wrap.pin-mode{cursor:crosshair}
 #cv{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform;touch-action:none}
 .pins-layer{position:absolute;top:0;left:0;pointer-events:none;transform-origin:0 0}
-
 .pin-m{position:absolute;pointer-events:all;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%);cursor:pointer;z-index:10}
 .pin-m:active{opacity:.7}
 .pin-drop{width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.25);box-shadow:0 3px 12px rgba(0,0,0,.5)}
 .pin-drop span{transform:rotate(45deg);font-size:11px;font-weight:700;color:#fff}
 .pin-lbl{background:rgba(0,0,0,.8);color:#fff;font-size:9px;font-weight:600;padding:2px 6px;border-radius:5px;margin-top:2px;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;backdrop-filter:blur(6px)}
-
 .zoom-btns{position:absolute;bottom:20px;right:14px;display:flex;flex-direction:column;gap:5px;z-index:30}
 .zb{width:42px;height:42px;border-radius:10px;background:var(--s1);border:1px solid var(--border);color:var(--text);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow);user-select:none}
 .zb:active{background:var(--s2)}
-
 .page-nav{position:absolute;bottom:20px;left:14px;display:flex;gap:5px;z-index:30}
 .pn-btn{padding:7px 13px;border-radius:10px;background:var(--s1);border:1px solid var(--border);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;box-shadow:var(--shadow);user-select:none}
 .pn-btn:active{background:var(--s2)}
-
 .pin-banner{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;z-index:40;display:none;white-space:nowrap;box-shadow:var(--shadow)}
 .pin-banner.on{display:block}
-
 #scPlans{overflow-y:auto;padding:12px;gap:10px}
 .plan-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:background .15s}
 .plan-card:active{background:var(--s2)}
@@ -115,13 +77,10 @@ header{
 .plan-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .plan-meta{font-size:11px;color:var(--text2);margin-top:2px;font-family:'IBM Plex Mono',monospace}
 .plan-actions{display:flex;gap:5px}
-
 .add-plan-btn{width:100%;padding:14px;border-radius:var(--r);background:var(--s1);border:1.5px dashed var(--border);color:var(--text2);font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s}
 .add-plan-btn:active{background:var(--s2)}
-
 .res-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 .res-bar::-webkit-scrollbar{display:none}
-
 .res-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:fadeUp .22s ease;flex-shrink:0}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .res-card-head{display:flex;align-items:center;gap:10px;padding:11px 13px}
@@ -140,7 +99,6 @@ header{
 .ib.red{color:var(--red)}
 .res-card-body{padding:0 13px 11px}
 .res-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:7px}
-
 #scExport{overflow-y:auto;padding:12px;gap:10px}
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stat-box{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:12px;text-align:center}
@@ -154,7 +112,6 @@ header{
 .exp-desc{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4}
 .exp-arr{color:var(--text3);font-size:16px}
 .section-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;padding:4px 0 6px}
-
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:none;align-items:flex-end;backdrop-filter:blur(5px)}
 .overlay.on{display:flex}
 .modal{width:100%;background:var(--s1);border-radius:18px 18px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 max(16px,env(safe-area-inset-bottom));animation:slideUp .28s ease;max-height:94dvh;display:flex;flex-direction:column}
@@ -164,14 +121,12 @@ header{
 .modal-title{font-size:16px;font-weight:700}
 .modal-body{padding:14px 18px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:13px}
 .modal-foot{padding:10px 18px 0;display:flex;flex-direction:column;gap:7px;flex-shrink:0}
-
 .fg{display:flex;flex-direction:column;gap:5px}
 .fl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
 .fi,.ft,.fs{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;color:var(--text);font-family:inherit;font-size:14px;outline:none;width:100%;transition:border-color .18s}
 .fi:focus,.ft:focus,.fs:focus{border-color:var(--accent)}
 .ft{resize:none;min-height:72px}
 .fs option{background:var(--s2)}
-
 .cat-row{display:flex;gap:7px;flex-wrap:wrap}
 .cp{padding:7px 12px;border-radius:20px;font-size:12px;font-weight:600;border:2px solid transparent;cursor:pointer;transition:all .15s;opacity:.45}
 .cp.on{opacity:1;border-color:rgba(255,255,255,.35)!important}
@@ -185,16 +140,9 @@ header{
 .cp-qua.on{background:var(--blue);color:#fff}
 .cp-ava{background:rgba(34,197,94,.2);color:var(--green)}
 .cp-ava.on{background:var(--green);color:#0a2a10}
-
 .photo-drop{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;position:relative;transition:border-color .18s}
 .photo-drop:active{border-color:var(--accent)}
 .photo-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.photo-drop-ico{font-size:28px;margin-bottom:4px}
-.photo-drop-txt{font-size:12px;color:var(--text2)}
-.photo-prev-wrap{position:relative}
-.photo-prev{width:100%;border-radius:9px;max-height:180px;object-fit:cover}
-.photo-rem{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
 .status-row{display:flex;gap:7px}
 .stp{flex:1;padding:8px 4px;border-radius:9px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .15s;opacity:.45}
 .stp.on{opacity:1;border-color:rgba(255,255,255,.3)!important}
@@ -204,39 +152,30 @@ header{
 .stp-wip.on{background:var(--yellow);color:#1a1500}
 .stp-done{background:rgba(34,197,94,.15);color:var(--green)}
 .stp-done.on{background:var(--green);color:#071a0b}
-
 .btn{padding:13px 18px;border-radius:11px;font-size:15px;font-weight:600;font-family:inherit;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
 .btn-acc{background:var(--accent);color:#fff}.btn-acc:active{background:var(--accent-d)}
 .btn-sec{background:var(--s2);color:var(--text);border:1px solid var(--border)}.btn-sec:active{background:var(--s3)}
 .btn-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}.btn-red:active{background:rgba(239,68,68,.2)}
 .btn-grn{background:var(--green);color:#071a0b}.btn-grn:active{filter:brightness(.9)}
 .btn-sm{padding:9px 14px;font-size:13px;border-radius:9px}
-
 #ovSettings .modal-body{gap:0}
 .setting-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
 .setting-row:last-child{border-bottom:none}
-.setting-ico{font-size:22px;flex-shrink:0}
-.setting-label{font-size:14px;font-weight:500;flex:1}
-.setting-val{font-size:12px;color:var(--text2);font-family:'IBM Plex Mono',monospace}
-
 #ovPlanSel .modal-body{gap:0}
 .plan-sel-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer}
 .plan-sel-item:last-child{border-bottom:none}
 .plan-sel-item:active{opacity:.7}
 .plan-sel-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
 .plan-sel-item.on .plan-sel-check{background:var(--accent);border-color:var(--accent);color:#fff}
-
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:200;display:none;align-items:center;justify-content:center;flex-direction:column}
 .lightbox.on{display:flex}
 .lightbox img{max-width:100%;max-height:82dvh;object-fit:contain;border-radius:8px}
 .lb-close{position:absolute;top:max(18px,env(safe-area-inset-top));right:18px;width:38px;height:38px;border-radius:50%;background:var(--s2);border:1px solid var(--border);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
 .toast{position:fixed;top:max(56px,calc(env(safe-area-inset-top)+46px));left:50%;transform:translateX(-50%) translateY(-8px);background:var(--s1);border:1px solid var(--border);border-radius:9px;padding:9px 15px;font-size:13px;font-weight:500;z-index:999;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap;box-shadow:var(--shadow)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:var(--green);color:var(--green)}
 .toast.err{border-color:var(--red);color:var(--red)}
 .toast.info{border-color:var(--blue);color:var(--blue)}
-
 .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--text2);padding:40px;text-align:center}
 .empty-ico{font-size:44px}
 .empty-ttl{font-size:16px;font-weight:600;color:var(--text)}
@@ -245,33 +184,65 @@ header{
 .prog-wrap.on{display:block}
 .prog-bar{height:100%;background:var(--accent);transition:width .25s;border-radius:2px}
 .divider{height:1px;background:var(--border);flex-shrink:0}
+
+/* ─── ZONE INSPECTION ─────────────────── */
+.zi-cascade{display:flex;flex-direction:column;gap:10px}
+.zi-select{width:100%;background:var(--s2);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:inherit;font-size:14px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237c7d8a' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.zi-select:focus{border-color:var(--accent)}
+.zi-select:disabled{opacity:.35;cursor:not-allowed}
+.zi-loc-tag{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);border-radius:8px;padding:9px 13px;font-size:12px;color:var(--accent);font-family:'IBM Plex Mono',monospace;text-align:center;display:none}
+.zi-loc-tag.on{display:block}
+.zi-section{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;padding:6px 0 4px;display:flex;align-items:center;gap:8px}
+.zi-section::after{content:'';flex:1;height:1px;background:var(--border)}
+.zi-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.zi-item:last-child{border-bottom:none}
+.zi-check{width:24px;height:24px;border-radius:7px;border:2px solid var(--border);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:13px}
+.zi-check.on{border-color:var(--red);background:var(--red);color:#fff}
+.zi-label{flex:1;font-size:13px;line-height:1.4;cursor:pointer}
+.zi-photo-btn{width:32px;height:32px;border-radius:8px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:14px;position:relative}
+.zi-photo-badge{position:absolute;top:-5px;right:-5px;width:16px;height:16px;background:var(--accent);border-radius:50%;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.nett-row{display:flex;gap:8px;margin:4px 0}
+.nett-btn{flex:1;padding:10px 6px;border-radius:9px;font-size:12px;font-weight:700;text-align:center;cursor:pointer;border:2px solid var(--border);color:var(--text2);background:transparent;transition:all .15s;font-family:inherit}
+.nett-btn.on-1{border-color:var(--yellow);background:rgba(234,179,8,.15);color:var(--yellow)}
+.nett-btn.on-2{border-color:#f97316;background:rgba(249,115,22,.15);color:#f97316}
+.nett-btn.on-3{border-color:var(--red);background:rgba(239,68,68,.15);color:var(--red)}
+.sec-item-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+.sec-item-row:last-child{border-bottom:none}
+.sec-inp{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;color:var(--text);font-family:inherit;font-size:13px;outline:none}
+.sec-inp:focus{border-color:var(--red)}
+.zi-checklist{display:none}
+.zi-checklist.on{display:block}
+.zi-save-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent)}
+.res-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px}
+.res-tag{font-size:10px;background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:2px 7px;color:var(--text2)}
 </style>
 </head>
 <body>
 
 <div class="toast" id="toast"></div>
-
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <button class="lb-close">✕</button>
   <img id="lbImg" src="" alt="">
 </div>
 
+<!-- Annotation -->
 <div class="overlay" id="ovAnnotate" style="z-index:200;">
-  <div class="modal" style="height:92dvh; display:flex; flex-direction:column; border-radius:18px 18px 0 0; overflow:hidden; padding:0">
+  <div class="modal" style="height:92dvh;border-radius:18px 18px 0 0;overflow:hidden;padding:0">
     <div class="modal-hdr" style="padding:14px 18px">
       <div class="modal-title">Dessiner sur la photo</div>
       <button class="ib" onclick="closeAnnotate()">✕</button>
     </div>
-    <div class="modal-body" id="annotBody" style="flex:1; padding:0; background:#111; display:flex; align-items:center; justify-content:center; touch-action:none; position:relative; overflow:hidden">
-      <canvas id="annotCv" style="touch-action:none; border: 1px solid #333"></canvas>
+    <div class="modal-body" id="annotBody" style="flex:1;padding:0;background:#111;display:flex;align-items:center;justify-content:center;touch-action:none;position:relative;overflow:hidden">
+      <canvas id="annotCv" style="touch-action:none;border:1px solid #333"></canvas>
     </div>
-    <div class="modal-foot" style="padding:12px 18px max(16px, env(safe-area-inset-bottom)); display:flex; gap:10px; background:var(--s1); border-top:1px solid var(--border)">
+    <div class="modal-foot" style="padding:12px 18px max(16px,env(safe-area-inset-bottom));display:flex;gap:10px;background:var(--s1);border-top:1px solid var(--border)">
       <button class="btn btn-sec" onclick="clearAnnotate()" style="flex:1">Effacer</button>
       <button class="btn btn-acc" onclick="saveAnnotate()" style="flex:2">✓ Valider</button>
     </div>
   </div>
 </div>
 
+<!-- Reserve modal (classique - pour pin sur plan) -->
 <div class="overlay" id="ovReserve">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -281,8 +252,24 @@ header{
     </div>
     <div class="modal-body">
       <div class="fg">
+        <div class="fl">Saisie rapide</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Finition mur','FIN')">🟣 Finition mur</button>
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Finition plafond','FIN')">🟣 Finition plafond</button>
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Finition sol','FIN')">🟣 Finition sol</button>
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Finition sous-face dalle','FIN')">🟣 Sous-face dalle</button>
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Huisserie à nettoyer','FIN')">🟣 Huisserie</button>
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Relevé béton à faire','AVA')">🟢 Relevé béton</button>
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Coffrage à retirer','AVA')">🟢 Coffrage</button>
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Nettoyage général','QUA')">🔵 Nettoyage</button>
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Ferraille à couper','SEC')">🔴 Ferraille</button>
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Passage thermique à fermer','SEC')">🔴 Pont thermique</button>
+          <button class="chip" style="font-size:11px;padding:5px 10px" onclick="quickFill('Réservations à boucher','FIN')">🟣 Réservations</button>
+        </div>
+      </div>
+      <div class="fg">
         <div class="fl">Titre *</div>
-        <input class="fi" id="mTitleInp" placeholder="Ex: Élément mal fini" maxlength="80">
+        <input class="fi" id="mTitleInp" placeholder="Ex: Finition mur" maxlength="80">
       </div>
       <div class="fg">
         <div class="fl">Catégorie</div>
@@ -307,12 +294,17 @@ header{
         <textarea class="ft" id="mDesc" placeholder="Décrivez le problème..."></textarea>
       </div>
       <div class="fg">
-        <div class="fl">Intervenant / Lot</div>
-        <input class="fi" id="mLot" placeholder="Ex: Peintre, Menuisier...">
-      </div>
-      <div class="fg">
-        <div class="fl">Localisation (zone / repère)</div>
-        <input class="fi" id="mLoc" placeholder="Ex: Bâtiment A, Niveau 2...">
+        <div class="fl">Localisation</div>
+        <select class="zi-select" id="mLocBat" onchange="updateLocFromCascade()" style="margin-bottom:6px">
+          <option value="">— Bâtiment —</option>
+        </select>
+        <select class="zi-select" id="mLocFloor" onchange="updateLocFromCascade()" style="margin-bottom:6px" disabled>
+          <option value="">— Étage —</option>
+        </select>
+        <select class="zi-select" id="mLocZone" onchange="updateLocFromCascade()" disabled>
+          <option value="">— Zone —</option>
+        </select>
+        <input class="fi" id="mLoc" placeholder="ou saisir manuellement..." style="margin-top:6px">
       </div>
       <div class="fg">
         <div class="fl">Photos</div>
@@ -327,6 +319,46 @@ header{
   </div>
 </div>
 
+<!-- Zone Inspection modal -->
+<div class="overlay" id="ovZoneInspect" style="z-index:150">
+  <div class="modal" style="height:92dvh">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-title">Levée par zone</div>
+        <div id="ziSaveCount" class="zi-save-count" style="font-size:11px;color:var(--text2);margin-top:2px"></div>
+      </div>
+      <button class="ib" onclick="closeOverlay('ovZoneInspect')">✕</button>
+    </div>
+    <div class="modal-body" id="ziModalBody">
+      <!-- Cascade selector -->
+      <div class="fg">
+        <div class="fl">Localisation</div>
+        <div class="zi-cascade">
+          <select class="zi-select" id="ziBat" onchange="ziSelectBat()">
+            <option value="">— Bâtiment —</option>
+          </select>
+          <select class="zi-select" id="ziFloor" onchange="ziSelectFloor()" disabled>
+            <option value="">— Étage / Niveau —</option>
+          </select>
+          <select class="zi-select" id="ziZone" onchange="ziSelectZone()" disabled>
+            <option value="">— Zone —</option>
+          </select>
+        </div>
+        <div class="zi-loc-tag" id="ziLocTag">—</div>
+      </div>
+
+      <!-- Checklist (shown after zone selected) -->
+      <div class="zi-checklist" id="ziChecklist"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-acc" id="ziBtnSave" onclick="batchSaveReserves()" style="display:none">✓ Enregistrer</button>
+      <button class="btn btn-sec" onclick="closeOverlay('ovZoneInspect')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings -->
 <div class="overlay" id="ovSettings">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -335,32 +367,18 @@ header{
       <button class="ib" onclick="closeOverlay('ovSettings')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="fg">
-        <div class="fl">Nom du projet</div>
-        <input class="fi" id="sChantier" placeholder="Ex: Résidence Les Lilas">
-      </div>
-      <div class="fg">
-        <div class="fl">Responsable</div>
-        <input class="fi" id="sConducteur" placeholder="Votre nom">
-      </div>
-      <div class="fg">
-        <div class="fl">Entreprise</div>
-        <input class="fi" id="sEntreprise" placeholder="Nom de votre entreprise">
-      </div>
+      <div class="fg"><div class="fl">Nom du projet</div><input class="fi" id="sChantier" placeholder="Ex: Résidence Les Lilas"></div>
+      <div class="fg"><div class="fl">Responsable</div><input class="fi" id="sConducteur" placeholder="Votre nom"></div>
+      <div class="fg"><div class="fl">Entreprise</div><input class="fi" id="sEntreprise" placeholder="Nom de votre entreprise"></div>
     </div>
-    <div class="modal-foot">
-      <button class="btn btn-acc" onclick="saveSettings()">✓ Enregistrer</button>
-    </div>
+    <div class="modal-foot"><button class="btn btn-acc" onclick="saveSettings()">✓ Enregistrer</button></div>
   </div>
 </div>
 
 <div class="overlay" id="ovPlanSel">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-hdr">
-      <div class="modal-title">Choisir un plan</div>
-      <button class="ib" onclick="closeOverlay('ovPlanSel')">✕</button>
-    </div>
+    <div class="modal-hdr"><div class="modal-title">Choisir un plan</div><button class="ib" onclick="closeOverlay('ovPlanSel')">✕</button></div>
     <div class="modal-body" id="planSelList"></div>
   </div>
 </div>
@@ -381,9 +399,7 @@ header{
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-hdr"><div class="modal-title" id="confirmTitle">Confirmer</div><button class="ib" onclick="closeOverlay('ovConfirm')">✕</button></div>
-    <div class="modal-body">
-      <div id="confirmMsg" style="font-size:14px;color:var(--text2);line-height:1.6"></div>
-    </div>
+    <div class="modal-body"><div id="confirmMsg" style="font-size:14px;color:var(--text2);line-height:1.6"></div></div>
     <div class="modal-foot">
       <button class="btn btn-red" id="confirmOk">Supprimer</button>
       <button class="btn btn-sec" onclick="closeOverlay('ovConfirm')">Annuler</button>
@@ -409,7 +425,7 @@ header{
 <div class="screen" id="scWelcome" style="display:none">
   <div class="wlc-logo">🏗️</div>
   <div class="wlc-title">Chantier<em>View</em></div>
-  <div class="wlc-sub">Chargez vos plans PDF, épinglez vos réserves directement sur le plan, et exportez un rapport professionnel en fin de journée.</div>
+  <div class="wlc-sub">Chargez vos plans PDF, épinglez vos réserves directement sur le plan, et exportez un rapport professionnel.</div>
   <div class="prog-wrap" id="progWrap"><div class="prog-bar" id="progBar" style="width:0"></div></div>
   <button class="wlc-btn" onclick="triggerPDF()">📄 Charger un plan PDF</button>
   <input type="file" id="pdfInput" accept=".pdf,application/pdf" multiple onchange="loadPDFs(event)" style="display:none">
@@ -424,7 +440,6 @@ header{
       <div class="wlc-setting-arr">›</div>
     </div>
   </div>
-  <div style="font-size:11px;color:var(--text3);text-align:center">Vos données sont synchronisées sur le serveur</div>
 </div>
 
 <div class="screen" id="scPlan">
@@ -461,6 +476,9 @@ header{
 
 <div class="screen on" id="scReserves">
   <div class="res-bar" id="resBar">
+    <!-- Bouton levée par zone en premier, bien visible -->
+    <button class="chip" style="background:rgba(249,115,22,.15);border-color:var(--accent);color:var(--accent);font-weight:700" onclick="openZoneInspect()">📋 Par zone</button>
+    <div class="sep"></div>
     <button class="chip on" data-f="all" onclick="filterRes(this,'all')">Tous</button>
     <button class="chip" data-f="SEC" onclick="filterRes(this,'SEC')">🔴 Sécu</button>
     <button class="chip" data-f="FIN" onclick="filterRes(this,'FIN')">🟣 Fini</button>
@@ -475,1809 +493,920 @@ header{
     <button class="chip" data-f="today" onclick="filterRes(this,'today')">📅 Aujourd'hui</button>
     <button class="chip" data-f="yesterday" onclick="filterRes(this,'yesterday')">📅 Hier</button>
     <div id="extraDateChips"></div>
+    <div class="sep"></div>
+    <button class="chip" onclick="filterByLoc()" id="locFilterChip">📍 Par zone</button>
   </div>
-  <div id="resList" style="overflow-y:auto; flex:1; min-height:0; padding:12px; padding-bottom:max(24px, env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:10px"></div>
+  <div id="resList" style="overflow-y:auto;flex:1;min-height:0;padding:12px;padding-bottom:max(90px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px"></div>
+  <button onclick="openZoneInspect()" style="position:absolute;bottom:max(80px,calc(env(safe-area-inset-bottom)+70px));right:16px;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:26px;cursor:pointer;box-shadow:0 4px 20px rgba(249,115,22,.5);z-index:40;display:flex;align-items:center;justify-content:center">+</button>
 </div>
 
 <div class="screen" id="scExport">
   <div style="padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1">
     <div class="stats-grid" id="statsGrid"></div>
     <div class="section-title">📊 Tableaux de bord</div>
-    <div class="exp-card" onclick="exportXLSX()">
-      <div class="exp-ico">📊</div>
-      <div class="exp-info">
-        <div class="exp-title">Export Excel (.xlsx)</div>
-        <div class="exp-desc">Toutes les réserves avec statut, catégorie, intervenant, position sur plan</div>
-      </div>
-      <div class="exp-arr">›</div>
-    </div>
-    <div class="exp-card" onclick="exportCSV()">
-      <div class="exp-ico">📑</div>
-      <div class="exp-info">
-        <div class="exp-title">Export CSV</div>
-        <div class="exp-desc">Compatible Numbers, Google Sheets, tout tableur</div>
-      </div>
-      <div class="exp-arr">›</div>
-    </div>
+    <div class="exp-card" onclick="exportXLSX()"><div class="exp-ico">📊</div><div class="exp-info"><div class="exp-title">Export Excel (.xlsx)</div><div class="exp-desc">Toutes les réserves avec statut, catégorie, localisation</div></div><div class="exp-arr">›</div></div>
+    <div class="exp-card" onclick="exportCSV()"><div class="exp-ico">📑</div><div class="exp-info"><div class="exp-title">Export CSV</div><div class="exp-desc">Compatible Numbers, Google Sheets</div></div><div class="exp-arr">›</div></div>
     <div class="divider"></div>
-    <div class="section-title">📋 Rapport de fin de journée</div>
-    <div class="exp-card" onclick="exportReport('all')">
-      <div class="exp-ico">📋</div>
-      <div class="exp-info">
-        <div class="exp-title">Rapport global (HTML → PDF)</div>
-        <div class="exp-desc">Toutes les réserves avec photos et localisation HD</div>
-      </div>
-      <div class="exp-arr">›</div>
-    </div>
-    <div class="exp-card" onclick="exportReport('today')">
-      <div class="exp-ico">📅</div>
-      <div class="exp-info">
-        <div class="exp-title">Rapport du jour seulement</div>
-        <div class="exp-desc">Réserves créées aujourd'hui uniquement</div>
-      </div>
-      <div class="exp-arr">›</div>
-    </div>
+    <div class="section-title">📋 Rapport</div>
+    <div class="exp-card" onclick="exportReport('all')"><div class="exp-ico">📋</div><div class="exp-info"><div class="exp-title">Rapport global (HTML → PDF)</div><div class="exp-desc">Toutes les réserves avec photos</div></div><div class="exp-arr">›</div></div>
+    <div class="exp-card" onclick="exportReport('today')"><div class="exp-ico">📅</div><div class="exp-info"><div class="exp-title">Rapport du jour</div><div class="exp-desc">Réserves créées aujourd'hui uniquement</div></div><div class="exp-arr">›</div></div>
     <div class="divider"></div>
     <div class="section-title">💾 Sauvegarde</div>
-    <div class="exp-card" onclick="exportJSON()">
-      <div class="exp-ico">💾</div>
-      <div class="exp-info">
-        <div class="exp-title">Exporter une sauvegarde (.json)</div>
-        <div class="exp-desc">Backup de toutes les données — importable sur un autre appareil</div>
-      </div>
-      <div class="exp-arr">›</div>
-    </div>
-    <div class="exp-card" onclick="document.getElementById('jsonInput').click()">
-      <div class="exp-ico">📥</div>
-      <div class="exp-info">
-        <div class="exp-title">Importer une sauvegarde</div>
-        <div class="exp-desc">Restaurer les données depuis un fichier .json</div>
-      </div>
-      <div class="exp-arr">›</div>
-    </div>
+    <div class="exp-card" onclick="exportJSON()"><div class="exp-ico">💾</div><div class="exp-info"><div class="exp-title">Exporter une sauvegarde (.json)</div><div class="exp-desc">Backup importable sur un autre appareil</div></div><div class="exp-arr">›</div></div>
+    <div class="exp-card" onclick="document.getElementById('jsonInput').click()"><div class="exp-ico">📥</div><div class="exp-info"><div class="exp-title">Importer une sauvegarde</div><div class="exp-desc">Restaurer depuis un fichier .json</div></div><div class="exp-arr">›</div></div>
     <input type="file" id="jsonInput" accept=".json" onchange="importJSON(event)" style="display:none">
-    <div class="exp-card" onclick="confirmClear()">
-      <div class="exp-ico">🗑️</div>
-      <div class="exp-info">
-        <div class="exp-title" style="color:var(--red)">Tout effacer (Cloud)</div>
-        <div class="exp-desc">Supprimer toutes les réserves de la base</div>
-      </div>
-      <div class="exp-arr">›</div>
-    </div>
+    <div class="exp-card" onclick="confirmClear()"><div class="exp-ico">🗑️</div><div class="exp-info"><div class="exp-title" style="color:var(--red)">Tout effacer (Cloud)</div><div class="exp-desc">Supprimer toutes les réserves de la base</div></div><div class="exp-arr">›</div></div>
   </div>
 </div>
 
+<input type="file" id="ziPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="ziHandlePhoto(event)">
+
 <script>
 // ═══════════════════════════════════════════════════════
-// SUPABASE SYNC — temps réel entre appareils
+// IGNY ALLENDE — STRUCTURE COMPLÈTE
 // ═══════════════════════════════════════════════════════
-const SB_URL = 'https://brdhlqqfhwjmnrbqemml.supabase.co';
-const SB_KEY = 'sb_publishable_RWcEYhkNNfffbFJs6qJgfg_IcOs-apL';
+const IGNY_STRUCTURE = [
+  {id:'ss', name:'Sous-Sol', floors:[
+    {id:'ss-0', name:'Sous-Sol', zones:[
+      {id:'ss-pk', name:'Parking SS — 73 places', type:'parking'},
+      {id:'ss-rampe', name:'Rampe d\'accès parking', type:'rampe'},
+      {id:'ss-esc-cd', name:'Cage escalier CD — Bât 1', type:'escalier'},
+      {id:'ss-esc-cd1', name:'Cage escalier CD1 — Bât 2', type:'escalier'},
+      {id:'ss-esc-ab', name:'Cage escalier AB — Bât 3', type:'escalier'},
+      {id:'ss-esc-ne', name:'Cage escalier NE — Bât 4', type:'escalier'},
+      {id:'ss-esc-oe', name:'Cage escalier OE — Bât 5', type:'escalier'},
+      {id:'ss-cuv', name:'Cuvettes ascenseurs (×4)', type:'cuvette'},
+      {id:'ss-aep', name:'Local AEP', type:'local'},
+      {id:'ss-elec', name:'Local Électricité', type:'local'},
+      {id:'ss-vno', name:'Local Vélos N-O', type:'local'},
+      {id:'ss-vne', name:'Local Vélos N-E', type:'local'},
+      {id:'ss-vso', name:'Local Vélos S-O', type:'local'},
+      {id:'ss-vse', name:'Local Vélos S-E', type:'local'},
+      {id:'ss-pac', name:'Local PAC + ECS + Ballon', type:'local'},
+      {id:'ss-fibre', name:'Local Fibre / Panoplie', type:'local'},
+    ]}
+  ]},
+  {id:'bat1', name:'Bâtiment 1', floors:[
+    {id:'bat1-rdc', name:'RDC', zones:[
+      {id:'bat1-rdc-hall', name:'Hall / Parties communes', type:'hall'},
+      {id:'bat1-rdc-esc', name:'Cage escalier Bât 1', type:'escalier'},
+      {id:'bat1-rdc-asc', name:'Ascenseur Bât 1', type:'ascenseur'},
+      {id:'bat1-rdc-om', name:'Local OM (11.90m²)', type:'local'},
+      {id:'1101', name:'Log. 1101 — 3P', type:'logement_t'},
+      {id:'1102', name:'Log. 1102 — 3P', type:'logement_t'},
+      {id:'1103', name:'Log. 1103 — 2P', type:'logement_t'},
+      {id:'1104', name:'Log. 1104 — 4P', type:'logement_t'},
+    ]},
+    {id:'bat1-n1', name:'Niveau 1', zones:[
+      {id:'bat1-n1-pal', name:'Palier N1', type:'palier'},
+      {id:'1111', name:'Log. 1111 — 3P', type:'logement_b'},
+      {id:'1112', name:'Log. 1112 — 3P', type:'logement_b'},
+      {id:'1113', name:'Log. 1113 — 2P', type:'logement_b'},
+      {id:'1114', name:'Log. 1114 — 4P', type:'logement_b'},
+      {id:'1115', name:'Log. 1115 — 5P', type:'logement_b'},
+    ]},
+    {id:'bat1-n2', name:'Niveau 2', zones:[
+      {id:'bat1-n2-pal', name:'Palier N2', type:'palier'},
+      {id:'1121', name:'Log. 1121 — 3P', type:'logement_b'},
+      {id:'1122', name:'Log. 1122 — 2P', type:'logement_b'},
+      {id:'1123', name:'Log. 1123 — 4P', type:'logement_b'},
+      {id:'1124', name:'Log. 1124 — 2P', type:'logement_b'},
+      {id:'1125', name:'Log. 1125 — 3P', type:'logement_b'},
+    ]},
+    {id:'bat1-n3', name:'Niveau 3', zones:[
+      {id:'bat1-n3-pal', name:'Palier N3', type:'palier'},
+      {id:'1131', name:'Log. 1131 — 2P', type:'logement_t'},
+      {id:'1132', name:'Log. 1132 — 3P', type:'logement_t'},
+      {id:'1133', name:'Log. 1133 — 4P', type:'logement_t'},
+    ]},
+  ]},
+  {id:'bat2', name:'Bâtiment 2', floors:[
+    {id:'bat2-rdc', name:'RDC', zones:[
+      {id:'bat2-rdc-hall', name:'Hall / Parties communes', type:'hall'},
+      {id:'bat2-rdc-esc', name:'Cage escalier Bât 2', type:'escalier'},
+      {id:'bat2-rdc-asc', name:'Ascenseur Bât 2', type:'ascenseur'},
+      {id:'bat2-rdc-om', name:'Local OM (11.99m²)', type:'local'},
+      {id:'2101', name:'Log. 2101 — 3P', type:'logement_t'},
+    ]},
+    {id:'bat2-n1', name:'Niveau 1', zones:[
+      {id:'bat2-n1-pal', name:'Palier N1', type:'palier'},
+      {id:'2111', name:'Log. 2111 — 4P', type:'logement_b'},
+      {id:'2112', name:'Log. 2112 — 3P', type:'logement_b'},
+      {id:'2113', name:'Log. 2113 — 4P', type:'logement_b'},
+      {id:'2114', name:'Log. 2114 — 2P', type:'logement_b'},
+    ]},
+    {id:'bat2-n2', name:'Niveau 2', zones:[
+      {id:'bat2-n2-pal', name:'Palier N2', type:'palier'},
+      {id:'2121', name:'Log. 2121 — 4P', type:'logement_b'},
+      {id:'2122', name:'Log. 2122 — 3P', type:'logement_b'},
+      {id:'2123', name:'Log. 2123 — 4P', type:'logement_b'},
+      {id:'2124', name:'Log. 2124 — 2P', type:'logement_b'},
+    ]},
+    {id:'bat2-n3', name:'Niveau 3', zones:[
+      {id:'bat2-n3-pal', name:'Palier N3', type:'palier'},
+      {id:'2131', name:'Log. 2131 — 3P', type:'logement_t'},
+      {id:'2132', name:'Log. 2132 — 2P', type:'logement_t'},
+      {id:'2133', name:'Log. 2133 — 3P', type:'logement_t'},
+      {id:'2134', name:'Log. 2134 — 4P', type:'logement_t'},
+    ]},
+  ]},
+  {id:'bat3', name:'Bâtiment 3', floors:[
+    {id:'bat3-rdc', name:'RDC', zones:[
+      {id:'bat3-rdc-hall', name:'Hall / Parties communes', type:'hall'},
+      {id:'bat3-rdc-esc', name:'Cage escalier Bât 3', type:'escalier'},
+      {id:'bat3-rdc-asc', name:'Ascenseur Bât 3', type:'ascenseur'},
+      {id:'bat3-rdc-om', name:'Local OM (10.09m²)', type:'local'},
+      {id:'3101', name:'Log. 3101 — 2P', type:'logement_t'},
+      {id:'3102', name:'Log. 3102 — 3P', type:'logement_t'},
+      {id:'3103', name:'Log. 3103 — 2P', type:'logement_t'},
+    ]},
+    {id:'bat3-n1', name:'Niveau 1', zones:[
+      {id:'bat3-n1-pal', name:'Palier N1', type:'palier'},
+      {id:'3111', name:'Log. 3111 — 2P', type:'logement_b'},
+      {id:'3112', name:'Log. 3112 — 3P', type:'logement_b'},
+      {id:'3113', name:'Log. 3113 — 3P', type:'logement_b'},
+      {id:'3114', name:'Log. 3114 — 2P', type:'logement_b'},
+    ]},
+    {id:'bat3-n2', name:'Niveau 2', zones:[
+      {id:'bat3-n2-pal', name:'Palier N2', type:'palier'},
+      {id:'3121', name:'Log. 3121 — 3P', type:'logement_b'},
+      {id:'3122', name:'Log. 3122 — 3P', type:'logement_b'},
+      {id:'3123', name:'Log. 3123 — 2P', type:'logement_b'},
+      {id:'3124', name:'Log. 3124 — 5P', type:'logement_b'},
+    ]},
+    {id:'bat3-n3', name:'Niveau 3', zones:[
+      {id:'bat3-n3-pal', name:'Palier N3', type:'palier'},
+      {id:'3131', name:'Log. 3131 — 3P', type:'logement_t'},
+      {id:'3132', name:'Log. 3132 — 2P', type:'logement_t'},
+      {id:'3133', name:'Log. 3133 — 3P', type:'logement_t'},
+    ]},
+  ]},
+  {id:'bat4', name:'Bâtiment 4', floors:[
+    {id:'bat4-rdc', name:'RDC', zones:[
+      {id:'bat4-rdc-hall', name:'Hall / Parties communes', type:'hall'},
+      {id:'bat4-rdc-esc', name:'Cage escalier Bât 4', type:'escalier'},
+      {id:'bat4-rdc-asc', name:'Ascenseur Bât 4', type:'ascenseur'},
+      {id:'bat4-rdc-om', name:'Local OM (12.24m²)', type:'local'},
+      {id:'4101', name:'Log. 4101 — 3P', type:'logement_t'},
+      {id:'4102', name:'Log. 4102 — ST', type:'logement_t'},
+      {id:'4103', name:'Log. 4103 — 2P', type:'logement_t'},
+    ]},
+    {id:'bat4-n1', name:'Niveau 1', zones:[
+      {id:'bat4-n1-pal', name:'Palier N1', type:'palier'},
+      {id:'4111', name:'Log. 4111 — 3P', type:'logement_b'},
+      {id:'4112', name:'Log. 4112 — 4P', type:'logement_b'},
+      {id:'4113', name:'Log. 4113 — 3P', type:'logement_b'},
+    ]},
+    {id:'bat4-n2', name:'Niveau 2', zones:[
+      {id:'bat4-n2-pal', name:'Palier N2', type:'palier'},
+      {id:'4121', name:'Log. 4121 — 3P', type:'logement_t'},
+      {id:'4122', name:'Log. 4122 — 4P', type:'logement_t'},
+    ]},
+  ]},
+  {id:'bat5', name:'Bâtiment 5', floors:[
+    {id:'bat5-rdc', name:'RDC — Tiers-Lieu & Locaux', zones:[
+      {id:'bat5-rdc-hall', name:'Hall / Accès Bât 5', type:'hall'},
+      {id:'bat5-rdc-esc', name:'Cage escalier Bât 5', type:'escalier'},
+      {id:'bat5-rdc-asc', name:'Ascenseur Bât 5', type:'ascenseur'},
+      {id:'bat5-tiers', name:'Tiers-Lieu (Brasserie, Atelier...)', type:'tiers_lieu'},
+      {id:'bat5-assoc', name:'Locaux Associatifs Mairie', type:'tiers_lieu'},
+      {id:'bat5-rdc-om', name:'Local OM (12.56m²)', type:'local'},
+    ]},
+    {id:'bat5-n1', name:'Niveau 1', zones:[
+      {id:'bat5-n1-pal', name:'Palier N1', type:'palier'},
+      {id:'5111', name:'Log. 5111 — 3P', type:'logement_b'},
+      {id:'5112', name:'Log. 5112 — ST', type:'logement_b'},
+      {id:'5113', name:'Log. 5113 — 2P', type:'logement_b'},
+      {id:'5114', name:'Log. 5114 — 3P', type:'logement_b'},
+      {id:'5115', name:'Log. 5115 — 2P', type:'logement_b'},
+      {id:'5116', name:'Log. 5116 — 3P', type:'logement_b'},
+      {id:'5117', name:'Log. 5117 — 2P', type:'logement_b'},
+      {id:'5118', name:'Log. 5118 — 2P', type:'logement_b'},
+    ]},
+    {id:'bat5-n2', name:'Niveau 2', zones:[
+      {id:'bat5-n2-pal', name:'Palier N2', type:'palier'},
+      {id:'5121', name:'Log. 5121 — 3P', type:'logement_b'},
+      {id:'5122', name:'Log. 5122 — 2P', type:'logement_b'},
+      {id:'5123', name:'Log. 5123 — ST', type:'logement_b'},
+      {id:'5124', name:'Log. 5124 — 2P', type:'logement_b'},
+      {id:'5125', name:'Log. 5125 — 3P', type:'logement_b'},
+      {id:'5126', name:'Log. 5126 — 2P', type:'logement_b'},
+      {id:'5127', name:'Log. 5127 — 2P', type:'logement_b'},
+      {id:'5128', name:'Log. 5128 — 3P', type:'logement_b'},
+    ]},
+  ]},
+  {id:'ext', name:'Extérieur / VRD GO', floors:[
+    {id:'ext-0', name:'Espaces extérieurs', zones:[
+      {id:'ext-murets', name:'Murets de clôture', type:'ext'},
+      {id:'ext-aire', name:'Aire présentation déchets', type:'ext'},
+      {id:'ext-emmarch', name:'Emmarchements extérieurs', type:'ext'},
+      {id:'ext-seuils', name:'Seuils / sas entrées bâtiments', type:'ext'},
+    ]}
+  ]},
+];
 
-async function sbFetch(path, options = {}) {
-  const res = await fetch(SB_URL + '/rest/v1/' + path, {
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': options.prefer || 'return=representation',
-    },
-    ...options
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error('Supabase: ' + err);
-  }
-  return options.method === 'DELETE' ? null : res.json();
-}
-
-async function sbLoadReserves() {
-  try {
-    const rows = await sbFetch('reserves?order=ts.asc');
-    return rows.map(r => ({
-      id: r.id,
-      code: r.code,
-      cat: r.cat,
-      status: r.status,
-      title: r.title,
-      desc: r.description || '',
-      lot: r.lot || '',
-      loc: r.loc || '',
-      photos: r.photos || [], 
-      pinX: r.pin_x,
-      pinY: r.pin_y,
-      planId: r.plan_id,
-      planName: r.plan_name || '',
-      page: r.page || 1,
-      date: r.date || '',
-      time: r.heure || '',
-      ts: r.ts
-    }));
-  } catch(e) {
-    console.warn('Sync impossible (hors ligne ?)', e);
-    return null;
-  }
-}
-
-async function uploadPhotosVersSupabase(photosArray) {
-  if (!photosArray || photosArray.length === 0) return [];
-  const urlsPubliques = [];
-  for (let photo of photosArray) {
-    if (photo.startsWith('http')) { urlsPubliques.push(photo); continue; }
-    try {
-      const res = await fetch(photo);
-      const blob = await res.blob();
-      const nomFichier = `photo_${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
-      const uploadReponse = await fetch(`${SB_URL}/storage/v1/object/photos/${nomFichier}`, {
-        method: 'POST',
-        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'image/jpeg' },
-        body: blob
-      });
-      if (uploadReponse.ok) {
-        urlsPubliques.push(`${SB_URL}/storage/v1/object/public/photos/${nomFichier}`);
-      } else {
-        urlsPubliques.push(photo);
-      }
-    } catch (err) {
-      urlsPubliques.push(photo);
-    }
-  }
-  return urlsPubliques;
-}
-
-async function sbSaveReserve(r) {
-  try {
-    await sbFetch('reserves', {
-      method: 'POST',
-      prefer: 'resolution=merge-duplicates,return=minimal',
-      body: JSON.stringify({
-        id: r.id,
-        code: r.code,
-        cat: r.cat,
-        status: r.status,
-        title: r.title,
-        description: r.desc || '',
-        lot: r.lot || '',
-        loc: r.loc || '',
-        photos: r.photos || [],
-        pin_x: r.pinX,
-        pin_y: r.pinY,
-        plan_id: r.planId,
-        plan_name: r.planName || '',
-        page: r.page || 1,
-        date: r.date || '',
-        heure: r.time || '',
-      })
-    });
-  } catch(e) { console.warn('Erreur sync réserve:', e); }
-}
-
-async function sbDeleteReserve(id) {
-  try {
-    await sbFetch('reserves?id=eq.' + id, { method: 'DELETE', prefer: 'return=minimal' });
-  } catch(e) { console.warn('Erreur suppression sync:', e); }
-}
-
-// ── PLANS SYNC ──────────────────────────────────────────
-
-async function sbLoadPlans() {
-  try {
-    return await sbFetch('plans?order=created_at.asc');
-  } catch(e) {
-    console.warn('Impossible de charger les plans distants', e);
-    return null;
-  }
-}
-
-async function sbSavePlan(plan) {
-  try {
-    await sbFetch('plans', {
-      method: 'POST',
-      prefer: 'resolution=merge-duplicates,return=minimal',
-      body: JSON.stringify({
-        id: plan.id,
-        name: plan.name,
-        pages: plan.pages,
-        pdf_url: plan.pdfUrl || null,
-      })
-    });
-  } catch(e) { console.warn('Erreur sync plan:', e); }
-}
-
-async function sbDeletePlan(id) {
-  try {
-    await sbFetch('plans?id=eq.' + id, { method: 'DELETE', prefer: 'return=minimal' });
-  } catch(e) { console.warn('Erreur suppression plan:', e); }
-}
-
-async function uploadPDFVersSupabase(planId, arrayBuffer) {
-  try {
-    const nomFichier = `${planId}.pdf`;
-    const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-    const res = await fetch(`${SB_URL}/storage/v1/object/plans/${nomFichier}`, {
-      method: 'POST',
-      headers: {
-        'apikey': SB_KEY,
-        'Authorization': `Bearer ${SB_KEY}`,
-        'Content-Type': 'application/pdf',
-        'x-upsert': 'true',
-      },
-      body: blob
-    });
-    if (res.ok) {
-      return `${SB_URL}/storage/v1/object/public/plans/${nomFichier}`;
-    }
-    console.warn('Upload PDF échoué:', await res.text());
-    return null;
-  } catch(e) {
-    console.warn('Erreur upload PDF:', e);
-    return null;
-  }
-}
-
-async function downloadPDFFromSupabase(pdfUrl) {
-  try {
-    const res = await fetch(pdfUrl);
-    if (!res.ok) return null;
-    return await res.arrayBuffer();
-  } catch(e) {
-    console.warn('Erreur download PDF:', e);
-    return null;
-  }
-}
-
-async function syncPlansFromSupabase() {
-  try {
-    const remotePlans = await sbLoadPlans();
-    if (!remotePlans) return;
-
-    for (const rp of remotePlans) {
-      const existing = state.plans.find(p => p.id === rp.id);
-      if (!existing) {
-        state.plans.push({ id: rp.id, name: rp.name, pages: rp.pages, pdfUrl: rp.pdf_url });
-      } else {
-        existing.pdfUrl = rp.pdf_url;
-        existing.pages = rp.pages;
-      }
-    }
-    await idbSet('app_state', state);
-    renderPlansList();
-  } catch(e) {
-    // Table plans pas encore créée ou autre erreur — silencieux
-    console.warn('syncPlansFromSupabase ignoré:', e);
-  }
-}
-
-async function downloadPlanLocalement(planId) {
-  const plan = state.plans.find(p => p.id === planId);
-  if (!plan || !plan.pdfUrl) { toast('Pas de PDF distant pour ce plan', 'err'); return; }
-  toast(`⬇️ Téléchargement de ${plan.name}...`, 'info');
-  const ab = await downloadPDFFromSupabase(plan.pdfUrl);
-  if (!ab) { toast('Échec du téléchargement', 'err'); return; }
-  try {
-    const pdfDoc = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
-    pdfs[plan.id] = pdfDoc;
-    await idbSet(plan.id, ab);
-    toast(`✓ ${plan.name} téléchargé`, 'ok');
-    renderPlansList();
-    await activatePlan(plan.id);
-  } catch(e) {
-    toast('Fichier PDF invalide', 'err');
-  }
-}
-
-// ── FIN PLANS SYNC ──────────────────────────────────────
-
-async function syncFromSupabase() {
-  const remote = await sbLoadReserves();
-  if (!remote) return; 
-  
-  state.reserves = remote;
-  state.counter = { SEC:0, FIN:0, NC:0, QUA:0, AVA:0 };
-  state.reserves.forEach(r => {
-    const num = parseInt((r.code.split('-')[1] || '0'));
-    if (!isNaN(num)) state.counter[r.cat] = Math.max(state.counter[r.cat] || 0, num);
-  });
-  
-  await idbSet('app_state', state);
-  updateBadge();
-  updateStats();
-  renderReservesList();
-  renderPins();
-  // Sync plans en arrière-plan, erreur silencieuse si table pas encore créée
-  try { await syncPlansFromSupabase(); } catch(e) {}
-}
-
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) syncFromSupabase();
-});
-window.addEventListener('focus', () => syncFromSupabase());
-
-// ═══════════════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════════════
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-const CAT_COLOR = { SEC:'#ef4444', FIN:'#a855f7', NC:'#eab308', QUA:'#3b82f6', AVA:'#22c55e' };
-const CAT_LABEL = { SEC:'Sécurité', FIN:'Finition', NC:'Non-conformité', QUA:'Qualité', AVA:'Avancement' };
-const STATUS_LABEL = { todo:'À faire', wip:'En cours', done:'Levée' };
-
-// ═══════════════════════════════════════════════════════
-// HELPERS DATE
-// ═══════════════════════════════════════════════════════
-function frDateSlug() {
-  const d = new Date();
-  const dd = String(d.getDate()).padStart(2,'0');
-  const mm = String(d.getMonth()+1).padStart(2,'0');
-  const yyyy = d.getFullYear();
-  return `${dd}-${mm}-${yyyy}`;
-}
-
-// ═══════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════
-let state = {
-  settings: { chantier:'', conducteur:'', entreprise:'' },
-  plans: [],
-  activePlanId: null,
-  reserves: [], 
-  counter: { SEC:0, FIN:0, NC:0, QUA:0, AVA:0 }
+// ── Checklist GO par type de zone ──────────────────────
+const ZONE_ITEMS = {
+  logement_t: ['Finition enduit murs','Finition sous-face dalle','Planéité support sol','Huisseries banchées en place','Seuil extérieur non saillant','Appuis de baies / rejingots GO','Relevés béton sous châssis terrasse','Forme de pente terrasse (min 1%)','Siphon/avaloir terrasse en place','Réservations et trémies bouchées','Calfeutrements traversées GO'],
+  logement_b: ['Finition enduit murs','Finition sous-face dalle','Planéité support sol','Huisseries banchées en place','Seuil extérieur non saillant','Appuis de baies / rejingots GO','Relevés béton sous châssis balcon','Forme de pente balcon','Siphon/avaloir balcon en place','Réservations et trémies bouchées','Calfeutrements traversées GO'],
+  hall:       ['Finition enduit voiles','Finition sous-face dalle','Huisseries en place','Réservations et trémies bouchées','Calfeutrement coupe-feu gaines'],
+  palier:     ['Finition enduit voiles / fonds de coffrage','Finition sous-face dalle','Huisseries portes palières en place','Réservations bouchées'],
+  escalier:   ['Finition marches / contremarches lissée','Sous-face paillasse poncée/ragréée','Rives volées calfeutrées (mastic silicone)','Désolidarisation acoustique Schöck en place','Hauteur marches ≤17cm / Giron ≥28cm vérifiés'],
+  ascenseur:  ['Réservations portes palières en place','Corbeaux saillants réalisés','Calfeutrement seuil/tableaux/voussures'],
+  parking:    ['Dalle portée finition hélicoptère','Tolérance planéité 10mm/2m vérifiée','Formes de pente vers avaloirs (min 1%)','Cuvelage voiles + plancher réalisé','Avaloirs / regards hydrocarbures en place','Séparateur HC raccordé et fonctionnel','Bac à sable posé (100L)','Réservations / fourreaux bouchés'],
+  rampe:      ['Finition béton balayé (joints ZEBRA)','Trottoirs chasse-roue H=16cm réalisés','Caniveau pied de rampe en place','Pente vérifiée (≤15%)','Hauteur libre ≥2m sur toute la largeur'],
+  cuvette:    ['Cuvelage mortier résine réalisé','Joint hydrogonflant posé en périphérie','Fond de fosse propre et sec','Échelons de descente posés'],
+  local:      ['Finition dalle béton','Siphon de sol posé (si prévu)','Réservations et trémies bouchées','Huisserie en place'],
+  tiers_lieu: ['Finition enduit voiles / parois béton','Finition sous-face dalle','Seuils et appuis de baies réalisés','Réservations et trémies bouchées','Calfeutrements traversées GO'],
+  ext:        ['Fondations (semelles filantes) réalisées','Finition béton matricé faces visibles','Chaperon béton 2 pentes posé'],
 };
 
-let pdfs = {};
-let activePdf = null;
-let curPage = 1;
-let totalPages = 1;
-let scale = 1, baseScale = 1;
-let panX = 0, panY = 0;
-let baseW = 0, baseH = 0;
-let pinMode = false;
-let editId = null;
-let pendingX = null, pendingY = null;
-let curCat = 'SEC', curStatus = 'todo';
+// ── Zone inspection state ──────────────────────────────
+let ziState = {
+  batId: '', floorId: '', zoneId: '',
+  zoneName: '', batName: '', floorName: '',
+  locString: '',
+  checks: {},    // itemId -> {checked, photos:[]}
+  nettoyage: 0,  // 0=non, 1=sale, 2=très sale, 3=immonde
+  nettPhotos: [],
+  secItems: [],  // [{id, text, photos:[]}]
+};
+let ziPhotoTarget = null; // {type:'check'|'nett'|'sec', id?}
 
-let curPhotos = [];
-
-let pinFilter = 'all', resFilter = 'all', dateFilter = '';
-let statusTarget = null;
-let lastSavedReserve = null;
-let deleteTarget = null;
-let planThumbs = {};
-let repositionId = null;
-
-// ═══════════════════════════════════════════════════════
-// INDEXEDDB
-// ═══════════════════════════════════════════════════════
-let db = null;
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open('ChantierViewDB', 1);
-    req.onupgradeneeded = e => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains('pdfs')) d.createObjectStore('pdfs');
-    };
-    req.onsuccess = e => { db = e.target.result; resolve(db); };
-    req.onerror = () => reject(req.error);
-  });
-}
-function idbSet(key, value) {
-  return new Promise((res, rej) => {
-    const tx = db.transaction('pdfs', 'readwrite');
-    tx.objectStore('pdfs').put(value, key);
-    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
-  });
-}
-function idbGet(key) {
-  return new Promise((res, rej) => {
-    const tx = db.transaction('pdfs', 'readonly');
-    const req = tx.objectStore('pdfs').get(key);
-    req.onsuccess = () => res(req.result);
-    req.onerror = () => rej(req.error);
-  });
-}
-function idbDel(key) {
-  return new Promise((res, rej) => {
-    const tx = db.transaction('pdfs', 'readwrite');
-    tx.objectStore('pdfs').delete(key);
-    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// PERSIST & INIT
-// ═══════════════════════════════════════════════════════
-function save(reserveToSync = null) {
-  idbSet('app_state', state).catch(e => console.error("Erreur de sauvegarde IndexedDB:", e));
-  try { localStorage.removeItem('cv_state'); } catch(e) {}
+function openZoneInspect() {
+  // Reset state
+  ziState = {batId:'',floorId:'',zoneId:'',zoneName:'',batName:'',floorName:'',locString:'',checks:{},nettoyage:0,nettPhotos:[],secItems:[]};
   
-  if (reserveToSync) {
-    (async () => {
-      reserveToSync.photos = await uploadPhotosVersSupabase(reserveToSync.photos);
-      await sbSaveReserve(reserveToSync);
-      await syncFromSupabase();
-    })();
-  }
-}
-
-async function init() {
-  await openDB();
+  // Populate bâtiment selector
+  const batSel = document.getElementById('ziBat');
+  batSel.innerHTML = '<option value="">— Bâtiment —</option>';
+  IGNY_STRUCTURE.forEach(b => { const o = document.createElement('option'); o.value=b.id; o.textContent=b.name; batSel.appendChild(o); });
   
-  try {
-    const savedState = await idbGet('app_state');
-    if (savedState) {
-      state = savedState;
-    } else {
-      const raw = localStorage.getItem('cv_state');
-      if (raw) {
-        state = JSON.parse(raw);
-        await idbSet('app_state', state); 
-      }
-    }
-  } catch(e) { console.error('Erreur chargement DB:', e); }
-
-  state.reserves.forEach(r => {
-    if (r.photo && !r.photos) {
-      r.photos = [r.photo];
-      delete r.photo;
-    }
-  });
-
-  toast('🔄 Synchronisation...', 'info');
-  await syncFromSupabase();
-
-  // ── SEED : pré-charger les réserves si Supabase vide ──
-  if (state.reserves.length === 0) {
-    const SEED = [{"id": 1700000000000, "code": "FIN-002", "cat": "FIN", "status": "todo", "title": "Logement 1112", "desc": "Il y a un gros trou dans la pièce derrière le plafond", "lot": "", "loc": "Logement 1112", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000001, "code": "QUA-001", "cat": "SEC", "status": "todo", "title": "Logement 1113", "desc": "Plusieurs tubes de garde corps à couper dans la pièce", "lot": "", "loc": "Logement 1113", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000002, "code": "QUA-002", "cat": "QUA", "status": "todo", "title": "Couloir 1113 et 12", "desc": "Nettoyage et couper la ferraille", "lot": "", "loc": "Couloir 1113 et 12", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000003, "code": "QUA-003", "cat": "QUA", "status": "todo", "title": "Bât 1 - 1112", "desc": "Nettoyage huisserie", "lot": "", "loc": "Bât 1 - 1112", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000004, "code": "SEC-003", "cat": "SEC", "status": "todo", "title": "Bât 1 - Logement 1111", "desc": "Il manque des finitions mur dans la pièce", "lot": "", "loc": "Bât 1 - Log. 1111", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000005, "code": "QUA-004", "cat": "QUA", "status": "todo", "title": "Logement 1111", "desc": "Il faudra nettoyer la pièce", "lot": "", "loc": "Logement 1111", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000006, "code": "FIN-003", "cat": "FIN", "status": "todo", "title": "Logement 1104", "desc": "Il manque de bout de mur en finition", "lot": "", "loc": "Logement 1104", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000007, "code": "FIN-004", "cat": "FIN", "status": "todo", "title": "Logement 1104", "desc": "Finition mur", "lot": "", "loc": "Logement 1104", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000008, "code": "FIN-005", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition poutre", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000009, "code": "FIN-006", "cat": "FIN", "status": "todo", "title": "Bât 1 - Escalier", "desc": "Finition mur escalier bâtiment 1", "lot": "", "loc": "Bât 1 - Escalier", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000010, "code": "NC-001", "cat": "NC", "status": "todo", "title": "Bât 1 - Escalier", "desc": "Finir le bout d'escalier", "lot": "", "loc": "Bât 1 - Escalier", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000011, "code": "QUA-005", "cat": "QUA", "status": "todo", "title": "Escalier Bât 1", "desc": "Nettoyer escalier", "lot": "", "loc": "Escalier Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000012, "code": "FIN-007", "cat": "FIN", "status": "todo", "title": "Bât 1 - Balcon", "desc": "Nettoyer le balcon", "lot": "", "loc": "Bât 1 - Balcon", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000013, "code": "FIN-008", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition bout de mur porte", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000014, "code": "FIN-009", "cat": "FIN", "status": "todo", "title": "Bât 1 - Couloir", "desc": "Finition plafond couloir", "lot": "", "loc": "Bât 1 - Couloir", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000015, "code": "AVA-001", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Finir les relevés", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000016, "code": "SEC-004", "cat": "SEC", "status": "todo", "title": "Bât 1", "desc": "Couper ferraille (intérieur)", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000017, "code": "SEC-005", "cat": "SEC", "status": "todo", "title": "Bât 1 - Terrasse", "desc": "Couper ferraille (terrasse)", "lot": "", "loc": "Bât 1 - Terrasse", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000018, "code": "FIN-010", "cat": "FIN", "status": "todo", "title": "Bât 1 - Ascenseur", "desc": "Finition poutre ascenseur", "lot": "", "loc": "Bât 1 - Ascenseur", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000019, "code": "FIN-011", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition du mur", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000020, "code": "AVA-002", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Mur à finir ou couper ferraille", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000021, "code": "SEC-006", "cat": "SEC", "status": "todo", "title": "Bât 1 - Ascenseur", "desc": "Grille ascenseur non conforme", "lot": "", "loc": "Bât 1 - Ascenseur", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000022, "code": "FIN-012", "cat": "FIN", "status": "todo", "title": "Bât 1 - Ascenseur", "desc": "Finition mur ascenseur", "lot": "", "loc": "Bât 1 - Ascenseur", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000023, "code": "AVA-003", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Finir de faire les relevés (RDC)", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000024, "code": "FIN-013", "cat": "FIN", "status": "todo", "title": "Bât 1 - NIV2", "desc": "Finition relevé NIV2", "lot": "", "loc": "Bât 1 - NIV2", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "12/03/2026", "time": "08:00", "ts": "2026-03-12T08:00:00.000Z"}, {"id": 1700000000025, "code": "13-FIN-004", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition plafond à finir", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000026, "code": "13-AVA-001", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Coffrage à retirer", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000027, "code": "13-AVA-002", "cat": "AVA", "status": "todo", "title": "Bât 1", "desc": "Étais de séchage à retirer", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000028, "code": "13-FIN-005", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition de toiture à finaliser", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000029, "code": "13-FIN-007", "cat": "FIN", "status": "todo", "title": "Bât 1", "desc": "Finition mur à faire", "lot": "", "loc": "Bât 1", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000030, "code": "13-FIN-008", "cat": "FIN", "status": "todo", "title": "Bât 2", "desc": "Finition plafond Bât 2", "lot": "", "loc": "Bât 2", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}, {"id": 1700000000031, "code": "13-FIN-009", "cat": "FIN", "status": "todo", "title": "Bât 2", "desc": "Remplir les trous Bât 2", "lot": "", "loc": "Bât 2", "photos": [], "pinX": null, "pinY": null, "planId": null, "planName": "", "page": 1, "date": "13/03/2026", "time": "08:00", "ts": "2026-03-13T08:00:00.000Z"}];
-    
-    toast('📤 Chargement initial des réserves...', 'info');
-    for (const r of SEED) {
-      await sbSaveReserve(r);
-    }
-    await syncFromSupabase();
-  }
-  // ── FIN SEED ──
-
-  updateBadge();
-  updateStats();
-  updateSettingVal();
-  renderPlansList();
-
-  // Toujours afficher l'interface — plus de page d'accueil
-  document.getElementById('mainTabs').classList.add('show');
-  document.getElementById('planSwitchBtn').style.display = 'flex';
-  document.getElementById('scWelcome').classList.remove('on');
-
-  // Charger les PDFs depuis IndexedDB si disponibles
-  if (state.plans.length > 0) {
-    for (const plan of state.plans) {
-      try {
-        const ab = await idbGet(plan.id);
-        if (ab) {
-          const pdfDoc = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
-          pdfs[plan.id] = pdfDoc;
-        }
-      } catch(e) {}
-    }
-    if (state.activePlanId && pdfs[state.activePlanId]) {
-      await activatePlan(state.activePlanId);
-      return; // activatePlan gère le switchTab
-    }
-    const firstLoaded = state.plans.find(p => pdfs[p.id]);
-    if (firstLoaded) {
-      await activatePlan(firstLoaded.id);
-      return;
-    }
-  }
-
-  // Pas de plan chargé → aller sur Réserves directement
-  switchTab('scReserves');
-}
-
-// ═══════════════════════════════════════════════════════
-// PDF LOADING
-// ═══════════════════════════════════════════════════════
-function triggerPDF() { document.getElementById('pdfInput').click(); }
-
-async function loadPDFs(e) {
-  const files = Array.from(e.target.files);
-  if (!files.length) return;
-  setProgress(5);
-  let loaded = 0;
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    try {
-      setProgress(5 + (i / files.length) * 70);
-      const ab = await file.arrayBuffer();
-      const pdfDoc = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
-      const planName = file.name.replace(/\.pdf$/i, '');
-      let plan = state.plans.find(p => p.name === planName);
-      if (!plan) {
-        plan = { id: 'p_' + Date.now() + '_' + i, name: planName, pages: pdfDoc.numPages };
-        state.plans.push(plan);
-      } else {
-        plan.pages = pdfDoc.numPages;
-      }
-      pdfs[plan.id] = pdfDoc;
-      await idbSet(plan.id, ab);
-      loaded++;
-      // Upload vers Supabase en arrière-plan
-      setProgress(70 + (i / files.length) * 25);
-      toast(`⬆️ Upload de ${planName} vers le cloud...`, 'info');
-      const pdfUrl = await uploadPDFVersSupabase(plan.id, ab);
-      if (pdfUrl) {
-        plan.pdfUrl = pdfUrl;
-        toast(`✓ ${planName} synchronisé`, 'ok');
-      } else {
-        toast(`⚠️ ${planName} chargé localement (upload échoué)`, 'info');
-      }
-      await sbSavePlan(plan);
-    } catch(err) { console.error(err); toast('Erreur: ' + file.name, 'err'); }
-  }
-  setProgress(100);
-  save();
-  renderPlansList();
-  if (loaded > 0) {
-    const newPlan = state.plans.find(p => pdfs[p.id]);
-    if (newPlan) await activatePlan(newPlan.id);
-  }
-  setTimeout(() => document.getElementById('progWrap').classList.remove('on'), 600);
-  e.target.value = '';
-  toast(`✓ ${loaded} plan(s) chargé(s)`, 'ok');
-}
-
-function setProgress(v) {
-  document.getElementById('progWrap').classList.add('on');
-  document.getElementById('progBar').style.width = v + '%';
-}
-
-async function activatePlan(planId) {
-  const plan = state.plans.find(p => p.id === planId);
-  if (!plan) return;
-
-  if (!pdfs[planId]) {
-    try {
-      const ab = await idbGet(planId);
-      if (ab) pdfs[planId] = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
-    } catch(e) {}
-  }
-
-  state.activePlanId = planId;
-  activePdf = pdfs[planId] || null;
-  totalPages = plan.pages;
-  curPage = 1;
-  save();
-
-  document.getElementById('scWelcome').classList.remove('on');
-  document.getElementById('mainTabs').classList.add('show');
-  document.getElementById('planSwitchBtn').style.display = 'flex';
-  const shortName = plan.name.length > 14 ? plan.name.slice(0, 14) + '…' : plan.name;
-  document.getElementById('planSwitchBtn').textContent = shortName + ' ▾';
-
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  document.getElementById('scPlan').classList.add('on');
-  document.querySelector('.tab[data-s="scPlan"]')?.classList.add('on');
-
-  if (activePdf) {
-    await renderPage(curPage);
-    document.getElementById('pageNav').style.display = totalPages > 1 ? 'flex' : 'none';
-  } else {
-    showReloadPrompt();
-  }
-}
-
-function showReloadPrompt() {
-  const cv = document.getElementById('cv');
-  const wrap = document.getElementById('cvWrap');
-  const ww = Math.max(wrap.clientWidth, 300);
-  const wh = Math.max(wrap.clientHeight, 200);
-  cv.width = ww; cv.height = wh;
-  cv.style.width = ww + 'px'; cv.style.height = wh + 'px';
-  cv.style.transform = 'translate(0px,0px)';
-  document.getElementById('pinsLayer').style.transform = 'translate(0px,0px)';
-  const ctx = cv.getContext('2d');
-  ctx.fillStyle = '#1c1d20';
-  ctx.fillRect(0, 0, ww, wh);
-  ctx.fillStyle = '#f97316';
-  ctx.font = 'bold 16px IBM Plex Sans, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('📄 Rechargez le PDF', ww / 2, wh / 2 - 16);
-  ctx.fillStyle = '#7c7d8a';
-  ctx.font = '13px IBM Plex Sans, sans-serif';
-  ctx.fillText('Vos réserves sont sauvegardées', ww / 2, wh / 2 + 12);
-  ctx.fillText('Appuyez sur 📂 en haut à droite', ww / 2, wh / 2 + 34);
-  baseW = ww; baseH = wh; baseScale = 1; scale = 1;
-  panX = 0; panY = 0;
-  cv.dataset.bw = ww; cv.dataset.bh = wh;
-}
-
-// ═══════════════════════════════════════════════════════
-// RENDER PAGE
-// ═══════════════════════════════════════════════════════
-async function renderPage(num) {
-  if (!activePdf) return;
-  const page = await activePdf.getPage(num);
-
-  const wrap = document.getElementById('cvWrap');
-  let ww = wrap.clientWidth, wh = wrap.clientHeight;
-  if (ww < 10 || wh < 10) {
-    await new Promise(r => setTimeout(r, 80));
-    ww = wrap.clientWidth; wh = wrap.clientHeight;
-  }
-
-  const vp1 = page.getViewport({ scale: 1 });
-  baseScale = Math.min(ww / vp1.width, wh / vp1.height) * 0.96;
-  scale = baseScale;
-  baseW = vp1.width * baseScale;
-  baseH = vp1.height * baseScale;
-  panX = (ww - baseW) / 2;
-  panY = (wh - baseH) / 2;
-
-  const cv = document.getElementById('cv');
+  document.getElementById('ziFloor').innerHTML = '<option value="">— Étage / Niveau —</option>';
+  document.getElementById('ziFloor').disabled = true;
+  document.getElementById('ziZone').innerHTML = '<option value="">— Zone —</option>';
+  document.getElementById('ziZone').disabled = true;
+  document.getElementById('ziLocTag').classList.remove('on');
+  document.getElementById('ziLocTag').textContent = '—';
+  document.getElementById('ziChecklist').classList.remove('on');
+  document.getElementById('ziChecklist').innerHTML = '';
+  document.getElementById('ziBtnSave').style.display = 'none';
+  document.getElementById('ziSaveCount').textContent = '';
   
-  let HIRES = Math.min(Math.ceil(window.devicePixelRatio) * 2, 4);
-  if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
-    HIRES = 1.5;
-  }
+  openOverlay('ovZoneInspect');
+}
+
+function ziSelectBat() {
+  const batId = document.getElementById('ziBat').value;
+  ziState.batId = batId;
+  ziState.floorId = ''; ziState.zoneId = '';
   
-  cv.width = Math.round(vp1.width * HIRES);
-  cv.height = Math.round(vp1.height * HIRES);
-  cv.dataset.bw = baseW;
-  cv.dataset.bh = baseH;
-
-  const renderVP = page.getViewport({ scale: HIRES });
-  const ctx = cv.getContext('2d');
-  ctx.clearRect(0, 0, cv.width, cv.height);
-  await page.render({ canvasContext: ctx, viewport: renderVP }).promise;
-
-  cv.style.width = baseW + 'px';
-  cv.style.height = baseH + 'px';
-  cv.style.transform = `translate(${panX}px,${panY}px)`;
-  const layer = document.getElementById('pinsLayer');
-  layer.style.width = baseW + 'px';
-  layer.style.height = baseH + 'px';
-  layer.style.transform = `translate(${panX}px,${panY}px)`;
-
-  document.getElementById('pageInfo').textContent = `${num}/${totalPages}`;
-  renderPins();
-}
-
-// ═══════════════════════════════════════════════════════
-// TRANSFORM
-// ═══════════════════════════════════════════════════════
-let rafId = null;
-function applyT() {
-  if (rafId) cancelAnimationFrame(rafId);
-  rafId = requestAnimationFrame(() => {
-    const cv = document.getElementById('cv');
-    const layer = document.getElementById('pinsLayer');
-    const bw = parseFloat(cv.dataset.bw) || baseW;
-    const bh = parseFloat(cv.dataset.bh) || baseH;
-    const ratio = baseScale > 0 ? scale / baseScale : 1;
-    const cw = bw * ratio;
-    const ch = bh * ratio;
-    const t = `translate(${panX}px,${panY}px)`;
-    cv.style.width = cw + 'px';
-    cv.style.height = ch + 'px';
-    cv.style.transform = t;
-    layer.style.width = cw + 'px';
-    layer.style.height = ch + 'px';
-    layer.style.transform = t;
-    rafId = null;
-  });
-}
-
-function smartZoom(factor, cx, cy) {
-  const minS = baseScale * 0.4;
-  const maxS = baseScale * 28;
-  const ns = Math.min(Math.max(scale * factor, minS), maxS);
-  if (ns === scale) return;
-  const ratio = ns / scale;
-  scale = ns;
-  const wrap = document.getElementById('cvWrap');
-  const pcx = cx !== undefined ? cx : wrap.clientWidth / 2;
-  const pcy = cy !== undefined ? cy : wrap.clientHeight / 2;
-  panX = pcx - (pcx - panX) * ratio;
-  panY = pcy - (pcy - panY) * ratio;
-  applyT();
-  renderPins();
-}
-
-function zI() { smartZoom(1.3); }
-function zO() { smartZoom(0.77); }
-function zFit() {
-  scale = baseScale;
-  const wrap = document.getElementById('cvWrap');
-  panX = (wrap.clientWidth - baseW) / 2;
-  panY = (wrap.clientHeight - baseH) / 2;
-  applyT();
-  renderPins();
-}
-
-// ═══════════════════════════════════════════════════════
-// TOUCH / PAN / ZOOM
-// ═══════════════════════════════════════════════════════
-const cvWrap = document.getElementById('cvWrap');
-let touches = {};
-let gestureStart = null;
-let mouseDown = false, msx = 0, msy = 0;
-
-function resetTouches() {
-  touches = {};
-  gestureStart = null;
-  mouseDown = false;
-}
-
-cvWrap.addEventListener('touchcancel', resetTouches);
-
-cvWrap.addEventListener('touchstart', e => {
-  e.preventDefault();
-  Array.from(e.changedTouches).forEach(t => { touches[t.identifier] = { x: t.clientX, y: t.clientY }; });
-  const ids = Object.keys(touches);
-  if (ids.length === 2) {
-    const t0 = touches[ids[0]], t1 = touches[ids[1]];
-    gestureStart = {
-      dist: Math.hypot(t1.x - t0.x, t1.y - t0.y),
-      cx: (t0.x + t1.x) / 2, cy: (t0.y + t1.y) / 2,
-      panX, panY, scale
-    };
+  const floorSel = document.getElementById('ziFloor');
+  const zoneSel = document.getElementById('ziZone');
+  floorSel.innerHTML = '<option value="">— Étage / Niveau —</option>';
+  floorSel.disabled = !batId;
+  zoneSel.innerHTML = '<option value="">— Zone —</option>';
+  zoneSel.disabled = true;
+  
+  if (batId) {
+    const bat = IGNY_STRUCTURE.find(b => b.id === batId);
+    ziState.batName = bat.name;
+    bat.floors.forEach(f => { const o = document.createElement('option'); o.value=f.id; o.textContent=f.name; floorSel.appendChild(o); });
   }
-}, { passive: false });
+  document.getElementById('ziLocTag').classList.remove('on');
+  document.getElementById('ziChecklist').classList.remove('on');
+  document.getElementById('ziBtnSave').style.display = 'none';
+  document.getElementById('ziSaveCount').textContent = '';
+}
 
-cvWrap.addEventListener('touchmove', e => {
-  e.preventDefault();
-  const ids = Object.keys(touches);
+function ziSelectFloor() {
+  const floorId = document.getElementById('ziFloor').value;
+  ziState.floorId = floorId;
+  ziState.zoneId = '';
+  
+  const zoneSel = document.getElementById('ziZone');
+  zoneSel.innerHTML = '<option value="">— Zone —</option>';
+  zoneSel.disabled = !floorId;
+  
+  if (floorId) {
+    const bat = IGNY_STRUCTURE.find(b => b.id === ziState.batId);
+    const floor = bat?.floors.find(f => f.id === floorId);
+    ziState.floorName = floor?.name || '';
+    floor?.zones.forEach(z => { const o = document.createElement('option'); o.value=z.id; o.textContent=z.name; zoneSel.appendChild(o); });
+  }
+  document.getElementById('ziLocTag').classList.remove('on');
+  document.getElementById('ziChecklist').classList.remove('on');
+  document.getElementById('ziBtnSave').style.display = 'none';
+  document.getElementById('ziSaveCount').textContent = '';
+}
 
-  if (ids.length === 1 && !pinMode) {
-    const t = e.changedTouches[0];
-    const prev = touches[t.identifier];
-    if (prev) {
-      panX += t.clientX - prev.x;
-      panY += t.clientY - prev.y;
-      applyT();
-    }
-    touches[t.identifier] = { x: t.clientX, y: t.clientY };
+function ziSelectZone() {
+  const zoneId = document.getElementById('ziZone').value;
+  ziState.zoneId = zoneId;
+  if (!zoneId) {
+    document.getElementById('ziLocTag').classList.remove('on');
+    document.getElementById('ziChecklist').classList.remove('on');
+    document.getElementById('ziBtnSave').style.display = 'none';
     return;
   }
-
-  if (ids.length === 2 && gestureStart) {
-    Array.from(e.changedTouches).forEach(t => { if (touches[t.identifier]) touches[t.identifier] = { x: t.clientX, y: t.clientY }; });
-    const [id0, id1] = ids;
-    const t0 = touches[id0], t1 = touches[id1];
-    const newDist = Math.hypot(t1.x - t0.x, t1.y - t0.y);
-    const newCx = (t0.x + t1.x) / 2, newCy = (t0.y + t1.y) / 2;
-    const factor = newDist / gestureStart.dist;
-    const minS = baseScale * 0.4, maxS = baseScale * 28;
-    const ns = Math.min(Math.max(gestureStart.scale * factor, minS), maxS);
-    const ratio = ns / gestureStart.scale;
-    scale = ns;
-    const rect = cvWrap.getBoundingClientRect();
-    const pivX = gestureStart.cx - rect.left;
-    const pivY = gestureStart.cy - rect.top;
-    panX = pivX - (pivX - gestureStart.panX) * ratio + (newCx - gestureStart.cx);
-    panY = pivY - (pivY - gestureStart.panY) * ratio + (newCy - gestureStart.cy);
-    applyT();
-  }
-}, { passive: false });
-
-cvWrap.addEventListener('touchend', e => {
-  const changedIds = Array.from(e.changedTouches).map(t => t.identifier);
-  const wasSingle = Object.keys(touches).length === 1;
-  const t = e.changedTouches[0];
-  changedIds.forEach(id => delete touches[id]);
   
-  if (Object.keys(touches).length < 2) {
-    gestureStart = null;
-  }
-
-  if (pinMode && wasSingle && activePdf && t) {
-    const rect = cvWrap.getBoundingClientRect();
-    const cv = document.getElementById('cv');
-    const cw = parseFloat(cv.style.width);
-    const ch = parseFloat(cv.style.height);
-    const x = t.clientX - rect.left;
-    const y = t.clientY - rect.top;
-    pendingX = (x - panX) / cw;
-    pendingY = (y - panY) / ch;
-    if (pendingX >= 0 && pendingX <= 1 && pendingY >= 0 && pendingY <= 1) {
-      if (repositionId !== null) {
-        applyReposition();
-      } else {
-        openReserveModal();
-      }
-    }
-  }
-}, { passive: false });
-
-cvWrap.addEventListener('mousedown', e => {
-  if (pinMode) return;
-  mouseDown = true; msx = e.clientX - panX; msy = e.clientY - panY;
-  cvWrap.style.cursor = 'grabbing';
-});
-window.addEventListener('mousemove', e => {
-  if (!mouseDown) return;
-  panX = e.clientX - msx; panY = e.clientY - msy; applyT();
-});
-window.addEventListener('mouseup', () => { mouseDown = false; cvWrap.style.cursor = pinMode ? 'crosshair' : 'grab'; });
-cvWrap.addEventListener('wheel', e => {
-  e.preventDefault();
-  const rect = cvWrap.getBoundingClientRect();
-  smartZoom(e.deltaY < 0 ? 1.12 : 0.89, e.clientX - rect.left, e.clientY - rect.top);
-}, { passive: false });
-cvWrap.addEventListener('click', e => {
-  if (!pinMode || !activePdf) return;
-  const rect = cvWrap.getBoundingClientRect();
-  const cv = document.getElementById('cv');
-  const cw = parseFloat(cv.style.width), ch = parseFloat(cv.style.height);
-  pendingX = (e.clientX - rect.left - panX) / cw;
-  pendingY = (e.clientY - rect.top - panY) / ch;
-  if (pendingX >= 0 && pendingX <= 1 && pendingY >= 0 && pendingY <= 1) {
-    if (repositionId !== null) {
-      applyReposition();
-    } else {
-      openReserveModal();
-    }
-  }
-});
-
-// ═══════════════════════════════════════════════════════
-// PIN MODE & RENDER
-// ═══════════════════════════════════════════════════════
-function togglePinMode(forReposition = false) {
-  if (!activePdf && !state.plans.length) { toast('Chargez d\'abord un PDF', 'err'); return; }
-  pinMode = !pinMode;
-  document.getElementById('pinBtn').classList.toggle('pin-active', pinMode);
-  const banner = document.getElementById('pinBanner');
-  banner.textContent = forReposition
-    ? '📍 Touchez le plan pour repositionner la réserve'
-    : '📍 Touchez le plan pour placer la réserve';
-  banner.classList.toggle('on', pinMode);
-  cvWrap.classList.toggle('pin-mode', pinMode);
+  const bat = IGNY_STRUCTURE.find(b => b.id === ziState.batId);
+  const floor = bat?.floors.find(f => f.id === ziState.floorId);
+  const zone = floor?.zones.find(z => z.id === zoneId);
+  
+  ziState.zoneName = zone?.name || '';
+  ziState.locString = `${ziState.batName} › ${ziState.floorName} › ${ziState.zoneName}`;
+  ziState.checks = {};
+  ziState.nettoyage = 0;
+  ziState.nettPhotos = [];
+  ziState.secItems = [];
+  
+  const tag = document.getElementById('ziLocTag');
+  tag.textContent = ziState.locString;
+  tag.classList.add('on');
+  
+  renderZiChecklist(zone);
+  document.getElementById('ziChecklist').classList.add('on');
+  document.getElementById('ziBtnSave').style.display = 'flex';
+  updateZiCount();
 }
 
-function startReposition() {
-  const title = document.getElementById('mTitleInp').value.trim();
-  if (!title) { toast('Titre requis avant de repositionner', 'err'); return; }
-  // Sauvegarder les champs en cours sans sync
-  if (editId !== null) {
-    const r = state.reserves.find(x => x.id === editId);
-    if (r) {
-      r.title = title;
-      r.desc = document.getElementById('mDesc').value.trim();
-      r.lot = document.getElementById('mLot').value.trim();
-      r.loc = document.getElementById('mLoc').value.trim();
-      r.cat = curCat; r.status = curStatus;
-      r.photos = [...curPhotos];
-    }
-  }
-  repositionId = editId;
-  closeOverlay('ovReserve');
-  switchTab('scPlan');
-  if (!pinMode) togglePinMode(true);
-  else {
-    document.getElementById('pinBanner').textContent = '📍 Touchez le plan pour repositionner la réserve';
-    document.getElementById('pinBanner').classList.add('on');
-  }
-  toast('Touchez l\'endroit exact sur le plan', 'info');
-}
+function renderZiChecklist(zone) {
+  const items = ZONE_ITEMS[zone.type] || [];
+  let h = '';
 
-function applyReposition() {
-  const r = state.reserves.find(x => x.id === repositionId);
-  if (r && pendingX !== null) {
-    r.pinX = pendingX;
-    r.pinY = pendingY;
-    r.planId = state.activePlanId;
-    r.planName = state.plans.find(p => p.id === state.activePlanId)?.name || '';
-    r.page = curPage;
-    save(r);
-    renderPins();
-    toast(`📍 ${r.code} repositionnée ✓`, 'ok');
-  }
-  repositionId = null;
-  pendingX = null; pendingY = null;
-  if (pinMode) togglePinMode();
-}
-
-function renderPins() {
-  const layer = document.getElementById('pinsLayer');
-  const cv = document.getElementById('cv');
-  const cw = parseFloat(cv.style.width || cv.dataset.bw || 100);
-  const ch = parseFloat(cv.style.height || cv.dataset.bh || 100);
-  layer.innerHTML = '';
-  layer.style.width = cw + 'px';
-  layer.style.height = ch + 'px';
-
-  state.reserves
-    .filter(r => r.planId === state.activePlanId && r.page === curPage &&
-      r.pinX !== null && (pinFilter === 'all' || r.cat === pinFilter))
-    .forEach(r => {
-      const el = document.createElement('div');
-      el.className = 'pin-m';
-      el.style.left = (r.pinX * 100) + '%';
-      el.style.top = (r.pinY * 100) + '%';
-      const color = CAT_COLOR[r.cat] || '#f97316';
-      el.innerHTML = `<div class="pin-drop" style="background:${color}"><span>${r.code}</span></div><div class="pin-lbl">${r.title}</div>`;
-      el.addEventListener('click', ev => { ev.stopPropagation(); openReserveModal(r.id); });
-      el.addEventListener('touchend', ev => { ev.stopPropagation(); if (!pinMode) openReserveModal(r.id); }, { passive: true });
-      layer.appendChild(el);
+  // ── Points GO ──
+  if (items.length) {
+    h += `<div class="zi-section" style="margin-top:4px">Points GO — Finition</div>`;
+    items.forEach((label, i) => {
+      const id = `go_${i}`;
+      ziState.checks[id] = ziState.checks[id] || {checked:false, photos:[]};
+      const c = ziState.checks[id];
+      const pc = c.photos.length;
+      h += `<div class="zi-item" id="ziItem_${id}">
+        <div class="zi-check ${c.checked?'on':''}" onclick="ziToggle('${id}')" id="ziChk_${id}">${c.checked?'✕':''}</div>
+        <div class="zi-label" onclick="ziToggle('${id}')">${label}</div>
+        <div class="zi-photo-btn" onclick="ziAddPhoto('check','${id}')">📷${pc?`<span class='zi-photo-badge'>${pc}</span>`:''}
+        </div>
+      </div>`;
     });
-}
-
-// ═══════════════════════════════════════════════════════
-// RESERVE MODAL
-// ═══════════════════════════════════════════════════════
-function openReserveModal(id = null) {
-  resetTouches(); 
-
-  editId = id;
-  curPhotos = [];
-  curCat = 'SEC'; curStatus = 'todo';
-
-  if (id !== null) {
-    const r = state.reserves.find(x => x.id === id);
-    document.getElementById('mTitle').textContent = `Réserve ${r.code}`;
-    document.getElementById('mTitleInp').value = r.title;
-    document.getElementById('mDesc').value = r.desc || '';
-    document.getElementById('mLot').value = r.lot || '';
-    document.getElementById('mLoc').value = r.loc || '';
-    curCat = r.cat; curStatus = r.status;
-    curPhotos = r.photos ? [...r.photos] : [];
-    // Afficher le bouton repositionner si on est sur un plan chargé
-    document.getElementById('btnReposition').style.display = activePdf ? 'flex' : 'none';
-  } else {
-    document.getElementById('mTitle').textContent = 'Nouvelle réserve';
-    document.getElementById('mTitleInp').value = '';
-    document.getElementById('mDesc').value = '';
-    document.getElementById('mLot').value = '';
-    document.getElementById('mLoc').value = '';
-    document.getElementById('btnReposition').style.display = 'none';
-  }
-  
-  renderPhotoArea();
-  pickCat(curCat);
-  pickStatus(curStatus);
-  openOverlay('ovReserve');
-  setTimeout(() => document.getElementById('mTitleInp').focus(), 350);
-}
-
-function saveReserve() {
-  const title = document.getElementById('mTitleInp').value.trim();
-  if (!title) { toast('Titre requis', 'err'); return; }
-
-  if (editId !== null) {
-    const r = state.reserves.find(x => x.id === editId);
-    r.title = title;
-    r.desc = document.getElementById('mDesc').value.trim();
-    r.lot = document.getElementById('mLot').value.trim();
-    r.loc = document.getElementById('mLoc').value.trim();
-    r.cat = curCat; r.status = curStatus;
-    r.photos = [...curPhotos];
-    
-    if (pendingX !== null && pendingY !== null) {
-      r.pinX = pendingX;
-      r.pinY = pendingY;
-      r.planId = state.activePlanId;
-      r.planName = state.plans.find(p => p.id === state.activePlanId)?.name || '';
-      r.page = curPage;
-    }
-    
-    toast('Réserve modifiée ✓', 'ok');
-    save(r); 
-  } else {
-    state.counter[curCat] = (state.counter[curCat] || 0) + 1;
-    const num = String(state.counter[curCat]).padStart(3, '0');
-    const code = `${curCat}-${num}`;
-    const now = new Date();
-    const r = {
-      id: Date.now(),
-      code, cat: curCat, status: curStatus,
-      title,
-      desc: document.getElementById('mDesc').value.trim(),
-      lot: document.getElementById('mLot').value.trim(),
-      loc: document.getElementById('mLoc').value.trim(),
-      photos: [...curPhotos],
-      pinX: pendingX, pinY: pendingY,
-      planId: state.activePlanId,
-      planName: state.plans.find(p => p.id === state.activePlanId)?.name || '',
-      page: curPage,
-      date: now.toLocaleDateString('fr-FR'),
-      time: now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-      ts: now.toISOString()
-    };
-    state.reserves.push(r);
-    lastSavedReserve = r;
-    toast(`📍 ${code} ajoutée`, 'ok');
-    save(lastSavedReserve);
   }
 
-  closeOverlay('ovReserve');
+  // ── Nettoyage ──
+  h += `<div class="zi-section" style="margin-top:8px">Nettoyage</div>
+  <div class="nett-row">
+    <button class="nett-btn ${ziState.nettoyage===1?'on-1':''}" onclick="ziNett(1)">🟡 Sale</button>
+    <button class="nett-btn ${ziState.nettoyage===2?'on-2':''}" onclick="ziNett(2)">🟠 Très sale</button>
+    <button class="nett-btn ${ziState.nettoyage===3?'on-3':''}" onclick="ziNett(3)">🔴 Immonde</button>
+  </div>
+  <div id="ziNettPhoto" style="${ziState.nettoyage>0?'':'display:none'}; margin-top:6px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="zi-photo-btn" onclick="ziAddPhoto('nett')">📷 Photo${ziState.nettPhotos.length?` (${ziState.nettPhotos.length})`:''}</div>
+    </div>
+  </div>`;
+
+  // ── Sécurité libre ──
+  h += `<div class="zi-section" style="margin-top:8px">Sécurité <span style="font-size:10px;color:var(--text2);text-transform:none;letter-spacing:0;font-weight:400">— saisie libre</span></div>
+  <div id="ziSecList">`;
+  ziState.secItems.forEach(si => {
+    h += `<div class="sec-item-row" id="ziSecRow_${si.id}">
+      <input class="sec-inp" placeholder="Décrire la réserve sécurité..." value="${si.text||''}" oninput="ziSecText('${si.id}',this.value)">
+      <div class="zi-photo-btn" onclick="ziAddPhoto('sec','${si.id}')">📷${si.photos.length?`<span class='zi-photo-badge'>${si.photos.length}</span>`:''}
+      </div>
+      <div class="ib red" onclick="ziRemSec('${si.id}')">✕</div>
+    </div>`;
+  });
+  h += `</div>
+  <button class="btn btn-sec btn-sm" style="margin-top:8px;border-style:dashed" onclick="ziAddSec()">+ Ajouter sécurité</button>`;
+
+  document.getElementById('ziChecklist').innerHTML = h;
+}
+
+function ziToggle(id) {
+  if (!ziState.checks[id]) ziState.checks[id] = {checked:false,photos:[]};
+  ziState.checks[id].checked = !ziState.checks[id].checked;
   
-  if (pinMode) togglePinMode();
-  pendingX = null; pendingY = null;
-  renderPins();
-  updateBadge();
-  updateStats();
+  const chk = document.getElementById('ziChk_'+id);
+  if (chk) {
+    chk.classList.toggle('on', ziState.checks[id].checked);
+    chk.textContent = ziState.checks[id].checked ? '✕' : '';
+  }
+  updateZiCount();
 }
 
-// ═══════════════════════════════════════════════════════
-// FORM HELPERS & DRAWING ANNOTATION
-// ═══════════════════════════════════════════════════════
-function pickCat(c) {
-  curCat = c;
-  document.querySelectorAll('.cp').forEach(el => el.classList.toggle('on', el.dataset.c === c));
-}
-function pickStatus(s) {
-  curStatus = s;
-  document.querySelectorAll('.stp').forEach(el => el.classList.toggle('on', el.dataset.s === s));
+function ziNett(level) {
+  ziState.nettoyage = ziState.nettoyage === level ? 0 : level;
+  document.querySelectorAll('.nett-btn').forEach((btn, i) => {
+    btn.className = 'nett-btn' + (ziState.nettoyage === i+1 ? ` on-${i+1}` : '');
+  });
+  const nettPhoto = document.getElementById('ziNettPhoto');
+  if (nettPhoto) nettPhoto.style.display = ziState.nettoyage > 0 ? '' : 'none';
+  updateZiCount();
 }
 
-let annotImg = null;
-let annotCtx = null;
-let annotIsDrawing = false;
-let annotStrokes = [];
-let currentStroke = [];
-let rawPhotoData = null;
+function ziAddSec() {
+  const id = 'sec_'+Date.now();
+  ziState.secItems.push({id, text:'', photos:[]});
+  const bat = IGNY_STRUCTURE.find(b=>b.id===ziState.batId);
+  const floor = bat?.floors.find(f=>f.id===ziState.floorId);
+  const zone = floor?.zones.find(z=>z.id===ziState.zoneId);
+  renderZiChecklist(zone);
+  updateZiCount();
+}
 
-function handlePhoto(e) {
-  const file = e.target.files[0]; 
-  if (!file) return;
-  
+function ziRemSec(id) {
+  ziState.secItems = ziState.secItems.filter(s => s.id !== id);
+  document.getElementById('ziSecRow_'+id)?.remove();
+  updateZiCount();
+}
+
+function ziSecText(id, val) {
+  const si = ziState.secItems.find(s=>s.id===id);
+  if (si) si.text = val;
+  updateZiCount();
+}
+
+function ziAddPhoto(type, id) {
+  ziPhotoTarget = {type, id};
+  document.getElementById('ziPhotoInput').click();
+}
+
+function ziHandlePhoto(e) {
+  const file = e.target.files[0];
+  if (!file || !ziPhotoTarget) return;
   const r = new FileReader();
-  r.onload = ev => { 
+  r.onload = ev => {
     const img = new Image();
     img.onload = () => {
-      const cvs = document.createElement('canvas');
-      const MAX_SIZE = 800; 
-      let w = img.width, h = img.height;
-      
-      if (w > h) { 
-        if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } 
-      } else { 
-        if (h > MAX_SIZE) { w *= MAX_SIZE / h; h = MAX_SIZE; } 
-      }
-      
-      cvs.width = w; 
-      cvs.height = h;
-      cvs.getContext('2d').drawImage(img, 0, 0, w, h);
-      
-      rawPhotoData = cvs.toDataURL('image/jpeg', 0.6);
+      const c = document.createElement('canvas');
+      const MAX = 800;
+      let w=img.width, h=img.height;
+      if(w>h){if(w>MAX){h*=MAX/w;w=MAX;}}else{if(h>MAX){w*=MAX/h;h=MAX;}}
+      c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      rawPhotoData = c.toDataURL('image/jpeg',0.6);
       openAnnotateModal();
     };
     img.src = ev.target.result;
   };
   r.readAsDataURL(file);
-  e.target.value = ''; 
+  e.target.value='';
 }
 
-function openAnnotateModal() {
-  document.getElementById('ovAnnotate').classList.add('on');
-  const cv = document.getElementById('annotCv');
-  const container = document.getElementById('annotBody');
-  annotCtx = cv.getContext('2d');
-  annotStrokes = [];
-  
-  annotImg = new Image();
-  annotImg.onload = () => {
-    const cw = container.clientWidth;
-    const ch = container.clientHeight;
-    const ratio = Math.min(cw / annotImg.width, ch / annotImg.height);
-    cv.width = annotImg.width * ratio;
-    cv.height = annotImg.height * ratio;
-    cv.dataset.ratio = ratio;
-    
-    redrawAnnotate();
-  };
-  annotImg.src = rawPhotoData;
-  
-  cv.ontouchstart = annotStart;
-  cv.ontouchmove = annotMove;
-  cv.ontouchend = annotEnd;
-  cv.onmousedown = annotStart;
-  cv.onmousemove = annotMove;
-  cv.onmouseup = annotEnd;
-}
-
-function redrawAnnotate() {
-  const cv = document.getElementById('annotCv');
-  annotCtx.clearRect(0, 0, cv.width, cv.height);
-  annotCtx.drawImage(annotImg, 0, 0, cv.width, cv.height);
-  annotCtx.strokeStyle = '#ef4444'; 
-  annotCtx.lineWidth = 4;
-  annotCtx.lineCap = 'round';
-  annotCtx.lineJoin = 'round';
-  
-  for (const stroke of annotStrokes) {
-    if(!stroke.length) continue;
-    annotCtx.beginPath();
-    annotCtx.moveTo(stroke[0].x, stroke[0].y);
-    for (let i=1; i<stroke.length; i++) {
-      annotCtx.lineTo(stroke[i].x, stroke[i].y);
-    }
-    annotCtx.stroke();
-  }
-}
-
-function getAnnotPos(e) {
-  const cv = document.getElementById('annotCv');
-  const rect = cv.getBoundingClientRect();
-  const touch = e.touches ? e.touches[0] : e;
-  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-}
-
-function annotStart(e) {
-  e.preventDefault();
-  annotIsDrawing = true;
-  currentStroke = [getAnnotPos(e)];
-  annotStrokes.push(currentStroke);
-}
-
-function annotMove(e) {
-  if(!annotIsDrawing) return;
-  e.preventDefault();
-  currentStroke.push(getAnnotPos(e));
-  redrawAnnotate(); 
-}
-
-function annotEnd(e) {
-  if(!annotIsDrawing) return;
-  e.preventDefault();
-  annotIsDrawing = false;
-}
-
-function clearAnnotate() {
-  annotStrokes = [];
-  redrawAnnotate();
-}
-
-function closeAnnotate() {
-  document.getElementById('ovAnnotate').classList.remove('on');
-  annotStrokes = [];
-}
-
+// Override saveAnnotate for zone inspection context
+const _origSaveAnnotate = window.saveAnnotate;
 function saveAnnotate() {
-  const offCv = document.createElement('canvas');
-  offCv.width = annotImg.width;
-  offCv.height = annotImg.height;
-  const offCtx = offCv.getContext('2d');
-  offCtx.drawImage(annotImg, 0, 0);
+  if (ziPhotoTarget) {
+    // Zone inspect mode
+    const offCv = document.createElement('canvas');
+    offCv.width = annotImg.width; offCv.height = annotImg.height;
+    const offCtx = offCv.getContext('2d');
+    offCtx.drawImage(annotImg,0,0);
+    offCtx.strokeStyle='#ef4444';offCtx.lineCap='round';offCtx.lineJoin='round';
+    const ratio = parseFloat(document.getElementById('annotCv').dataset.ratio||1);
+    offCtx.lineWidth = 6/ratio;
+    for(const stroke of annotStrokes){if(stroke.length<2)continue;offCtx.beginPath();offCtx.moveTo(stroke[0].x/ratio,stroke[0].y/ratio);for(let i=1;i<stroke.length;i++)offCtx.lineTo(stroke[i].x/ratio,stroke[i].y/ratio);offCtx.stroke();}
+    const dataUrl = offCv.toDataURL('image/jpeg',0.6);
+    
+    const {type, id} = ziPhotoTarget;
+    if (type==='check' && id) { if(!ziState.checks[id])ziState.checks[id]={checked:false,photos:[]};ziState.checks[id].photos.push(dataUrl); }
+    else if (type==='nett') { ziState.nettPhotos.push(dataUrl); }
+    else if (type==='sec' && id) { const si=ziState.secItems.find(s=>s.id===id);if(si)si.photos.push(dataUrl); }
+    
+    // Re-render to update photo badges
+    const bat=IGNY_STRUCTURE.find(b=>b.id===ziState.batId);
+    const floor=bat?.floors.find(f=>f.id===ziState.floorId);
+    const zone=floor?.zones.find(z=>z.id===ziState.zoneId);
+    if(zone) renderZiChecklist(zone);
+    
+    ziPhotoTarget = null;
+    closeAnnotate();
+  } else {
+    // Original reserve modal mode
+    if (typeof _origSaveAnnotate === 'function') { _origSaveAnnotate(); return; }
+    const offCv=document.createElement('canvas');
+    offCv.width=annotImg.width;offCv.height=annotImg.height;
+    const offCtx=offCv.getContext('2d');
+    offCtx.drawImage(annotImg,0,0);
+    offCtx.strokeStyle='#ef4444';offCtx.lineCap='round';offCtx.lineJoin='round';
+    const ratio=parseFloat(document.getElementById('annotCv').dataset.ratio||1);
+    offCtx.lineWidth=6/ratio;
+    for(const stroke of annotStrokes){if(stroke.length<2)continue;offCtx.beginPath();offCtx.moveTo(stroke[0].x/ratio,stroke[0].y/ratio);for(let i=1;i<stroke.length;i++)offCtx.lineTo(stroke[i].x/ratio,stroke[i].y/ratio);offCtx.stroke();}
+    curPhotos.push(offCv.toDataURL('image/jpeg',0.6));
+    renderPhotoArea();
+    closeAnnotate();
+  }
+}
+
+function updateZiCount() {
+  const items = ZONE_ITEMS[IGNY_STRUCTURE.find(b=>b.id===ziState.batId)?.floors.find(f=>f.id===ziState.floorId)?.zones.find(z=>z.id===ziState.zoneId)?.type||''] || [];
+  let n = 0;
+  items.forEach((_,i) => { if(ziState.checks['go_'+i]?.checked) n++; });
+  if (ziState.nettoyage > 0) n++;
+  ziState.secItems.forEach(s => { if(s.text.trim()) n++; });
   
-  offCtx.strokeStyle = '#ef4444';
-  offCtx.lineCap = 'round';
-  offCtx.lineJoin = 'round';
+  const btn = document.getElementById('ziBtnSave');
+  const cnt = document.getElementById('ziSaveCount');
+  if (n > 0) {
+    btn.textContent = `✓ Enregistrer ${n} réserve${n>1?'s':''}`;
+    cnt.textContent = `${n} réserve${n>1?'s':''} à créer`;
+  } else {
+    btn.textContent = '✓ Enregistrer';
+    cnt.textContent = 'Aucun point coché';
+  }
+}
+
+async function batchSaveReserves() {
+  if (!ziState.zoneId) { toast('Sélectionnez une zone', 'err'); return; }
   
-  const ratio = parseFloat(document.getElementById('annotCv').dataset.ratio || 1);
-  offCtx.lineWidth = 6 / ratio; 
+  const items = ZONE_ITEMS[IGNY_STRUCTURE.find(b=>b.id===ziState.batId)?.floors.find(f=>f.id===ziState.floorId)?.zones.find(z=>z.id===ziState.zoneId)?.type||''] || [];
+  const now = new Date();
+  const date = now.toLocaleDateString('fr-FR');
+  const time = now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  let created = 0;
+
+  // GO items
+  items.forEach((label, i) => {
+    const c = ziState.checks['go_'+i];
+    if (!c?.checked) return;
+    state.counter['FIN'] = (state.counter['FIN']||0)+1;
+    const code = 'FIN-'+String(state.counter['FIN']).padStart(3,'0');
+    const r = {
+      id: Date.now()+Math.random(),
+      code, cat:'FIN', status:'todo',
+      title: label,
+      desc: '',
+      lot: '',
+      loc: ziState.locString,
+      photos: c.photos||[],
+      pinX:null, pinY:null, planId:state.activePlanId,
+      planName: state.plans.find(p=>p.id===state.activePlanId)?.name||'',
+      page: curPage,
+      date, time,
+      ts: new Date(now.getTime()+created).toISOString()
+    };
+    state.reserves.push(r);
+    save(r);
+    created++;
+  });
+
+  // Nettoyage
+  if (ziState.nettoyage > 0) {
+    const nettLabels = ['','Sale','Très sale','Immonde'];
+    state.counter['QUA'] = (state.counter['QUA']||0)+1;
+    const code = 'QUA-'+String(state.counter['QUA']).padStart(3,'0');
+    const r = {
+      id: Date.now()+Math.random(),
+      code, cat:'QUA', status:'todo',
+      title: `Nettoyage — ${nettLabels[ziState.nettoyage]}`,
+      desc: '',
+      lot: '',
+      loc: ziState.locString,
+      photos: ziState.nettPhotos||[],
+      pinX:null, pinY:null, planId:state.activePlanId,
+      planName: state.plans.find(p=>p.id===state.activePlanId)?.name||'',
+      page: curPage,
+      date, time,
+      ts: new Date(now.getTime()+created).toISOString()
+    };
+    state.reserves.push(r);
+    save(r);
+    created++;
+  }
+
+  // Sécurité
+  ziState.secItems.forEach(si => {
+    if (!si.text.trim()) return;
+    state.counter['SEC'] = (state.counter['SEC']||0)+1;
+    const code = 'SEC-'+String(state.counter['SEC']).padStart(3,'0');
+    const r = {
+      id: Date.now()+Math.random(),
+      code, cat:'SEC', status:'todo',
+      title: si.text.trim(),
+      desc: '',
+      lot: '',
+      loc: ziState.locString,
+      photos: si.photos||[],
+      pinX:null, pinY:null, planId:state.activePlanId,
+      planName: state.plans.find(p=>p.id===state.activePlanId)?.name||'',
+      page: curPage,
+      date, time,
+      ts: new Date(now.getTime()+created).toISOString()
+    };
+    state.reserves.push(r);
+    save(r);
+    created++;
+  });
+
+  if (created === 0) { toast('Aucun point coché', 'err'); return; }
+
+  closeOverlay('ovZoneInspect');
+  updateBadge();
+  updateStats();
+  renderReservesList();
+  renderPins();
+  toast(`✓ ${created} réserve${created>1?'s':''} créée${created>1?'s':''}`, 'ok');
+}
+
+// ─── Cascade helper for classic reserve modal ──────────
+function initLocCascade() {
+  const batSel = document.getElementById('mLocBat');
+  if (!batSel) return;
+  batSel.innerHTML = '<option value="">— Bâtiment —</option>';
+  IGNY_STRUCTURE.forEach(b => { const o=document.createElement('option');o.value=b.id;o.textContent=b.name;batSel.appendChild(o); });
+}
+
+function updateLocFromCascade() {
+  const batId = document.getElementById('mLocBat').value;
+  const floorSel = document.getElementById('mLocFloor');
+  const zoneSel = document.getElementById('mLocZone');
   
-  for (const stroke of annotStrokes) {
-    if(stroke.length < 2) continue;
-    offCtx.beginPath();
-    offCtx.moveTo(stroke[0].x / ratio, stroke[0].y / ratio);
-    for (let i=1; i<stroke.length; i++) {
-      offCtx.lineTo(stroke[i].x / ratio, stroke[i].y / ratio);
+  // Update floors
+  if (document.getElementById('mLocBat').value !== (floorSel.dataset.batId||'')) {
+    floorSel.innerHTML = '<option value="">— Étage —</option>';
+    floorSel.disabled = !batId;
+    floorSel.dataset.batId = batId;
+    zoneSel.innerHTML = '<option value="">— Zone —</option>';
+    zoneSel.disabled = true;
+    if (batId) {
+      const bat = IGNY_STRUCTURE.find(b=>b.id===batId);
+      bat?.floors.forEach(f=>{const o=document.createElement('option');o.value=f.id;o.textContent=f.name;floorSel.appendChild(o);});
     }
-    offCtx.stroke();
   }
   
-  curPhotos.push(offCv.toDataURL('image/jpeg', 0.6));
-  renderPhotoArea();
-  closeAnnotate();
-}
-
-function renderPhotoArea() {
-  const area = document.getElementById('photoArea');
-  let html = '<div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:5px;">';
+  const floorId = floorSel.value;
+  if (floorId && floorId !== (zoneSel.dataset.floorId||'')) {
+    zoneSel.innerHTML = '<option value="">— Zone —</option>';
+    zoneSel.disabled = false;
+    zoneSel.dataset.floorId = floorId;
+    const bat = IGNY_STRUCTURE.find(b=>b.id===batId);
+    const floor = bat?.floors.find(f=>f.id===floorId);
+    floor?.zones.forEach(z=>{const o=document.createElement('option');o.value=z.id;o.textContent=z.name;zoneSel.appendChild(o);});
+  }
   
-  curPhotos.forEach((p, i) => {
-    html += `
-    <div style="position:relative; flex-shrink:0; height:80px; width:80px; border-radius:8px; border:1px solid var(--border); overflow:hidden;">
-      <img src="${p}" style="width:100%; height:100%; object-fit:cover;">
-      <button onclick="removePhoto(${i})" style="position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,.7); border:none; color:#fff; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
-    </div>`;
-  });
+  // Build loc string
+  const bat = IGNY_STRUCTURE.find(b=>b.id===batId);
+  const floor = bat?.floors.find(f=>f.id===floorId);
+  const zoneId = zoneSel.value;
+  const zone = floor?.zones.find(z=>z.id===zoneId);
   
-  html += `
-    <div style="flex-shrink:0; height:80px; width:80px; display:flex; flex-direction:column; justify-content:center; padding:0; cursor:pointer; border:2px dashed var(--border); border-radius:10px; text-align:center; transition:border-color .18s" onclick="triggerPhoto()">
-      <div style="font-size:24px; margin-bottom:2px">📷</div>
-      <div style="font-size:10px; color:var(--text2)">Ajouter</div>
-    </div>
-  </div>`;
-  
-  area.innerHTML = html + `<input type="file" id="photoFileInp" accept="image/*" onchange="handlePhoto(event)" style="display:none">`;
-}
-
-function removePhoto(index) {
-  curPhotos.splice(index, 1);
-  renderPhotoArea();
-}
-
-function triggerPhoto() {
-  document.getElementById('photoFileInp').click();
+  let parts = [bat?.name, floor?.name, zone?.name].filter(Boolean);
+  if (parts.length) document.getElementById('mLoc').value = parts.join(' › ');
 }
 
 // ═══════════════════════════════════════════════════════
-// STATUS CHANGE & DELETE
+// SUPABASE SYNC
 // ═══════════════════════════════════════════════════════
-function openStatusModal(id) {
-  statusTarget = id;
-  openOverlay('ovStatus');
+const SB_URL='https://brdhlqqfhwjmnrbqemml.supabase.co';
+const SB_KEY='sb_publishable_RWcEYhkNNfffbFJs6qJgfg_IcOs-apL';
+async function sbFetch(path,options={}){
+  const res=await fetch(SB_URL+'/rest/v1/'+path,{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':options.prefer||'return=representation'},...options});
+  if(!res.ok){const err=await res.text();throw new Error('Supabase: '+err);}
+  return options.method==='DELETE'?null:res.json();
 }
-function applyStatus(s) {
-  if (!statusTarget) return;
-  const r = state.reserves.find(x => x.id === statusTarget);
-  if (r) { r.status = s; save(r); renderReservesList(); updateStats(); toast('Statut mis à jour', 'ok'); }
-  closeOverlay('ovStatus');
-  statusTarget = null;
+async function sbLoadReserves(){try{const rows=await sbFetch('reserves?order=ts.asc');return rows.map(r=>({id:r.id,code:r.code,cat:r.cat,status:r.status,title:r.title,desc:r.description||'',lot:r.lot||'',loc:r.loc||'',photos:r.photos||[],pinX:r.pin_x,pinY:r.pin_y,planId:r.plan_id,planName:r.plan_name||'',page:r.page||1,date:r.date||'',time:r.heure||'',ts:r.ts}));}catch(e){console.warn('Sync impossible',e);return null;}}
+async function uploadPhotosVersSupabase(photosArray){if(!photosArray||!photosArray.length)return[];const urls=[];for(let photo of photosArray){if(photo.startsWith('http')){urls.push(photo);continue;}try{const res=await fetch(photo);const blob=await res.blob();const nom=`photo_${Date.now()}_${Math.floor(Math.random()*1000)}.jpg`;const up=await fetch(`${SB_URL}/storage/v1/object/photos/${nom}`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'image/jpeg'},body:blob});if(up.ok)urls.push(`${SB_URL}/storage/v1/object/public/photos/${nom}`);else urls.push(photo);}catch(err){urls.push(photo);}}return urls;}
+async function sbSaveReserve(r){try{await sbFetch('reserves',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:JSON.stringify({id:r.id,code:r.code,cat:r.cat,status:r.status,title:r.title,description:r.desc||'',lot:r.lot||'',loc:r.loc||'',photos:r.photos||[],pin_x:r.pinX,pin_y:r.pinY,plan_id:r.planId,plan_name:r.planName||'',page:r.page||1,date:r.date||'',heure:r.time||''})});}catch(e){console.warn('Erreur sync réserve:',e);}}
+async function sbDeleteReserve(id){try{await sbFetch('reserves?id=eq.'+id,{method:'DELETE',prefer:'return=minimal'});}catch(e){console.warn('Erreur suppression sync:',e);}}
+async function sbLoadPlans(){try{return await sbFetch('plans?order=created_at.asc');}catch(e){return null;}}
+async function sbSavePlan(plan){try{await sbFetch('plans',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:JSON.stringify({id:plan.id,name:plan.name,pages:plan.pages,pdf_url:plan.pdfUrl||null})});}catch(e){}}
+async function sbDeletePlan(id){try{await sbFetch('plans?id=eq.'+id,{method:'DELETE',prefer:'return=minimal'});}catch(e){}}
+async function uploadPDFVersSupabase(planId,arrayBuffer){try{const nom=`${planId}.pdf`;const blob=new Blob([arrayBuffer],{type:'application/pdf'});const res=await fetch(`${SB_URL}/storage/v1/object/plans/${nom}`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/pdf','x-upsert':'true'},body:blob});if(res.ok)return`${SB_URL}/storage/v1/object/public/plans/${nom}`;return null;}catch(e){return null;}}
+async function downloadPDFFromSupabase(pdfUrl){try{const res=await fetch(pdfUrl);if(!res.ok)return null;return await res.arrayBuffer();}catch(e){return null;}}
+async function syncPlansFromSupabase(){try{const remotePlans=await sbLoadPlans();if(!remotePlans)return;for(const rp of remotePlans){const existing=state.plans.find(p=>p.id===rp.id);if(!existing)state.plans.push({id:rp.id,name:rp.name,pages:rp.pages,pdfUrl:rp.pdf_url});else{existing.pdfUrl=rp.pdf_url;existing.pages=rp.pages;}}await idbSet('app_state',state);renderPlansList();
+  // Auto-télécharger les plans qui ne sont pas encore en local
+  for(const plan of state.plans){if(!pdfs[plan.id]&&plan.pdfUrl){try{const ab=await downloadPDFFromSupabase(plan.pdfUrl);if(ab){const pdfDoc=await pdfjsLib.getDocument({data:ab.slice(0)}).promise;pdfs[plan.id]=pdfDoc;await idbSet(plan.id,ab);renderPlansList();}}catch(e){}}}
+}catch(e){console.warn('syncPlansFromSupabase ignoré:',e);}}
+async function downloadPlanLocalement(planId){const plan=state.plans.find(p=>p.id===planId);if(!plan||!plan.pdfUrl){toast('Pas de PDF distant','err');return;}toast(`⬇️ Téléchargement de ${plan.name}...`,'info');const ab=await downloadPDFFromSupabase(plan.pdfUrl);if(!ab){toast('Échec du téléchargement','err');return;}try{const pdfDoc=await pdfjsLib.getDocument({data:ab.slice(0)}).promise;pdfs[plan.id]=pdfDoc;await idbSet(plan.id,ab);toast(`✓ ${plan.name} téléchargé`,'ok');renderPlansList();await activatePlan(plan.id);}catch(e){toast('Fichier PDF invalide','err');}}
+async function syncFromSupabase(){const remote=await sbLoadReserves();if(!remote)return;state.reserves=remote;state.counter={SEC:0,FIN:0,NC:0,QUA:0,AVA:0};state.reserves.forEach(r=>{const num=parseInt((r.code.split('-')[1]||'0'));if(!isNaN(num))state.counter[r.cat]=Math.max(state.counter[r.cat]||0,num);});await idbSet('app_state',state);updateBadge();updateStats();renderReservesList();renderPins();try{await syncPlansFromSupabase();}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncFromSupabase();});
+window.addEventListener('focus',()=>syncFromSupabase());
+
+// ═══════════════════════════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════════════════════════
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+const CAT_COLOR={SEC:'#ef4444',FIN:'#a855f7',NC:'#eab308',QUA:'#3b82f6',AVA:'#22c55e'};
+const CAT_LABEL={SEC:'Sécurité',FIN:'Finition',NC:'Non-conformité',QUA:'Qualité',AVA:'Avancement'};
+const STATUS_LABEL={todo:'À faire',wip:'En cours',done:'Levée'};
+function frDateSlug(){const d=new Date();return`${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;}
+
+let state={settings:{chantier:'',conducteur:'',entreprise:''},plans:[],activePlanId:null,reserves:[],counter:{SEC:0,FIN:0,NC:0,QUA:0,AVA:0}};
+let pdfs={},activePdf=null,curPage=1,totalPages=1,scale=1,baseScale=1,panX=0,panY=0,baseW=0,baseH=0;
+let pinMode=false,editId=null,pendingX=null,pendingY=null,curCat='SEC',curStatus='todo';
+let curPhotos=[],pinFilter='all',resFilter='all',statusTarget=null,lastSavedReserve=null,deleteTarget=null,repositionId=null;
+let annotImg=null,annotCtx=null,annotIsDrawing=false,annotStrokes=[],currentStroke=[],rawPhotoData=null;
+
+// ═══════════════════════════════════════════════════════
+// INDEXEDDB
+// ═══════════════════════════════════════════════════════
+let db=null;
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open('ChantierViewDB',1);req.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains('pdfs'))d.createObjectStore('pdfs');};req.onsuccess=e=>{db=e.target.result;resolve(db);};req.onerror=()=>reject(req.error);});}
+function idbSet(key,value){return new Promise((res,rej)=>{const tx=db.transaction('pdfs','readwrite');tx.objectStore('pdfs').put(value,key);tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});}
+function idbGet(key){return new Promise((res,rej)=>{const tx=db.transaction('pdfs','readonly');const req=tx.objectStore('pdfs').get(key);req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);});}
+function idbDel(key){return new Promise((res,rej)=>{const tx=db.transaction('pdfs','readwrite');tx.objectStore('pdfs').delete(key);tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});}
+
+// ═══════════════════════════════════════════════════════
+// PERSIST & INIT
+// ═══════════════════════════════════════════════════════
+function save(reserveToSync=null){idbSet('app_state',state).catch(e=>console.error(e));try{localStorage.removeItem('cv_state');}catch(e){}if(reserveToSync){(async()=>{reserveToSync.photos=await uploadPhotosVersSupabase(reserveToSync.photos);await sbSaveReserve(reserveToSync);await syncFromSupabase();})();}}
+async function init(){
+  await openDB();
+  try{const saved=await idbGet('app_state');if(saved){state=saved;}else{const raw=localStorage.getItem('cv_state');if(raw){state=JSON.parse(raw);await idbSet('app_state',state);}}}catch(e){}
+  state.reserves.forEach(r=>{if(r.photo&&!r.photos){r.photos=[r.photo];delete r.photo;}});
+  toast('🔄 Synchronisation...','info');
+  await syncFromSupabase();
+  updateBadge();updateStats();updateSettingVal();renderPlansList();
+  document.getElementById('mainTabs').classList.add('show');
+  document.getElementById('planSwitchBtn').style.display='flex';
+  document.getElementById('scWelcome').classList.remove('on');
+  initLocCascade();
+  if(state.plans.length>0){for(const plan of state.plans){try{const ab=await idbGet(plan.id);if(ab){const pdfDoc=await pdfjsLib.getDocument({data:ab.slice(0)}).promise;pdfs[plan.id]=pdfDoc;}}catch(e){}}
+    if(state.activePlanId&&pdfs[state.activePlanId]){await activatePlan(state.activePlanId);return;}
+    const firstLoaded=state.plans.find(p=>pdfs[p.id]);if(firstLoaded){await activatePlan(firstLoaded.id);return;}
+  }
+  switchTab('scReserves');
 }
 
-function confirmDelete(id) {
-  deleteTarget = id;
-  const r = state.reserves.find(x => x.id === id);
-  document.getElementById('confirmTitle').textContent = 'Supprimer la réserve';
-  document.getElementById('confirmMsg').textContent = `Supprimer "${r.title}" (${r.code}) ? Cette action est irréversible.`;
-  document.getElementById('confirmOk').onclick = () => {
-    const delId = deleteTarget;
-    state.reserves = state.reserves.filter(x => x.id !== delId);
-    sbDeleteReserve(delId);
-    save(); renderReservesList(); renderPins(); updateBadge(); updateStats();
-    toast('Réserve supprimée', 'ok');
-    closeOverlay('ovConfirm');
-  };
-  openOverlay('ovConfirm');
+// ═══════════════════════════════════════════════════════
+// PDF
+// ═══════════════════════════════════════════════════════
+function triggerPDF(){document.getElementById('pdfInput').click();}
+async function loadPDFs(e){const files=Array.from(e.target.files);if(!files.length)return;setProgress(5);let loaded=0;for(let i=0;i<files.length;i++){const file=files[i];try{setProgress(5+(i/files.length)*70);const ab=await file.arrayBuffer();const pdfDoc=await pdfjsLib.getDocument({data:ab.slice(0)}).promise;const planName=file.name.replace(/\.pdf$/i,'');let plan=state.plans.find(p=>p.name===planName);if(!plan){plan={id:'p_'+Date.now()+'_'+i,name:planName,pages:pdfDoc.numPages};state.plans.push(plan);}else{plan.pages=pdfDoc.numPages;}pdfs[plan.id]=pdfDoc;await idbSet(plan.id,ab);loaded++;setProgress(70+(i/files.length)*25);toast(`⬆️ Upload de ${planName}...`,'info');const pdfUrl=await uploadPDFVersSupabase(plan.id,ab);if(pdfUrl){plan.pdfUrl=pdfUrl;toast(`✓ ${planName} synchronisé`,'ok');}else{toast(`⚠️ ${planName} local uniquement`,'info');}await sbSavePlan(plan);}catch(err){toast('Erreur: '+file.name,'err');}}setProgress(100);save();renderPlansList();if(loaded>0){const np=state.plans.find(p=>pdfs[p.id]);if(np)await activatePlan(np.id);}setTimeout(()=>document.getElementById('progWrap').classList.remove('on'),600);e.target.value='';toast(`✓ ${loaded} plan(s) chargé(s)`,'ok');}
+function setProgress(v){document.getElementById('progWrap').classList.add('on');document.getElementById('progBar').style.width=v+'%';}
+async function activatePlan(planId){const plan=state.plans.find(p=>p.id===planId);if(!plan)return;if(!pdfs[planId]){try{const ab=await idbGet(planId);if(ab)pdfs[planId]=await pdfjsLib.getDocument({data:ab.slice(0)}).promise;}catch(e){}}state.activePlanId=planId;activePdf=pdfs[planId]||null;totalPages=plan.pages;curPage=1;save();document.getElementById('scWelcome').classList.remove('on');document.getElementById('mainTabs').classList.add('show');document.getElementById('planSwitchBtn').style.display='flex';const shortName=plan.name.length>14?plan.name.slice(0,14)+'…':plan.name;document.getElementById('planSwitchBtn').textContent=shortName+' ▾';document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));document.getElementById('scPlan').classList.add('on');document.querySelector('.tab[data-s="scPlan"]')?.classList.add('on');if(activePdf){await renderPage(curPage);document.getElementById('pageNav').style.display=totalPages>1?'flex':'none';}else{showReloadPrompt();}}
+function showReloadPrompt(){const cv=document.getElementById('cv');const wrap=document.getElementById('cvWrap');const ww=Math.max(wrap.clientWidth,300),wh=Math.max(wrap.clientHeight,200);cv.width=ww;cv.height=wh;cv.style.width=ww+'px';cv.style.height=wh+'px';cv.style.transform='translate(0px,0px)';document.getElementById('pinsLayer').style.transform='translate(0px,0px)';const ctx=cv.getContext('2d');ctx.fillStyle='#1c1d20';ctx.fillRect(0,0,ww,wh);ctx.fillStyle='#f97316';ctx.font='bold 16px IBM Plex Sans,sans-serif';ctx.textAlign='center';ctx.fillText('📄 Rechargez le PDF',ww/2,wh/2-16);ctx.fillStyle='#7c7d8a';ctx.font='13px IBM Plex Sans,sans-serif';ctx.fillText('Vos réserves sont sauvegardées',ww/2,wh/2+12);baseW=ww;baseH=wh;baseScale=1;scale=1;panX=0;panY=0;cv.dataset.bw=ww;cv.dataset.bh=wh;}
+
+// ═══════════════════════════════════════════════════════
+// RENDER PAGE & TRANSFORM
+// ═══════════════════════════════════════════════════════
+async function renderPage(num){if(!activePdf)return;const page=await activePdf.getPage(num);const wrap=document.getElementById('cvWrap');let ww=wrap.clientWidth,wh=wrap.clientHeight;if(ww<10||wh<10){await new Promise(r=>setTimeout(r,80));ww=wrap.clientWidth;wh=wrap.clientHeight;}const vp1=page.getViewport({scale:1});baseScale=Math.min(ww/vp1.width,wh/vp1.height)*0.96;scale=baseScale;baseW=vp1.width*baseScale;baseH=vp1.height*baseScale;panX=(ww-baseW)/2;panY=(wh-baseH)/2;const cv=document.getElementById('cv');let HIRES=Math.min(Math.ceil(window.devicePixelRatio)*2,4);if(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent))HIRES=1.5;cv.width=Math.round(vp1.width*HIRES);cv.height=Math.round(vp1.height*HIRES);cv.dataset.bw=baseW;cv.dataset.bh=baseH;const renderVP=page.getViewport({scale:HIRES});const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);await page.render({canvasContext:ctx,viewport:renderVP}).promise;cv.style.width=baseW+'px';cv.style.height=baseH+'px';cv.style.transform=`translate(${panX}px,${panY}px)`;const layer=document.getElementById('pinsLayer');layer.style.width=baseW+'px';layer.style.height=baseH+'px';layer.style.transform=`translate(${panX}px,${panY}px)`;document.getElementById('pageInfo').textContent=`${num}/${totalPages}`;renderPins();}
+let rafId=null;
+function applyT(){if(rafId)cancelAnimationFrame(rafId);rafId=requestAnimationFrame(()=>{const cv=document.getElementById('cv');const layer=document.getElementById('pinsLayer');const bw=parseFloat(cv.dataset.bw)||baseW;const bh=parseFloat(cv.dataset.bh)||baseH;const ratio=baseScale>0?scale/baseScale:1;const cw=bw*ratio;const ch=bh*ratio;const t=`translate(${panX}px,${panY}px)`;cv.style.width=cw+'px';cv.style.height=ch+'px';cv.style.transform=t;layer.style.width=cw+'px';layer.style.height=ch+'px';layer.style.transform=t;rafId=null;});}
+function smartZoom(factor,cx,cy){const minS=baseScale*0.4,maxS=baseScale*28;const ns=Math.min(Math.max(scale*factor,minS),maxS);if(ns===scale)return;const ratio=ns/scale;scale=ns;const wrap=document.getElementById('cvWrap');const pcx=cx!==undefined?cx:wrap.clientWidth/2;const pcy=cy!==undefined?cy:wrap.clientHeight/2;panX=pcx-(pcx-panX)*ratio;panY=pcy-(pcy-panY)*ratio;applyT();renderPins();}
+function zI(){smartZoom(1.3);}function zO(){smartZoom(0.77);}
+function zFit(){scale=baseScale;const wrap=document.getElementById('cvWrap');panX=(wrap.clientWidth-baseW)/2;panY=(wrap.clientHeight-baseH)/2;applyT();renderPins();}
+
+// ═══════════════════════════════════════════════════════
+// TOUCH / PAN / ZOOM
+// ═══════════════════════════════════════════════════════
+const cvWrap=document.getElementById('cvWrap');
+let touches={},gestureStart=null,mouseDown=false,msx=0,msy=0;
+function resetTouches(){touches={};gestureStart=null;mouseDown=false;}
+cvWrap.addEventListener('touchcancel',resetTouches);
+cvWrap.addEventListener('touchstart',e=>{e.preventDefault();Array.from(e.changedTouches).forEach(t=>{touches[t.identifier]={x:t.clientX,y:t.clientY};});const ids=Object.keys(touches);if(ids.length===2){const t0=touches[ids[0]],t1=touches[ids[1]];gestureStart={dist:Math.hypot(t1.x-t0.x,t1.y-t0.y),cx:(t0.x+t1.x)/2,cy:(t0.y+t1.y)/2,panX,panY,scale};}},{passive:false});
+cvWrap.addEventListener('touchmove',e=>{e.preventDefault();const ids=Object.keys(touches);if(ids.length===1&&!pinMode){const t=e.changedTouches[0];const prev=touches[t.identifier];if(prev){panX+=t.clientX-prev.x;panY+=t.clientY-prev.y;applyT();}touches[t.identifier]={x:t.clientX,y:t.clientY};return;}if(ids.length===2&&gestureStart){Array.from(e.changedTouches).forEach(t=>{if(touches[t.identifier])touches[t.identifier]={x:t.clientX,y:t.clientY};});const[id0,id1]=ids;const t0=touches[id0],t1=touches[id1];const newDist=Math.hypot(t1.x-t0.x,t1.y-t0.y);const newCx=(t0.x+t1.x)/2,newCy=(t0.y+t1.y)/2;const factor=newDist/gestureStart.dist;const minS=baseScale*0.4,maxS=baseScale*28;const ns=Math.min(Math.max(gestureStart.scale*factor,minS),maxS);const ratio=ns/gestureStart.scale;scale=ns;const rect=cvWrap.getBoundingClientRect();const pivX=gestureStart.cx-rect.left;const pivY=gestureStart.cy-rect.top;panX=pivX-(pivX-gestureStart.panX)*ratio+(newCx-gestureStart.cx);panY=pivY-(pivY-gestureStart.panY)*ratio+(newCy-gestureStart.cy);applyT();}},{passive:false});
+cvWrap.addEventListener('touchend',e=>{const changedIds=Array.from(e.changedTouches).map(t=>t.identifier);const wasSingle=Object.keys(touches).length===1;const t=e.changedTouches[0];changedIds.forEach(id=>delete touches[id]);if(Object.keys(touches).length<2)gestureStart=null;if(pinMode&&wasSingle&&activePdf&&t){const rect=cvWrap.getBoundingClientRect();const cv=document.getElementById('cv');const cw=parseFloat(cv.style.width);const ch=parseFloat(cv.style.height);const x=t.clientX-rect.left;const y=t.clientY-rect.top;pendingX=(x-panX)/cw;pendingY=(y-panY)/ch;if(pendingX>=0&&pendingX<=1&&pendingY>=0&&pendingY<=1){if(repositionId!==null)applyReposition();else openReserveModal();}}},{passive:false});
+cvWrap.addEventListener('mousedown',e=>{if(pinMode)return;mouseDown=true;msx=e.clientX-panX;msy=e.clientY-panY;cvWrap.style.cursor='grabbing';});
+window.addEventListener('mousemove',e=>{if(!mouseDown)return;panX=e.clientX-msx;panY=e.clientY-msy;applyT();});
+window.addEventListener('mouseup',()=>{mouseDown=false;cvWrap.style.cursor=pinMode?'crosshair':'grab';});
+cvWrap.addEventListener('wheel',e=>{e.preventDefault();const rect=cvWrap.getBoundingClientRect();smartZoom(e.deltaY<0?1.12:0.89,e.clientX-rect.left,e.clientY-rect.top);},{passive:false});
+cvWrap.addEventListener('click',e=>{if(!pinMode||!activePdf)return;const rect=cvWrap.getBoundingClientRect();const cv=document.getElementById('cv');const cw=parseFloat(cv.style.width),ch=parseFloat(cv.style.height);pendingX=(e.clientX-rect.left-panX)/cw;pendingY=(e.clientY-rect.top-panY)/ch;if(pendingX>=0&&pendingX<=1&&pendingY>=0&&pendingY<=1){if(repositionId!==null)applyReposition();else openReserveModal();}});
+
+// ═══════════════════════════════════════════════════════
+// PIN MODE
+// ═══════════════════════════════════════════════════════
+function togglePinMode(forReposition=false){if(!activePdf&&!state.plans.length){toast('Chargez d\'abord un PDF','err');return;}pinMode=!pinMode;document.getElementById('pinBtn').classList.toggle('pin-active',pinMode);const banner=document.getElementById('pinBanner');banner.textContent=forReposition?'📍 Touchez le plan pour repositionner':'📍 Touchez le plan pour placer la réserve';banner.classList.toggle('on',pinMode);cvWrap.classList.toggle('pin-mode',pinMode);}
+function startReposition(){const title=document.getElementById('mTitleInp').value.trim();if(!title){toast('Titre requis avant de repositionner','err');return;}if(editId!==null){const r=state.reserves.find(x=>x.id===editId);if(r){r.title=title;r.desc=document.getElementById('mDesc').value.trim();r.lot='';r.loc=document.getElementById('mLoc').value.trim();r.cat=curCat;r.status=curStatus;r.photos=[...curPhotos];}}repositionId=editId;closeOverlay('ovReserve');switchTab('scPlan');if(!pinMode)togglePinMode(true);else{document.getElementById('pinBanner').textContent='📍 Touchez le plan pour repositionner';document.getElementById('pinBanner').classList.add('on');}toast('Touchez l\'endroit exact sur le plan','info');}
+function applyReposition(){const r=state.reserves.find(x=>x.id===repositionId);if(r&&pendingX!==null){r.pinX=pendingX;r.pinY=pendingY;r.planId=state.activePlanId;r.planName=state.plans.find(p=>p.id===state.activePlanId)?.name||'';r.page=curPage;save(r);renderPins();toast(`📍 ${r.code} repositionnée ✓`,'ok');}repositionId=null;pendingX=null;pendingY=null;if(pinMode)togglePinMode();}
+function renderPins(){const layer=document.getElementById('pinsLayer');const cv=document.getElementById('cv');const cw=parseFloat(cv.style.width||cv.dataset.bw||100);const ch=parseFloat(cv.style.height||cv.dataset.bh||100);layer.innerHTML='';layer.style.width=cw+'px';layer.style.height=ch+'px';state.reserves.filter(r=>r.planId===state.activePlanId&&r.page===curPage&&r.pinX!==null&&(pinFilter==='all'||r.cat===pinFilter)).forEach(r=>{const el=document.createElement('div');el.className='pin-m';el.style.left=(r.pinX*100)+'%';el.style.top=(r.pinY*100)+'%';const color=CAT_COLOR[r.cat]||'#f97316';el.innerHTML=`<div class="pin-drop" style="background:${color}"><span>${r.code}</span></div><div class="pin-lbl">${r.title}</div>`;el.addEventListener('click',ev=>{ev.stopPropagation();openReserveModal(r.id);});el.addEventListener('touchend',ev=>{ev.stopPropagation();if(!pinMode)openReserveModal(r.id);},{passive:true});layer.appendChild(el);});}
+
+// ═══════════════════════════════════════════════════════
+// RESERVE MODAL (classique)
+// ═══════════════════════════════════════════════════════
+function openReserveModal(id=null){
+  resetTouches();
+  editId=id;curPhotos=[];curCat='SEC';curStatus='todo';
+  // Reset cascade
+  document.getElementById('mLocBat').value='';
+  document.getElementById('mLocFloor').innerHTML='<option value="">— Étage —</option>';document.getElementById('mLocFloor').disabled=true;
+  document.getElementById('mLocZone').innerHTML='<option value="">— Zone —</option>';document.getElementById('mLocZone').disabled=true;
+  
+  if(id!==null){const r=state.reserves.find(x=>x.id===id);document.getElementById('mTitle').textContent=`Réserve ${r.code}`;document.getElementById('mTitleInp').value=r.title;document.getElementById('mDesc').value=r.desc||'';document.getElementById('mLoc').value=r.loc||'';curCat=r.cat;curStatus=r.status;curPhotos=r.photos?[...r.photos]:[];document.getElementById('btnReposition').style.display=activePdf?'flex':'none';}
+  else{document.getElementById('mTitle').textContent='Nouvelle réserve';document.getElementById('mTitleInp').value='';document.getElementById('mDesc').value='';document.getElementById('mLoc').value='';document.getElementById('btnReposition').style.display='none';}
+  renderPhotoArea();pickCat(curCat);pickStatus(curStatus);openOverlay('ovReserve');
+  setTimeout(()=>document.getElementById('mTitleInp').focus(),350);
 }
+function saveReserve(){
+  const title=document.getElementById('mTitleInp').value.trim();
+  if(!title){toast('Titre requis','err');return;}
+  if(editId!==null){const r=state.reserves.find(x=>x.id===editId);r.title=title;r.desc=document.getElementById('mDesc').value.trim();r.lot='';r.loc=document.getElementById('mLoc').value.trim();r.cat=curCat;r.status=curStatus;r.photos=[...curPhotos];if(pendingX!==null&&pendingY!==null){r.pinX=pendingX;r.pinY=pendingY;r.planId=state.activePlanId;r.planName=state.plans.find(p=>p.id===state.activePlanId)?.name||'';r.page=curPage;}toast('Réserve modifiée ✓','ok');save(r);}
+  else{state.counter[curCat]=(state.counter[curCat]||0)+1;const num=String(state.counter[curCat]).padStart(3,'0');const code=`${curCat}-${num}`;const now=new Date();const r={id:Date.now(),code,cat:curCat,status:curStatus,title,desc:document.getElementById('mDesc').value.trim(),lot:'',loc:document.getElementById('mLoc').value.trim(),photos:[...curPhotos],pinX:pendingX,pinY:pendingY,planId:state.activePlanId,planName:state.plans.find(p=>p.id===state.activePlanId)?.name||'',page:curPage,date:now.toLocaleDateString('fr-FR'),time:now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}),ts:now.toISOString()};state.reserves.push(r);lastSavedReserve=r;toast(`📍 ${code} ajoutée`,'ok');save(lastSavedReserve);}
+  closeOverlay('ovReserve');if(pinMode)togglePinMode();pendingX=null;pendingY=null;renderPins();updateBadge();updateStats();
+}
+
+// ═══════════════════════════════════════════════════════
+// FORM HELPERS & ANNOTATION
+// ═══════════════════════════════════════════════════════
+function pickCat(c){curCat=c;document.querySelectorAll('.cp').forEach(el=>el.classList.toggle('on',el.dataset.c===c));}
+function pickStatus(s){curStatus=s;document.querySelectorAll('.stp').forEach(el=>el.classList.toggle('on',el.dataset.s===s));}
+function handlePhoto(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{const img=new Image();img.onload=()=>{const cvs=document.createElement('canvas');const MAX=800;let w=img.width,h=img.height;if(w>h){if(w>MAX){h*=MAX/w;w=MAX;}}else{if(h>MAX){w*=MAX/h;h=MAX;}}cvs.width=w;cvs.height=h;cvs.getContext('2d').drawImage(img,0,0,w,h);rawPhotoData=cvs.toDataURL('image/jpeg',0.6);openAnnotateModal();};img.src=ev.target.result;};r.readAsDataURL(file);e.target.value='';}
+function openAnnotateModal(){document.getElementById('ovAnnotate').classList.add('on');const cv=document.getElementById('annotCv');const container=document.getElementById('annotBody');annotCtx=cv.getContext('2d');annotStrokes=[];annotImg=new Image();annotImg.onload=()=>{const cw=container.clientWidth;const ch=container.clientHeight;const ratio=Math.min(cw/annotImg.width,ch/annotImg.height);cv.width=annotImg.width*ratio;cv.height=annotImg.height*ratio;cv.dataset.ratio=ratio;redrawAnnotate();};annotImg.src=rawPhotoData;cv.ontouchstart=annotStart;cv.ontouchmove=annotMove;cv.ontouchend=annotEnd;cv.onmousedown=annotStart;cv.onmousemove=annotMove;cv.onmouseup=annotEnd;}
+function redrawAnnotate(){const cv=document.getElementById('annotCv');annotCtx.clearRect(0,0,cv.width,cv.height);annotCtx.drawImage(annotImg,0,0,cv.width,cv.height);annotCtx.strokeStyle='#ef4444';annotCtx.lineWidth=4;annotCtx.lineCap='round';annotCtx.lineJoin='round';for(const stroke of annotStrokes){if(!stroke.length)continue;annotCtx.beginPath();annotCtx.moveTo(stroke[0].x,stroke[0].y);for(let i=1;i<stroke.length;i++)annotCtx.lineTo(stroke[i].x,stroke[i].y);annotCtx.stroke();}}
+function getAnnotPos(e){const cv=document.getElementById('annotCv');const rect=cv.getBoundingClientRect();const touch=e.touches?e.touches[0]:e;return{x:touch.clientX-rect.left,y:touch.clientY-rect.top};}
+function annotStart(e){e.preventDefault();annotIsDrawing=true;currentStroke=[getAnnotPos(e)];annotStrokes.push(currentStroke);}
+function annotMove(e){if(!annotIsDrawing)return;e.preventDefault();currentStroke.push(getAnnotPos(e));redrawAnnotate();}
+function annotEnd(e){if(!annotIsDrawing)return;e.preventDefault();annotIsDrawing=false;}
+function clearAnnotate(){annotStrokes=[];redrawAnnotate();}
+function closeAnnotate(){document.getElementById('ovAnnotate').classList.remove('on');annotStrokes=[];ziPhotoTarget=null;}
+function renderPhotoArea(){const area=document.getElementById('photoArea');let html='<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:5px;">';curPhotos.forEach((p,i)=>{html+=`<div style="position:relative;flex-shrink:0;height:80px;width:80px;border-radius:8px;border:1px solid var(--border);overflow:hidden;"><img src="${p}" style="width:100%;height:100%;object-fit:cover;"><button onclick="removePhoto(${i})" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.7);border:none;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button></div>`;});html+=`<div style="flex-shrink:0;height:80px;width:80px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;border:2px dashed var(--border);border-radius:10px;text-align:center" onclick="triggerPhoto()"><div style="font-size:24px;margin-bottom:2px">📷</div><div style="font-size:10px;color:var(--text2)">Ajouter</div></div></div>`;area.innerHTML=html+`<input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="display:none">`;}
+function removePhoto(index){curPhotos.splice(index,1);renderPhotoArea();}
+function triggerPhoto(){document.getElementById('photoFileInp').click();}
+
+// ═══════════════════════════════════════════════════════
+// STATUS / DELETE
+// ═══════════════════════════════════════════════════════
+function openStatusModal(id){statusTarget=id;openOverlay('ovStatus');}
+function applyStatus(s){if(!statusTarget)return;const r=state.reserves.find(x=>x.id===statusTarget);if(r){r.status=s;save(r);renderReservesList();updateStats();toast('Statut mis à jour','ok');}closeOverlay('ovStatus');statusTarget=null;}
+function confirmDelete(id){deleteTarget=id;const r=state.reserves.find(x=>x.id===id);document.getElementById('confirmTitle').textContent='Supprimer la réserve';document.getElementById('confirmMsg').textContent=`Supprimer "${r.title}" (${r.code}) ?`;document.getElementById('confirmOk').onclick=()=>{const delId=deleteTarget;state.reserves=state.reserves.filter(x=>x.id!==delId);sbDeleteReserve(delId);save();renderReservesList();renderPins();updateBadge();updateStats();toast('Réserve supprimée','ok');closeOverlay('ovConfirm');};openOverlay('ovConfirm');}
 
 // ═══════════════════════════════════════════════════════
 // RESERVES LIST
 // ═══════════════════════════════════════════════════════
-function buildDateChips() {
-  // Collecter les dates uniques triées décroissant
-  const today = new Date().toLocaleDateString('fr-FR');
-  const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('fr-FR');
-  const allDates = [...new Set(state.reserves.map(r => r.date).filter(Boolean))].sort((a,b) => {
-    // Convertir dd/mm/yyyy en comparaison
-    const toNum = d => d.split('/').reverse().join('');
-    return toNum(b).localeCompare(toNum(a));
-  });
-  // Dates autres qu'aujourd'hui et hier
-  const extraDates = allDates.filter(d => d !== today && d !== yesterday);
-  const container = document.getElementById('extraDateChips');
-  if (!container) return;
-  container.innerHTML = extraDates.map(d =>
-    `<button class="chip" data-f="date:${d}" onclick="filterRes(this,'date:${d}')" style="margin-left:4px">${d}</button>`
-  ).join('');
-}
-
-function renderReservesList() {
-  buildDateChips();
-  const list = document.getElementById('resList');
-  let filtered = state.reserves;
-
-  // Filtre catégorie / statut
-  if (resFilter !== 'all') {
-    if (['todo','wip','done'].includes(resFilter)) filtered = filtered.filter(r => r.status === resFilter);
-    else if (resFilter === 'today') {
-      const today = new Date().toLocaleDateString('fr-FR');
-      filtered = filtered.filter(r => r.date === today);
-    } else if (resFilter === 'yesterday') {
-      const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('fr-FR');
-      filtered = filtered.filter(r => r.date === yesterday);
-    } else if (resFilter.startsWith('date:')) {
-      const d = resFilter.slice(5);
-      filtered = filtered.filter(r => r.date === d);
-    } else {
-      filtered = filtered.filter(r => r.cat === resFilter);
-    }
-  }
-  if (!filtered.length) {
-    list.innerHTML = `<div class="empty"><div class="empty-ico">📋</div><div class="empty-ttl">Aucune réserve</div><div class="empty-sub">Chargez un plan et utilisez le mode 📍 Épingler pour ajouter des réserves.</div></div>`;
-    return;
-  }
-  const sMap = { todo:'status-todo', wip:'status-wip', done:'status-done' };
+function buildDateChips(){const today=new Date().toLocaleDateString('fr-FR');const yesterday=new Date(Date.now()-86400000).toLocaleDateString('fr-FR');const allDates=[...new Set(state.reserves.map(r=>r.date).filter(Boolean))].sort((a,b)=>{const toNum=d=>d.split('/').reverse().join('');return toNum(b).localeCompare(toNum(a));});const extraDates=allDates.filter(d=>d!==today&&d!==yesterday);const container=document.getElementById('extraDateChips');if(!container)return;container.innerHTML=extraDates.map(d=>`<button class="chip" data-f="date:${d}" onclick="filterRes(this,'date:${d}')" style="margin-left:4px">${d}</button>`).join('');}
+let locFilter = '';
+function filterByLoc() {
+  // Ouvre une modale rapide pour choisir la zone
+  const locs = [...new Set(state.reserves.map(r => r.loc).filter(Boolean))].sort();
+  if (!locs.length) { toast('Aucune localisation enregistrée', 'err'); return; }
   
-  list.innerHTML = filtered.map(r => {
-    const photos = r.photos || [];
-    return `
-    <div class="res-card" id="rc-${r.id}">
-      <div class="res-card-head">
-        <div class="res-num" style="background:${CAT_COLOR[r.cat]}">${r.code}</div>
-        <div class="res-info">
-          <div class="res-title">${r.title}</div>
-          <div class="res-meta">${r.planName || ''} · P${r.page} · ${r.date} ${r.time}${r.lot ? ' · ' + r.lot : ''}</div>
-        </div>
-        <div class="res-right">
-          <span class="status-pill ${sMap[r.status]}" onclick="openStatusModal(${r.id})">${STATUS_LABEL[r.status]}</span>
-          <div class="res-btns">
-            ${r.pinX !== null ? `<div class="ib" onclick="jumpTo(${r.id})" title="Localiser">🗺️</div>` : ''}
-            <div class="ib" onclick="openReserveModal(${r.id})" title="Modifier">✏️</div>
-            <div class="ib red" onclick="confirmDelete(${r.id})" title="Supprimer">🗑️</div>
-          </div>
-        </div>
-      </div>
-      ${r.desc || photos.length || r.loc ? `<div class="res-card-body">
-        ${r.loc ? `<div class="res-tags"><span class="res-tag">📍 ${r.loc}</span></div>` : ''}
-        ${r.desc ? `<div class="res-desc">${r.desc}</div>` : ''}
-        ${photos.length ? `<div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-top:6px">
-          ${photos.map((p, i) => `<img src="${p}" style="height:60px; width:60px; object-fit:cover; border-radius:6px; cursor:pointer; flex-shrink:0; border:1px solid var(--border)" onclick="openLb(${r.id}, ${i})">`).join('')}
-        </div>` : ''}
-      </div>` : ''}
-    </div>`;
-  }).join('');
+  const existing = document.getElementById('ovLocFilter');
+  if (existing) existing.remove();
+  
+  const ov = document.createElement('div');
+  ov.id = 'ovLocFilter';
+  ov.className = 'overlay on';
+  ov.style.zIndex = '200';
+  ov.innerHTML = `<div class="modal" style="max-height:70dvh">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <div class="modal-title">Filtrer par zone</div>
+      <button class="ib" onclick="document.getElementById('ovLocFilter').remove()">✕</button>
+    </div>
+    <div class="modal-body" style="gap:0;padding:0">
+      <div style="padding:10px 18px;border-bottom:1px solid var(--border);cursor:pointer;font-size:14px;color:var(--accent)" onclick="applyLocFilter('')">Toutes les zones</div>
+      ${locs.map(l => `<div style="padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px" onclick="applyLocFilter('${l.replace(/'/g,"\'")}')">${l} <span style="font-size:10px;color:var(--text2);font-family:'IBM Plex Mono',monospace">(${state.reserves.filter(r=>r.loc===l).length})</span></div>`).join('')}
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e => { if(e.target===ov) ov.remove(); });
 }
-
-function jumpTo(id) {
-  const r = state.reserves.find(x => x.id === id);
-  if (!r || r.pinX === null) { toast('Pas de position sur plan', 'err'); return; }
-  const doJump = () => {
-    const cv = document.getElementById('cv');
-    const bw = parseFloat(cv.dataset.bw || baseW);
-    const bh = parseFloat(cv.dataset.bh || baseH);
-    const cw = bw * (scale / baseScale), ch = bh * (scale / baseScale);
-    const wrap = document.getElementById('cvWrap');
-    panX = wrap.clientWidth / 2 - r.pinX * cw;
-    panY = wrap.clientHeight / 2 - r.pinY * ch;
-    applyT(); renderPins();
-    toast(`📍 ${r.code} localisée`, 'ok');
-  };
-  if (r.planId !== state.activePlanId) {
-    if (pdfs[r.planId]) {
-      activatePlan(r.planId).then(() => {
-        if (r.page !== curPage) { curPage = r.page; renderPage(curPage).then(doJump); } else doJump();
-      });
-    } else { toast('Rechargez le PDF de ce plan', 'err'); return; }
-  } else {
-    if (r.page !== curPage) { curPage = r.page; renderPage(curPage).then(doJump); } else doJump();
-  }
-  switchTab('scPlan');
-}
-
-function filterPins(el, f) {
-  pinFilter = f;
-  document.querySelectorAll('#planBar .chip[data-f]').forEach(c => c.classList.toggle('on', c.dataset.f === f));
-  renderPins();
-}
-function filterRes(el, f) {
-  resFilter = f;
-  document.querySelectorAll('#resBar .chip[data-f]').forEach(c => c.classList.toggle('on', c.dataset.f === f));
+function applyLocFilter(loc) {
+  locFilter = loc;
+  document.getElementById('ovLocFilter')?.remove();
+  const chip = document.getElementById('locFilterChip');
+  if (loc) { chip.classList.add('on'); chip.textContent = '📍 ' + (loc.split('›').pop()?.trim() || loc); }
+  else { chip.classList.remove('on'); chip.textContent = '📍 Par zone'; }
   renderReservesList();
 }
+function renderReservesList(){buildDateChips();const list=document.getElementById('resList');let filtered=state.reserves;if(locFilter){filtered=filtered.filter(r=>r.loc===locFilter);}if(resFilter!=='all'){if(['todo','wip','done'].includes(resFilter))filtered=filtered.filter(r=>r.status===resFilter);else if(resFilter==='today'){const today=new Date().toLocaleDateString('fr-FR');filtered=filtered.filter(r=>r.date===today);}else if(resFilter==='yesterday'){const yesterday=new Date(Date.now()-86400000).toLocaleDateString('fr-FR');filtered=filtered.filter(r=>r.date===yesterday);}else if(resFilter.startsWith('date:')){const d=resFilter.slice(5);filtered=filtered.filter(r=>r.date===d);}else filtered=filtered.filter(r=>r.cat===resFilter);}if(!filtered.length){list.innerHTML=`<div class="empty"><div class="empty-ico">📋</div><div class="empty-ttl">Aucune réserve</div><div class="empty-sub">Appuyez sur 📋 Par zone pour faire votre levée, ou sur 📍 Épingler depuis le plan.</div></div>`;return;}const sMap={todo:'status-todo',wip:'status-wip',done:'status-done'};list.innerHTML=filtered.map(r=>{const photos=r.photos||[];return`<div class="res-card" id="rc-${r.id}"><div class="res-card-head"><div class="res-num" style="background:${CAT_COLOR[r.cat]}">${r.code}</div><div class="res-info"><div class="res-title">${r.title}</div><div class="res-meta">${r.loc?r.loc+' · ':''}${r.date} ${r.time}</div></div><div class="res-right"><span class="status-pill ${sMap[r.status]}" onclick="openStatusModal(${r.id})">${STATUS_LABEL[r.status]}</span><div class="res-btns">${r.pinX!==null?`<div class="ib" onclick="jumpTo(${r.id})" title="Localiser">🗺️</div>`:''}<div class="ib" onclick="openReserveModal(${r.id})" title="Modifier">✏️</div><div class="ib red" onclick="confirmDelete(${r.id})" title="Supprimer">🗑️</div></div></div></div>${r.desc||photos.length?`<div class="res-card-body">${r.desc?`<div class="res-desc">${r.desc}</div>`:''}${photos.length?`<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-top:6px">${photos.map((p,i)=>`<img src="${p}" style="height:60px;width:60px;object-fit:cover;border-radius:6px;cursor:pointer;flex-shrink:0;border:1px solid var(--border)" onclick="openLb(${r.id},${i})">`).join('')}</div>`:''}</div>`:''}</div>`;}).join('');}
+function jumpTo(id){const r=state.reserves.find(x=>x.id===id);if(!r||r.pinX===null){toast('Pas de position sur plan','err');return;}const doJump=()=>{const cv=document.getElementById('cv');const bw=parseFloat(cv.dataset.bw||baseW);const bh=parseFloat(cv.dataset.bh||baseH);const cw=bw*(scale/baseScale),ch=bh*(scale/baseScale);const wrap=document.getElementById('cvWrap');panX=wrap.clientWidth/2-r.pinX*cw;panY=wrap.clientHeight/2-r.pinY*ch;applyT();renderPins();toast(`📍 ${r.code} localisée`,'ok');};if(r.planId!==state.activePlanId){if(pdfs[r.planId]){activatePlan(r.planId).then(()=>{if(r.page!==curPage){curPage=r.page;renderPage(curPage).then(doJump);}else doJump();});}else{toast('Rechargez le PDF de ce plan','err');return;}}else{if(r.page!==curPage){curPage=r.page;renderPage(curPage).then(doJump);}else doJump();}switchTab('scPlan');}
+function filterPins(el,f){pinFilter=f;document.querySelectorAll('#planBar .chip[data-f]').forEach(c=>c.classList.toggle('on',c.dataset.f===f));renderPins();}
+function filterRes(el,f){resFilter=f;document.querySelectorAll('#resBar .chip[data-f]').forEach(c=>c.classList.toggle('on',c.dataset.f===f));renderReservesList();}
 
 // ═══════════════════════════════════════════════════════
 // PLANS LIST
 // ═══════════════════════════════════════════════════════
-function renderPlansList() {
-  const list = document.getElementById('plansList');
-  if (!state.plans.length) {
-    list.innerHTML = `<div class="empty"><div class="empty-ico">📂</div><div class="empty-ttl">Aucun plan</div><div class="empty-sub">Chargez vos plans PDF pour commencer.</div></div>
-      <button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un plan PDF</button>`;
-    return;
-  }
-  const reserveCount = id => state.reserves.filter(r => r.planId === id).length;
-  list.innerHTML = state.plans.map(p => {
-    const loaded = !!pdfs[p.id];
-    const hasRemote = !!p.pdfUrl;
-    let actionBtn = '';
-    if (!loaded && hasRemote) {
-      actionBtn = `<div class="ib" onclick="downloadPlanLocalement('${p.id}')" title="Télécharger" style="color:var(--accent);width:auto;padding:0 8px;font-size:11px;font-weight:600;gap:4px">⬇️ DL</div>`;
-    }
-    return `
-    <div class="plan-card ${p.id === state.activePlanId ? 'active-plan' : ''}" onclick="selectPlanFromList('${p.id}')">
-      <div class="plan-icon">${loaded ? '🗺️' : hasRemote ? '☁️' : '📄'}</div>
-      <div class="plan-info">
-        <div class="plan-name">${p.name}</div>
-        <div class="plan-meta">${p.pages} page(s) · ${reserveCount(p.id)} réserve(s) · ${loaded ? '✓ local' : hasRemote ? '☁️ cloud' : '⚠️ non chargé'}</div>
-      </div>
-      <div class="plan-actions">
-        ${actionBtn}
-        <div class="ib red" onclick="deletePlan(event,'${p.id}')">🗑️</div>
-      </div>
-    </div>`;
-  }).join('') +
-    `<button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un PDF</button>`;
-}
-
-async function selectPlanFromList(id) {
-  if (!pdfs[id]) {
-    const plan = state.plans.find(p => p.id === id);
-    if (plan?.pdfUrl) {
-      await downloadPlanLocalement(id);
-    } else {
-      toast('PDF non chargé — rechargez le fichier', 'err');
-    }
-    return;
-  }
-  await activatePlan(id);
-  renderPlansList();
-}
-
-function deletePlan(e, id) {
-  e.stopPropagation();
-  const plan = state.plans.find(p => p.id === id);
-  const resCount = state.reserves.filter(r => r.planId === id).length;
-  if (!confirm(`Supprimer le plan "${plan.name}"${resCount ? ` et ses ${resCount} réserve(s)` : ''} ?`)) return;
-  state.plans = state.plans.filter(p => p.id !== id);
-  state.reserves = state.reserves.filter(r => r.planId !== id);
-  delete pdfs[id];
-  idbDel(id).catch(() => {});
-  sbDeletePlan(id);
-  if (state.activePlanId === id) {
-    state.activePlanId = state.plans[0]?.id || null;
-    if (state.activePlanId) activatePlan(state.activePlanId);
-    else switchTab('scReserves');
-  }
-  save(); renderPlansList(); updateBadge(); updateStats();
-  toast('Plan supprimé', 'ok');
-}
-
-function openPlanSel() {
-  const list = document.getElementById('planSelList');
-  list.innerHTML = state.plans.map(p => `
-    <div class="plan-sel-item ${p.id === state.activePlanId ? 'on' : ''}" onclick="selPlan('${p.id}')">
-      <div class="plan-sel-check">${p.id === state.activePlanId ? '✓' : ''}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-        <div style="font-size:11px;color:var(--text2)">${p.pages}p · ${state.reserves.filter(r=>r.planId===p.id).length} rés.${!pdfs[p.id]?' · ⚠️ non chargé':''}</div>
-      </div>
-    </div>`).join('') +
-    `<div style="padding-top:10px"><button class="btn btn-sec btn-sm" style="width:100%" onclick="closeOverlay('ovPlanSel');triggerPDF()">+ Ajouter un PDF</button></div>`;
-  openOverlay('ovPlanSel');
-}
-
-async function selPlan(id) {
-  closeOverlay('ovPlanSel');
-  if (!pdfs[id]) {
-    const plan = state.plans.find(p => p.id === id);
-    if (plan?.pdfUrl) {
-      await downloadPlanLocalement(id);
-    } else {
-      toast('PDF non chargé — rechargez le fichier', 'err');
-    }
-    return;
-  }
-  await activatePlan(id);
-  renderPlansList();
-}
-
-async function goPage(d) {
-  const np = curPage + d;
-  if (np < 1 || np > totalPages) return;
-  curPage = np;
-  await renderPage(curPage);
-}
+function renderPlansList(){const list=document.getElementById('plansList');if(!state.plans.length){list.innerHTML=`<div class="empty"><div class="empty-ico">📂</div><div class="empty-ttl">Aucun plan</div><div class="empty-sub">Chargez vos plans PDF.</div></div><button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un plan PDF</button>`;return;}const reserveCount=id=>state.reserves.filter(r=>r.planId===id).length;list.innerHTML=state.plans.map(p=>{const loaded=!!pdfs[p.id];const hasRemote=!!p.pdfUrl;let actionBtn='';if(!loaded&&hasRemote)actionBtn=`<div class="ib" onclick="downloadPlanLocalement('${p.id}')" style="color:var(--accent);width:auto;padding:0 8px;font-size:11px;font-weight:600">⬇️ DL</div>`;return`<div class="plan-card ${p.id===state.activePlanId?'active-plan':''}" onclick="selectPlanFromList('${p.id}')"><div class="plan-icon">${loaded?'🗺️':hasRemote?'☁️':'📄'}</div><div class="plan-info"><div class="plan-name">${p.name}</div><div class="plan-meta">${p.pages}p · ${reserveCount(p.id)} rés. · ${loaded?'✓ local':hasRemote?'☁️ cloud':'⚠️ non chargé'}</div></div><div class="plan-actions">${actionBtn}<div class="ib red" onclick="deletePlan(event,'${p.id}')">🗑️</div></div></div>`;}).join('')+`<button class="add-plan-btn" onclick="triggerPDF()">+ Ajouter un PDF</button>`;}
+async function selectPlanFromList(id){if(!pdfs[id]){const plan=state.plans.find(p=>p.id===id);if(plan?.pdfUrl){await downloadPlanLocalement(id);}else{toast('PDF non chargé — rechargez','err');}return;}await activatePlan(id);renderPlansList();}
+function deletePlan(e,id){e.stopPropagation();const plan=state.plans.find(p=>p.id===id);const resCount=state.reserves.filter(r=>r.planId===id).length;if(!confirm(`Supprimer "${plan.name}"${resCount?` et ses ${resCount} réserve(s)`:''}?`))return;state.plans=state.plans.filter(p=>p.id!==id);state.reserves=state.reserves.filter(r=>r.planId!==id);delete pdfs[id];idbDel(id).catch(()=>{});sbDeletePlan(id);if(state.activePlanId===id){state.activePlanId=state.plans[0]?.id||null;if(state.activePlanId)activatePlan(state.activePlanId);else switchTab('scReserves');}save();renderPlansList();updateBadge();updateStats();toast('Plan supprimé','ok');}
+function openPlanSel(){const list=document.getElementById('planSelList');list.innerHTML=state.plans.map(p=>`<div class="plan-sel-item ${p.id===state.activePlanId?'on':''}" onclick="selPlan('${p.id}')"><div class="plan-sel-check">${p.id===state.activePlanId?'✓':''}</div><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div><div style="font-size:11px;color:var(--text2)">${p.pages}p · ${state.reserves.filter(r=>r.planId===p.id).length} rés.${!pdfs[p.id]?' · ⚠️':''}</div></div></div>`).join('')+`<div style="padding-top:10px"><button class="btn btn-sec btn-sm" style="width:100%" onclick="closeOverlay('ovPlanSel');triggerPDF()">+ Ajouter un PDF</button></div>`;openOverlay('ovPlanSel');}
+async function selPlan(id){closeOverlay('ovPlanSel');if(!pdfs[id]){const plan=state.plans.find(p=>p.id===id);if(plan?.pdfUrl){await downloadPlanLocalement(id);}else{toast('PDF non chargé','err');}return;}await activatePlan(id);renderPlansList();}
+async function goPage(d){const np=curPage+d;if(np<1||np>totalPages)return;curPage=np;await renderPage(curPage);}
 
 // ═══════════════════════════════════════════════════════
 // SETTINGS / OVERLAYS
 // ═══════════════════════════════════════════════════════
-function openOverlay(id) {
-  resetTouches(); 
-  if (id === 'ovSettings') {
-    document.getElementById('sChantier').value = state.settings.chantier;
-    document.getElementById('sConducteur').value = state.settings.conducteur;
-    document.getElementById('sEntreprise').value = state.settings.entreprise;
-  }
-  document.getElementById(id).classList.add('on');
-}
-
-function closeOverlay(id) { document.getElementById(id).classList.remove('on'); }
-
-function saveSettings() {
-  state.settings.chantier = document.getElementById('sChantier').value.trim();
-  state.settings.conducteur = document.getElementById('sConducteur').value.trim();
-  state.settings.entreprise = document.getElementById('sEntreprise').value.trim();
-  save(); updateSettingVal(); closeOverlay('ovSettings');
-  toast('Paramètres sauvegardés', 'ok');
-}
-
-function updateSettingVal() {
-  const v = state.settings.chantier || state.settings.conducteur || 'Configurer le nom, responsable...';
-  document.getElementById('wlcSettingVal').textContent = v;
-}
-
-function updateBadge() {
-  const n = state.reserves.length;
-  const b = document.getElementById('resBadge');
-  b.textContent = n; b.style.display = n ? 'inline' : 'none';
-}
-
-function updateStats() {
-  const r = state.reserves;
-  document.getElementById('statsGrid').innerHTML = `
-    <div class="stat-box" style="grid-column: 1 / -1; background:rgba(249,115,22,0.1); border-color:var(--accent)"><div class="stat-n" style="color:var(--accent)">${r.length}</div><div class="stat-l">Total Réserves</div></div>
-    
-    <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.cat==='SEC').length}</div><div class="stat-l">Sécurité</div></div>
-    <div class="stat-box"><div class="stat-n" style="color:var(--purple)">${r.filter(x=>x.cat==='FIN').length}</div><div class="stat-l">Finition</div></div>
-    <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.cat==='NC').length}</div><div class="stat-l">Non-conf.</div></div>
-    
-    <div class="stat-box"><div class="stat-n" style="color:var(--blue)">${r.filter(x=>x.cat==='QUA').length}</div><div class="stat-l">Qualité</div></div>
-    <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.cat==='AVA').length}</div><div class="stat-l">Avanc.</div></div>
-    <div class="stat-box"><div class="stat-n" style="color:var(--text2)">-</div><div class="stat-l">-</div></div>
-
-    <div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.status==='todo').length}</div><div class="stat-l">À faire</div></div>
-    <div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.status==='wip').length}</div><div class="stat-l">En cours</div></div>
-    <div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.status==='done').length}</div><div class="stat-l">Levées</div></div>`;
-}
+function openOverlay(id){resetTouches();if(id==='ovSettings'){document.getElementById('sChantier').value=state.settings.chantier;document.getElementById('sConducteur').value=state.settings.conducteur;document.getElementById('sEntreprise').value=state.settings.entreprise;}document.getElementById(id).classList.add('on');}
+function closeOverlay(id){document.getElementById(id).classList.remove('on');}
+function saveSettings(){state.settings.chantier=document.getElementById('sChantier').value.trim();state.settings.conducteur=document.getElementById('sConducteur').value.trim();state.settings.entreprise=document.getElementById('sEntreprise').value.trim();save();updateSettingVal();closeOverlay('ovSettings');toast('Paramètres sauvegardés','ok');}
+function updateSettingVal(){const v=state.settings.chantier||state.settings.conducteur||'Configurer le nom, responsable...';document.getElementById('wlcSettingVal').textContent=v;}
+function updateBadge(){const n=state.reserves.length;const b=document.getElementById('resBadge');b.textContent=n;b.style.display=n?'inline':'none';}
+function updateStats(){const r=state.reserves;document.getElementById('statsGrid').innerHTML=`<div class="stat-box" style="grid-column:1/-1;background:rgba(249,115,22,0.1);border-color:var(--accent)"><div class="stat-n" style="color:var(--accent)">${r.length}</div><div class="stat-l">Total Réserves</div></div><div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.cat==='SEC').length}</div><div class="stat-l">Sécurité</div></div><div class="stat-box"><div class="stat-n" style="color:var(--purple)">${r.filter(x=>x.cat==='FIN').length}</div><div class="stat-l">Finition</div></div><div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.cat==='NC').length}</div><div class="stat-l">Non-conf.</div></div><div class="stat-box"><div class="stat-n" style="color:var(--blue)">${r.filter(x=>x.cat==='QUA').length}</div><div class="stat-l">Qualité</div></div><div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.cat==='AVA').length}</div><div class="stat-l">Avanc.</div></div><div class="stat-box"><div class="stat-n" style="color:var(--text2)">-</div><div class="stat-l">-</div></div><div class="stat-box"><div class="stat-n" style="color:var(--red)">${r.filter(x=>x.status==='todo').length}</div><div class="stat-l">À faire</div></div><div class="stat-box"><div class="stat-n" style="color:var(--yellow)">${r.filter(x=>x.status==='wip').length}</div><div class="stat-l">En cours</div></div><div class="stat-box"><div class="stat-n" style="color:var(--green)">${r.filter(x=>x.status==='done').length}</div><div class="stat-l">Levées</div></div>`;}
 
 // ═══════════════════════════════════════════════════════
 // EXPORTS
 // ═══════════════════════════════════════════════════════
-function exportXLSX() {
-  if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
-  const wb = XLSX.utils.book_new();
-  const hdr = ['Code','Titre','Catégorie','Statut','Description','Intervenant/Lot','Localisation','Plan','Page','Date','Heure'];
-  const rows = state.reserves.map(r => [
-    r.code, r.title, CAT_LABEL[r.cat] || r.cat, STATUS_LABEL[r.status],
-    r.desc || '', r.lot || '', r.loc || '', r.planName || '', r.page, r.date, r.time
-  ]);
-  const ws = XLSX.utils.aoa_to_sheet([hdr, ...rows]);
-  ws['!cols'] = [10,35,15,12,45,20,20,25,6,12,8].map(w => ({ wch: w }));
-  if (!ws['!rows']) ws['!rows'] = [];
-  XLSX.utils.book_append_sheet(wb, ws, 'Réserves');
-
-  const cats = ['SEC','FIN','NC','QUA','AVA'];
-  const sumHdr = ['Catégorie','Total','À faire','En cours','Levées'];
-  const sumRows = cats.map(c => {
-    const rs = state.reserves.filter(r => r.cat === c);
-    return [CAT_LABEL[c], rs.length, rs.filter(r=>r.status==='todo').length, rs.filter(r=>r.status==='wip').length, rs.filter(r=>r.status==='done').length];
-  });
-  const wsSum = XLSX.utils.aoa_to_sheet([sumHdr, ...sumRows]);
-  wsSum['!cols'] = [18,8,10,12,10].map(w => ({ wch: w }));
-  XLSX.utils.book_append_sheet(wb, wsSum, 'Récapitulatif');
-
-  XLSX.writeFile(wb, `Reserves_${frDateSlug()}.xlsx`);
-  toast('Excel exporté 📊', 'ok');
-}
-
-function exportCSV() {
-  if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
-  const esc = v => `"${String(v || '').replace(/"/g,'""')}"`;
-  const hdr = ['Code','Titre','Catégorie','Statut','Description','Intervenant','Localisation','Plan','Page','Date','Heure'].map(esc).join(',');
-  const rows = state.reserves.map(r =>
-    [r.code,r.title,CAT_LABEL[r.cat],STATUS_LABEL[r.status],r.desc||'',r.lot||'',r.loc||'',r.planName||'',r.page,r.date,r.time].map(esc).join(',')
-  );
-  const blob = new Blob([[hdr,...rows].join('\n')], { type:'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `Reserves_${frDateSlug()}.csv`;
-  a.click();
-  toast('CSV exporté', 'ok');
-}
-
-async function getPlanThumb(planId, pageNum, pinX, pinY, catColor) {
-  let pdf = pdfs[planId];
-  if (!pdf) {
-    try {
-      const ab = await idbGet(planId);
-      if (ab) pdf = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
-    } catch(e) {}
-  }
-  if (!pdf) return null;
-
-  try {
-    const p = await pdf.getPage(pageNum);
-    const vp1 = p.getViewport({ scale: 1 });
-    
-    const SIZE = 500; 
-    const scale = (SIZE * 4) / Math.max(vp1.width, vp1.height); 
-    
-    const px = pinX * vp1.width * scale;
-    const py = pinY * vp1.height * scale;
-    
-    const cropVp = p.getViewport({ 
-      scale: scale, 
-      offsetX: (SIZE / 2) - px, 
-      offsetY: (SIZE / 2) - py 
-    });
-
-    const c = document.createElement('canvas');
-    c.width = SIZE; 
-    c.height = SIZE;
-    const ctx = c.getContext('2d');
-    
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, SIZE, SIZE);
-
-    await p.render({ canvasContext: ctx, viewport: cropVp }).promise;
-    
-    ctx.beginPath();
-    ctx.arc(SIZE/2, SIZE/2, 14, 0, 2 * Math.PI);
-    ctx.fillStyle = catColor || '#f97316';
-    ctx.fill();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = '#ffffff';
-    ctx.stroke();
-    
-    return c.toDataURL('image/jpeg', 0.6); 
-  } catch(e) {
-    console.error(e);
-    return null;
-  }
-}
-
-async function exportReport(mode) {
-  let reserves = state.reserves;
-  if (mode === 'today') {
-    const today = new Date().toLocaleDateString('fr-FR');
-    reserves = reserves.filter(r => r.date === today);
-  }
-  if (!reserves.length) { toast('Aucune réserve à exporter', 'err'); return; }
-
-  toast('Génération du plan net HD, veuillez patienter...', 'info');
-
-  for (const r of reserves) {
-    if (r.pinX !== null && !r._thumb) {
-      r._thumb = await getPlanThumb(r.planId, r.page, r.pinX, r.pinY, CAT_COLOR[r.cat]);
-    }
-  }
-
-  const s = state.settings;
-  const slug = frDateSlug();
-  const date = new Date().toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-  const sMap = { todo:'#ef4444', wip:'#eab308', done:'#22c55e' };
-  const cMap = CAT_COLOR;
-
-  const cards = reserves.map(r => {
-    const photos = r.photos || [];
-    return `
-    <div style="page-break-inside:avoid;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:14px;overflow:hidden">
-      <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f9fafb;border-bottom:1px solid #e5e7eb">
-        <div style="background:${cMap[r.cat]};color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;font-family:monospace">${r.code}</div>
-        <div style="flex:1;font-size:14px;font-weight:600;color:#111">${r.title}</div>
-        <div style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid ${sMap[r.status]};color:${sMap[r.status]}">${STATUS_LABEL[r.status]}</div>
-      </div>
-      <div style="padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:12px;color:#374151">
-        ${r.desc ? `<div style="grid-column:1/-1"><strong>Description :</strong> ${r.desc}</div>` : ''}
-        ${r.lot ? `<div><strong>Intervenant :</strong> ${r.lot}</div>` : ''}
-        ${r.loc ? `<div><strong>Localisation :</strong> ${r.loc}</div>` : ''}
-        <div><strong>Plan :</strong> ${r.planName || '-'} — Page ${r.page}</div>
-        <div><strong>Date :</strong> ${r.date} à ${r.time}</div>
-      </div>
-      
-      ${(photos.length || (r.pinX !== null && r._thumb)) ? `
-      <div style="padding:0 14px 12px; display:flex; flex-direction:column; gap:12px">
-        
-        ${(r.pinX !== null && r._thumb) ? `
-        <div style="width:100%">
-          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase;">Localisation sur Plan</div>
-          <img src="${r._thumb}" style="width:100%; max-width:400px; border-radius:8px; border:1px solid #e5e7eb; display:block;">
-        </div>` : ''}
-        
-        ${(photos.length) ? `
-        <div style="width:100%">
-          <div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Photos (${photos.length})</div>
-          <div style="display:flex; flex-wrap:wrap; gap:8px;">
-            ${photos.map(p => `<img src="${p}" style="max-width:100%; max-height:280px; object-fit:contain; border-radius:8px; border:1px solid #e5e7eb; background:#f9fafb">`).join('')}
-          </div>
-        </div>` : ''}
-
-      </div>` : ''}
-
-    </div>`;
-  }).join('');
-
-  const catSummary = ['SEC','FIN','NC','QUA','AVA'].map(c => {
-    const n = reserves.filter(r => r.cat === c).length;
-    if (!n) return '';
-    return `<span style="display:inline-flex;align-items:center;gap:5px;background:${cMap[c]}22;color:${cMap[c]};border:1px solid ${cMap[c]}44;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin:3px">● ${CAT_LABEL[c]} : ${n}</span>`;
-  }).join('');
-
-  const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport ChantierView ${slug}</title>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;background:#fff;padding:24px;max-width:800px;margin:0 auto}
-    @media print{
-      body{padding:0}
-      @page{margin:18mm; @bottom-center { content: "Page " counter(page) " / " counter(pages); font-size:10px; color:#9ca3af; }}
-      @page :first { @bottom-center { content: none; } }
-      .no-break{page-break-inside:avoid}
-    }
-    @counter-style decimal-leading-zero {}
-  </style></head><body>
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #f97316">
-    <div>
-      <div style="font-size:22px;font-weight:800;color:#111">${s.chantier || 'Rapport de suivi'}</div>
-      ${s.conducteur ? `<div style="font-size:13px;color:#6b7280;margin-top:3px">Responsable : <strong>${s.conducteur}</strong>${s.entreprise ? ' — ' + s.entreprise : ''}</div>` : ''}
-      <div style="font-size:12px;color:#9ca3af;margin-top:4px">${date}</div>
-    </div>
-    <div style="text-align:right">
-      <div style="font-size:28px;font-weight:800;color:#f97316">${reserves.length}</div>
-      <div style="font-size:11px;color:#6b7280">${mode === 'today' ? 'réserves du jour' : 'réserves au total'}</div>
-    </div>
-  </div>
-  <div style="margin-bottom:18px;display:flex;flex-wrap:wrap;gap:4px">${catSummary}</div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px">
-    <div style="background:#fef2f2;border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#ef4444">${reserves.filter(r=>r.status==='todo').length}</div><div style="font-size:11px;color:#6b7280">À faire</div></div>
-    <div style="background:#fefce8;border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#ca8a04">${reserves.filter(r=>r.status==='wip').length}</div><div style="font-size:11px;color:#6b7280">En cours</div></div>
-    <div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#16a34a">${reserves.filter(r=>r.status==='done').length}</div><div style="font-size:11px;color:#6b7280">Levées</div></div>
-  </div>
-  <div style="margin-bottom:8px;font-size:13px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Détail des réserves</div>
-  ${cards}
-  <div style="margin-top:24px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center">
-    Généré le ${date} via ChantierView
-  </div>
-  </body></html>`;
-
-  const w = window.open('', '_blank');
-  w.document.write(html);
-  w.document.close();
-  setTimeout(() => { w.focus(); w.print(); }, 800);
-  toast('Rapport ouvert — prêt à imprimer 🖨️', 'ok');
-}
-
-function exportJSON() {
-  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `Sauvegarde_ChantierView_${frDateSlug()}.json`;
-  a.click();
-  toast('Sauvegarde exportée 💾', 'ok');
-}
-
-function importJSON(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const r = new FileReader();
-  r.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      if (data.reserves && data.plans) {
-        state = data;
-        save();
-        renderPlansList(); renderReservesList(); updateBadge(); updateStats(); updateSettingVal();
-        toast(`✓ ${state.reserves.length} réserve(s) importées`, 'ok');
-        if (state.plans.length) {
-          document.getElementById('mainTabs').classList.add('show');
-          document.getElementById('scWelcome').classList.remove('on');
-          document.getElementById('scPlan').classList.add('on');
-          document.getElementById('planSwitchBtn').style.display = 'flex';
-          switchTab('scPlan');
-        }
-      } else { toast('Fichier invalide', 'err'); }
-    } catch { toast('Erreur de lecture', 'err'); }
-  };
-  r.readAsText(file);
-  e.target.value = '';
-}
-
-function confirmClear() {
-  if (!state.reserves.length) { toast('Aucune réserve', 'err'); return; }
-  document.getElementById('confirmTitle').textContent = 'Tout effacer';
-  document.getElementById('confirmMsg').textContent = `Supprimer les ${state.reserves.length} réserve(s) ? Cette action est irréversible.`;
-  document.getElementById('confirmOk').onclick = () => {
-    state.reserves = []; state.counter = { SEC:0,FIN:0,NC:0,QUA:0,AVA:0 };
-    save(); renderReservesList(); renderPins(); updateBadge(); updateStats();
-    toast('Tout effacé', 'ok');
-    closeOverlay('ovConfirm');
-  };
-  openOverlay('ovConfirm');
-}
-
-function openLb(id, idx = 0) {
-  const r = state.reserves.find(x => x.id === id);
-  if (!r || !r.photos || !r.photos[idx]) return;
-  document.getElementById('lbImg').src = r.photos[idx];
-  document.getElementById('lightbox').classList.add('on');
-}
-function closeLightbox() { document.getElementById('lightbox').classList.remove('on'); }
-
-function switchTab(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
-  document.querySelector(`.tab[data-s="${id}"]`)?.classList.add('on');
-  if (id === 'scReserves') renderReservesList();
-  if (id === 'scPlans') renderPlansList();
-  if (id === 'scExport') updateStats();
-}
-
+function exportXLSX(){if(!state.reserves.length){toast('Aucune réserve','err');return;}const wb=XLSX.utils.book_new();const hdr=['Code','Titre','Catégorie','Statut','Description','Localisation','Plan','Page','Date','Heure'];const rows=state.reserves.map(r=>[r.code,r.title,CAT_LABEL[r.cat]||r.cat,STATUS_LABEL[r.status],r.desc||'',r.loc||'',r.planName||'',r.page,r.date,r.time]);const ws=XLSX.utils.aoa_to_sheet([hdr,...rows]);ws['!cols']=[10,35,15,12,45,30,25,6,12,8].map(w=>({wch:w}));XLSX.utils.book_append_sheet(wb,ws,'Réserves');XLSX.writeFile(wb,`Reserves_${frDateSlug()}.xlsx`);toast('Excel exporté 📊','ok');}
+function exportCSV(){if(!state.reserves.length){toast('Aucune réserve','err');return;}const esc=v=>`"${String(v||'').replace(/"/g,'""')}"`;const hdr=['Code','Titre','Catégorie','Statut','Description','Localisation','Plan','Page','Date','Heure'].map(esc).join(',');const rows=state.reserves.map(r=>[r.code,r.title,CAT_LABEL[r.cat],STATUS_LABEL[r.status],r.desc||'',r.loc||'',r.planName||'',r.page,r.date,r.time].map(esc).join(','));const blob=new Blob([[hdr,...rows].join('\n')],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`Reserves_${frDateSlug()}.csv`;a.click();toast('CSV exporté','ok');}
+async function getPlanThumb(planId,pageNum,pinX,pinY,catColor){let pdf=pdfs[planId];if(!pdf){try{const ab=await idbGet(planId);if(ab)pdf=await pdfjsLib.getDocument({data:ab.slice(0)}).promise;}catch(e){}}if(!pdf)return null;try{const p=await pdf.getPage(pageNum);const vp1=p.getViewport({scale:1});const SIZE=500;const scale=(SIZE*4)/Math.max(vp1.width,vp1.height);const px=pinX*vp1.width*scale;const py=pinY*vp1.height*scale;const cropVp=p.getViewport({scale,offsetX:(SIZE/2)-px,offsetY:(SIZE/2)-py});const c=document.createElement('canvas');c.width=SIZE;c.height=SIZE;const ctx=c.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,SIZE,SIZE);await p.render({canvasContext:ctx,viewport:cropVp}).promise;ctx.beginPath();ctx.arc(SIZE/2,SIZE/2,14,0,2*Math.PI);ctx.fillStyle=catColor||'#f97316';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#ffffff';ctx.stroke();return c.toDataURL('image/jpeg',0.6);}catch(e){return null;}}
+async function exportReport(mode){let reserves=state.reserves;if(mode==='today'){const today=new Date().toLocaleDateString('fr-FR');reserves=reserves.filter(r=>r.date===today);}if(!reserves.length){toast('Aucune réserve à exporter','err');return;}toast('Génération du rapport...','info');for(const r of reserves){if(r.pinX!==null&&!r._thumb)r._thumb=await getPlanThumb(r.planId,r.page,r.pinX,r.pinY,CAT_COLOR[r.cat]);}const s=state.settings;const slug=frDateSlug();const date=new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});const sMap={todo:'#ef4444',wip:'#eab308',done:'#22c55e'};const cMap=CAT_COLOR;const cards=reserves.map(r=>{const photos=r.photos||[];return`<div style="page-break-inside:avoid;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:14px;overflow:hidden"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f9fafb;border-bottom:1px solid #e5e7eb"><div style="background:${cMap[r.cat]};color:#fff;font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;font-family:monospace">${r.code}</div><div style="flex:1;font-size:14px;font-weight:600;color:#111">${r.title}</div><div style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid ${sMap[r.status]};color:${sMap[r.status]}">${STATUS_LABEL[r.status]}</div></div><div style="padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:12px;color:#374151">${r.desc?`<div style="grid-column:1/-1"><strong>Description :</strong> ${r.desc}</div>`:''}<div><strong>Localisation :</strong> ${r.loc||'-'}</div><div><strong>Plan :</strong> ${r.planName||'-'} — P${r.page}</div><div><strong>Date :</strong> ${r.date} à ${r.time}</div></div>${(photos.length||(r.pinX!==null&&r._thumb))?`<div style="padding:0 14px 12px;display:flex;flex-direction:column;gap:12px">${(r.pinX!==null&&r._thumb)?`<div><div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Localisation sur Plan</div><img src="${r._thumb}" style="width:100%;max-width:400px;border-radius:8px;border:1px solid #e5e7eb;display:block;"></div>`:''}${photos.length?`<div><div style="font-size:10px;font-weight:700;color:#9ca3af;margin-bottom:4px;text-transform:uppercase">Photos (${photos.length})</div><div style="display:flex;flex-wrap:wrap;gap:8px;">${photos.map(p=>`<img src="${p}" style="max-width:100%;max-height:280px;object-fit:contain;border-radius:8px;border:1px solid #e5e7eb;background:#f9fafb">`).join('')}</div></div>`:''}</div>`:''}</div>`;}).join('');const catSummary=['SEC','FIN','NC','QUA','AVA'].map(c=>{const n=reserves.filter(r=>r.cat===c).length;if(!n)return'';return`<span style="display:inline-flex;align-items:center;gap:5px;background:${cMap[c]}22;color:${cMap[c]};border:1px solid ${cMap[c]}44;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin:3px">● ${CAT_LABEL[c]} : ${n}</span>`;}).join('');const html=`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport ChantierView ${slug}</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;background:#fff;padding:24px;max-width:800px;margin:0 auto}@media print{body{padding:0}}</style></head><body><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #f97316"><div><div style="font-size:22px;font-weight:800;color:#111">${s.chantier||'Rapport de suivi'}</div>${s.conducteur?`<div style="font-size:13px;color:#6b7280;margin-top:3px">Responsable : <strong>${s.conducteur}</strong>${s.entreprise?' — '+s.entreprise:''}</div>`:''}<div style="font-size:12px;color:#9ca3af;margin-top:4px">${date}</div></div><div style="text-align:right"><div style="font-size:28px;font-weight:800;color:#f97316">${reserves.length}</div><div style="font-size:11px;color:#6b7280">${mode==='today'?'réserves du jour':'réserves au total'}</div></div></div><div style="margin-bottom:18px;display:flex;flex-wrap:wrap;gap:4px">${catSummary}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px"><div style="background:#fef2f2;border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#ef4444">${reserves.filter(r=>r.status==='todo').length}</div><div style="font-size:11px;color:#6b7280">À faire</div></div><div style="background:#fefce8;border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#ca8a04">${reserves.filter(r=>r.status==='wip').length}</div><div style="font-size:11px;color:#6b7280">En cours</div></div><div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:#16a34a">${reserves.filter(r=>r.status==='done').length}</div><div style="font-size:11px;color:#6b7280">Levées</div></div></div><div style="margin-bottom:8px;font-size:13px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Détail des réserves</div>${cards}<div style="margin-top:24px;padding-top:14px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;text-align:center">Généré le ${date} via ChantierView</div></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(()=>{w.focus();w.print();},800);toast('Rapport ouvert 🖨️','ok');}
+function exportJSON(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`Sauvegarde_ChantierView_${frDateSlug()}.json`;a.click();toast('Sauvegarde exportée 💾','ok');}
+function importJSON(e){const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{try{const data=JSON.parse(ev.target.result);if(data.reserves&&data.plans){state=data;save();renderPlansList();renderReservesList();updateBadge();updateStats();updateSettingVal();toast(`✓ ${state.reserves.length} réserve(s) importées`,'ok');if(state.plans.length){document.getElementById('mainTabs').classList.add('show');document.getElementById('scWelcome').classList.remove('on');switchTab('scPlan');document.getElementById('planSwitchBtn').style.display='flex';}}else{toast('Fichier invalide','err');}}catch{toast('Erreur de lecture','err');}};r.readAsText(file);e.target.value='';}
+function confirmClear(){if(!state.reserves.length){toast('Aucune réserve','err');return;}document.getElementById('confirmTitle').textContent='Tout effacer';document.getElementById('confirmMsg').textContent=`Supprimer les ${state.reserves.length} réserve(s) ? Irréversible.`;document.getElementById('confirmOk').onclick=()=>{state.reserves=[];state.counter={SEC:0,FIN:0,NC:0,QUA:0,AVA:0};save();renderReservesList();renderPins();updateBadge();updateStats();toast('Tout effacé','ok');closeOverlay('ovConfirm');};openOverlay('ovConfirm');}
+function openLb(id,idx=0){const r=state.reserves.find(x=>x.id===id);if(!r||!r.photos||!r.photos[idx])return;document.getElementById('lbImg').src=r.photos[idx];document.getElementById('lightbox').classList.add('on');}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('on');}
+function switchTab(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));document.getElementById(id).classList.add('on');document.querySelector(`.tab[data-s="${id}"]`)?.classList.add('on');if(id==='scReserves')renderReservesList();if(id==='scPlans')renderPlansList();if(id==='scExport')updateStats();}
 let toastT;
-function toast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast on ' + type;
-  clearTimeout(toastT);
-  toastT = setTimeout(() => t.classList.remove('on'), 2800);
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast on '+type;clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800);}
+document.querySelectorAll('.overlay').forEach(ov=>{ov.addEventListener('click',e=>{if(e.target===ov)closeOverlay(ov.id);});});
+function quickFill(title, cat) {
+  document.getElementById('mTitleInp').value = title;
+  pickCat(cat);
+  // Highlight active chip
+  document.querySelectorAll('#ovReserve .chip').forEach(c => c.classList.remove('on'));
+  event.target.classList.add('on');
 }
-
-document.querySelectorAll('.overlay').forEach(ov => {
-  ov.addEventListener('click', e => { if (e.target === ov) closeOverlay(ov.id); });
-});
-
 init();
 </script>
 </body>

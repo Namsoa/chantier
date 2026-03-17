@@ -1480,9 +1480,10 @@ function renderPlansList(){
   const reserveCount=id=>state.reserves.filter(r=>r.planId===id).length;
   const hasLocalOnly = state.plans.some(p=>pdfs[p.id]&&!p.pdfUrl);
   
-  let topBtn = hasLocalOnly
-    ? `<button class="btn btn-acc btn-sm" style="margin-bottom:12px;background:var(--accent)" onclick="uploadAllPlans()">⬆️ Synchroniser tous les plans vers le cloud</button>`
-    : '';
+  const hasWithUrl = state.plans.some(p=>p.pdfUrl);
+  let topBtn = '';
+  if(hasLocalOnly) topBtn += `<button class="btn btn-acc btn-sm" style="margin-bottom:8px" onclick="uploadAllPlans()">⬆️ Uploader les plans locaux vers le cloud</button>`;
+  topBtn += `<button class="btn btn-sec btn-sm" style="margin-bottom:12px" onclick="diagPlans()">🔍 Diagnostic plans</button>`;
   
   list.innerHTML = topBtn + state.plans.map(p=>{
     const loaded=!!pdfs[p.id];
@@ -1535,36 +1536,96 @@ function switchTab(id){document.querySelectorAll('.screen').forEach(s=>s.classLi
 let toastT;
 function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast on '+type;clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800);}
 document.querySelectorAll('.overlay').forEach(ov=>{ov.addEventListener('click',e=>{if(e.target===ov)closeOverlay(ov.id);});});
+async function diagPlans() {
+  let msg = '=== DIAGNOSTIC PLANS ===\n\n';
+  msg += 'Plans locaux: ' + state.plans.length + '\n';
+  for(const p of state.plans) {
+    const hasLocal = !!pdfs[p.id];
+    const hasIdb = !!(await idbGet(p.id).catch(()=>null));
+    msg += '\n' + p.name + ':\n';
+    msg += '  - pdfs[]: ' + (hasLocal?'OUI':'NON') + '\n';
+    msg += '  - IndexedDB: ' + (hasIdb?'OUI':'NON') + '\n';
+    msg += '  - pdfUrl: ' + (p.pdfUrl?p.pdfUrl.slice(0,50)+'...':'VIDE') + '\n';
+  }
+  
+  // Test connexion Supabase Storage
+  try {
+    const res = await fetch(SB_URL + '/storage/v1/bucket/plans', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    msg += '\nBucket plans: ' + res.status + ' ' + (res.ok?'OK':'ERREUR');
+    const txt = await res.text();
+    msg += '\n' + txt.slice(0,100);
+  } catch(e) {
+    msg += '\nErreur bucket: ' + e.message;
+  }
+  
+  alert(msg);
+  console.log(msg);
+}
+
 async function uploadPlanToCloud(planId) {
   const plan = state.plans.find(p=>p.id===planId);
-  if(!plan || !pdfs[planId]) { toast('Plan non chargé localement', 'err'); return; }
-  toast('⬆️ Upload de ' + plan.name + '...', 'info');
+  if(!plan) { toast('Plan introuvable', 'err'); return; }
+  if(!pdfs[planId]) { toast('PDF non chargé pour : ' + plan.name, 'err'); return; }
+  
+  toast('⬆️ Lecture locale de ' + plan.name + '...', 'info');
+  
   try {
     const ab = await idbGet(planId);
-    if(!ab) { toast('Données locales introuvables', 'err'); return; }
-    const pdfUrl = await uploadPDFVersSupabase(planId, ab);
-    if(pdfUrl) {
+    if(!ab) { toast('⚠️ Données IndexedDB manquantes pour : ' + plan.name, 'err'); return; }
+    
+    toast('⬆️ Upload vers Supabase : ' + plan.name + ' (' + Math.round(ab.byteLength/1024) + 'ko)...', 'info');
+    
+    // Upload direct avec fetch et logs
+    const nomFichier = planId + '.pdf';
+    const blob = new Blob([ab], {type:'application/pdf'});
+    
+    const res = await fetch(SB_URL + '/storage/v1/object/plans/' + nomFichier, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/pdf',
+        'x-upsert': 'true',
+      },
+      body: blob
+    });
+    
+    const resText = await res.text();
+    console.log('Upload résultat:', res.status, resText);
+    
+    if(res.ok) {
+      const pdfUrl = SB_URL + '/storage/v1/object/public/plans/' + nomFichier;
       plan.pdfUrl = pdfUrl;
       await sbSavePlan(plan);
       await idbSet('app_state', state);
-      toast('✓ ' + plan.name + ' synchronisé ☁️', 'ok');
+      toast('✓ ' + plan.name + ' dans le cloud ☁️', 'ok');
       renderPlansList();
     } else {
-      toast('⚠️ Échec upload ' + plan.name, 'err');
+      toast('⚠️ Erreur ' + res.status + ' : ' + resText.slice(0,60), 'err');
+      console.error('Upload échoué:', res.status, resText);
     }
   } catch(e) {
-    toast('Erreur : ' + e.message, 'err');
+    console.error('Exception upload:', e);
+    toast('Erreur réseau : ' + e.message, 'err');
   }
 }
 
 async function uploadAllPlans() {
-  const localOnly = state.plans.filter(p=>pdfs[p.id]&&!p.pdfUrl);
-  if(!localOnly.length) { toast('Tous les plans sont déjà dans le cloud', 'ok'); return; }
-  toast('⬆️ Upload de ' + localOnly.length + ' plan(s)...', 'info');
+  const localOnly = state.plans.filter(p => pdfs[p.id] && !p.pdfUrl);
+  if(!localOnly.length) {
+    // Vérifier si certains ont pdfUrl mais qu'on ne sait pas
+    const withUrl = state.plans.filter(p => p.pdfUrl);
+    toast(withUrl.length 
+      ? withUrl.length + ' plan(s) déjà dans le cloud. ' + state.plans.filter(p=>!p.pdfUrl).length + ' sans URL.'
+      : 'Aucun plan local à uploader', 'info');
+    return;
+  }
   for(const plan of localOnly) {
     await uploadPlanToCloud(plan.id);
+    await new Promise(r => setTimeout(r, 500)); // pause entre uploads
   }
-  toast('✓ Tous les plans synchronisés', 'ok');
 }
 
 function quickFill(title, cat) {

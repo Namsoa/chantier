@@ -1198,7 +1198,22 @@ async function sbFetch(path,options={}){
   return options.method==='DELETE'?null:res.json();
 }
 async function sbLoadReserves(){try{const rows=await sbFetch('reserves?order=ts.asc');return rows.map(r=>({id:r.id,code:r.code,cat:r.cat,status:r.status,title:r.title,desc:r.description||'',lot:r.lot||'',loc:r.loc||'',photos:r.photos||[],pinX:r.pin_x,pinY:r.pin_y,planId:r.plan_id,planName:r.plan_name||'',page:r.page||1,date:r.date||'',time:r.heure||'',ts:r.ts}));}catch(e){console.warn('Sync impossible',e);return null;}}
-async function uploadPhotosVersSupabase(photosArray){if(!photosArray||!photosArray.length)return[];const urls=[];for(let photo of photosArray){if(photo.startsWith('http')){urls.push(photo);continue;}try{const res=await fetch(photo);const blob=await res.blob();const nom=`photo_${Date.now()}_${Math.floor(Math.random()*1000)}.jpg`;const up=await fetch(`${SB_URL}/storage/v1/object/photos/${nom}`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'image/jpeg'},body:blob});if(up.ok)urls.push(`${SB_URL}/storage/v1/object/public/photos/${nom}`);else urls.push(photo);}catch(err){urls.push(photo);}}return urls;}
+async function uploadPhotosVersSupabase(photosArray){
+  if(!photosArray||!photosArray.length) return [];
+  await ensureBucket('photos');
+  const urls=[];
+  for(let photo of photosArray){
+    if(photo.startsWith('http')){urls.push(photo);continue;}
+    try{
+      const res=await fetch(photo);const blob=await res.blob();
+      const nom=`photo_${Date.now()}_${Math.floor(Math.random()*1000)}.jpg`;
+      const up=await fetch(`${SB_URL}/storage/v1/object/photos/${nom}`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'image/jpeg','x-upsert':'true'},body:blob});
+      if(up.ok) urls.push(`${SB_URL}/storage/v1/object/public/photos/${nom}`);
+      else urls.push(photo);
+    }catch(err){urls.push(photo);}
+  }
+  return urls;
+}
 async function sbSaveReserve(r){try{await sbFetch('reserves',{method:'POST',prefer:'resolution=merge-duplicates,return=minimal',body:JSON.stringify({id:r.id,code:r.code,cat:r.cat,status:r.status,title:r.title,description:r.desc||'',lot:r.lot||'',loc:r.loc||'',photos:r.photos||[],pin_x:r.pinX,pin_y:r.pinY,plan_id:r.planId,plan_name:r.planName||'',page:r.page||1,date:r.date||'',heure:r.time||''})});}catch(e){console.warn('Erreur sync réserve:',e);}}
 async function sbDeleteReserve(id){try{await sbFetch('reserves?id=eq.'+id,{method:'DELETE',prefer:'return=minimal'});}catch(e){console.warn('Erreur suppression sync:',e);}}
 async function sbLoadPlans(){try{return await sbFetch('plans?order=created_at.asc');}catch(e){return null;}}
@@ -1536,6 +1551,33 @@ function switchTab(id){document.querySelectorAll('.screen').forEach(s=>s.classLi
 let toastT;
 function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast on '+type;clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800);}
 document.querySelectorAll('.overlay').forEach(ov=>{ov.addEventListener('click',e=>{if(e.target===ov)closeOverlay(ov.id);});});
+async function ensureBucket(name) {
+  try {
+    // Vérifier si le bucket existe
+    const check = await fetch(SB_URL + '/storage/v1/bucket/' + name, {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    if(check.ok) return true; // existe déjà
+    
+    // Créer le bucket
+    const create = await fetch(SB_URL + '/storage/v1/bucket', {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id: name, name: name, public: true })
+    });
+    const txt = await create.text();
+    console.log('Création bucket', name, ':', create.status, txt);
+    return create.ok;
+  } catch(e) {
+    console.warn('ensureBucket error:', e);
+    return false;
+  }
+}
+
 async function diagPlans() {
   let msg = '=== DIAGNOSTIC PLANS ===\n\n';
   msg += 'Plans locaux: ' + state.plans.length + '\n';
@@ -1581,6 +1623,9 @@ async function uploadPlanToCloud(planId) {
     const nomFichier = planId + '.pdf';
     const blob = new Blob([ab], {type:'application/pdf'});
     
+    // Créer le bucket s'il n'existe pas
+    await ensureBucket('plans');
+
     const res = await fetch(SB_URL + '/storage/v1/object/plans/' + nomFichier, {
       method: 'POST',
       headers: {

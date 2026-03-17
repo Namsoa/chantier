@@ -1206,27 +1206,56 @@ async function sbSavePlan(plan){try{await sbFetch('plans',{method:'POST',prefer:
 async function sbDeletePlan(id){try{await sbFetch('plans?id=eq.'+id,{method:'DELETE',prefer:'return=minimal'});}catch(e){}}
 async function uploadPDFVersSupabase(planId,arrayBuffer){try{const nom=`${planId}.pdf`;const blob=new Blob([arrayBuffer],{type:'application/pdf'});const res=await fetch(`${SB_URL}/storage/v1/object/plans/${nom}`,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/pdf','x-upsert':'true'},body:blob});if(res.ok)return`${SB_URL}/storage/v1/object/public/plans/${nom}`;return null;}catch(e){return null;}}
 async function downloadPDFFromSupabase(pdfUrl){try{const res=await fetch(pdfUrl);if(!res.ok)return null;return await res.arrayBuffer();}catch(e){return null;}}
-async function syncPlansFromSupabase(){try{const remotePlans=await sbLoadPlans();if(!remotePlans)return;for(const rp of remotePlans){const existing=state.plans.find(p=>p.id===rp.id);if(!existing)state.plans.push({id:rp.id,name:rp.name,pages:rp.pages,pdfUrl:rp.pdf_url});else{existing.pdfUrl=rp.pdf_url;existing.pages=rp.pages;}}await idbSet('app_state',state);renderPlansList();
-  // Auto-télécharger les plans qui ne sont pas encore en local
-  for(const plan of state.plans){
-    if(!pdfs[plan.id] && plan.pdfUrl){
-      try{
-        const ab = await downloadPDFFromSupabase(plan.pdfUrl);
-        if(ab){
-          const pdfDoc = await pdfjsLib.getDocument({data:ab.slice(0)}).promise;
-          pdfs[plan.id] = pdfDoc;
-          await idbSet(plan.id, ab);
-          console.log('Plan téléchargé:', plan.name);
-          renderPlansList();
-          // Si pas de plan actif, activer celui-ci
-          if(!state.activePlanId || !pdfs[state.activePlanId]){
-            await activatePlan(plan.id);
-          }
-        }
-      }catch(e){console.warn('Erreur DL plan:', plan.name, e);}
+async function syncPlansFromSupabase(){
+  try{
+    const remotePlans = await sbLoadPlans();
+    if(!remotePlans || !remotePlans.length) return;
+
+    // Mettre à jour la liste des plans locaux
+    for(const rp of remotePlans){
+      const existing = state.plans.find(p=>p.id===rp.id);
+      if(!existing) state.plans.push({id:rp.id, name:rp.name, pages:rp.pages, pdfUrl:rp.pdf_url});
+      else { existing.pdfUrl=rp.pdf_url; existing.pages=rp.pages; existing.name=rp.name; }
     }
+    await idbSet('app_state', state);
+    renderPlansList();
+
+    // Télécharger tous les plans manquants
+    let firstDownloaded = null;
+    for(const plan of state.plans){
+      if(pdfs[plan.id]) continue; // déjà chargé
+      if(!plan.pdfUrl) continue;  // pas de PDF distant
+
+      try{
+        toast('⬇️ Chargement plan : ' + plan.name + '...', 'info');
+        const ab = await downloadPDFFromSupabase(plan.pdfUrl);
+        if(!ab) { toast('⚠️ Échec : ' + plan.name, 'err'); continue; }
+        const pdfDoc = await pdfjsLib.getDocument({data: new Uint8Array(ab)}).promise;
+        pdfs[plan.id] = pdfDoc;
+        await idbSet(plan.id, ab);
+        if(!firstDownloaded) firstDownloaded = plan.id;
+        toast('✓ Plan chargé : ' + plan.name, 'ok');
+        renderPlansList();
+      }catch(e){
+        console.warn('Erreur DL plan:', plan.name, e);
+        toast('⚠️ Erreur plan : ' + plan.name, 'err');
+      }
+    }
+
+    // Activer un plan si aucun n'est actif
+    if(firstDownloaded && (!state.activePlanId || !pdfs[state.activePlanId])){
+      await activatePlan(firstDownloaded);
+    } else if(state.activePlanId && pdfs[state.activePlanId]){
+      // Re-render le plan actif pour afficher les pins
+      await renderPage(curPage);
+      renderPins();
+    }
+    renderPlansList();
+
+  }catch(e){
+    console.warn('syncPlansFromSupabase erreur:', e);
   }
-}catch(e){console.warn('syncPlansFromSupabase ignoré:',e);}}
+}
 async function downloadPlanLocalement(planId){const plan=state.plans.find(p=>p.id===planId);if(!plan||!plan.pdfUrl){toast('Pas de PDF distant','err');return;}toast(`⬇️ Téléchargement de ${plan.name}...`,'info');const ab=await downloadPDFFromSupabase(plan.pdfUrl);if(!ab){toast('Échec du téléchargement','err');return;}try{const pdfDoc=await pdfjsLib.getDocument({data:ab.slice(0)}).promise;pdfs[plan.id]=pdfDoc;await idbSet(plan.id,ab);toast(`✓ ${plan.name} téléchargé`,'ok');renderPlansList();await activatePlan(plan.id);}catch(e){toast('Fichier PDF invalide','err');}}
 async function syncFromSupabase(){const remote=await sbLoadReserves();if(!remote)return;state.reserves=remote;state.counter={SEC:0,FIN:0,NC:0,QUA:0,AVA:0};state.reserves.forEach(r=>{const num=parseInt((r.code.split('-')[1]||'0'));if(!isNaN(num))state.counter[r.cat]=Math.max(state.counter[r.cat]||0,num);});await idbSet('app_state',state);updateBadge();updateStats();renderReservesList();renderPins();try{await syncPlansFromSupabase();}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncFromSupabase();});
@@ -1265,17 +1294,42 @@ async function init(){
   try{const saved=await idbGet('app_state');if(saved){state=saved;}else{const raw=localStorage.getItem('cv_state');if(raw){state=JSON.parse(raw);await idbSet('app_state',state);}}}catch(e){}
   state.reserves.forEach(r=>{if(r.photo&&!r.photos){r.photos=[r.photo];delete r.photo;}});
   toast('🔄 Synchronisation...','info');
+
+  // 1. Charger les PDFs depuis IndexedDB (cache local)
+  if(state.plans.length > 0){
+    for(const plan of state.plans){
+      try{
+        const ab = await idbGet(plan.id);
+        if(ab){
+          const pdfDoc = await pdfjsLib.getDocument({data: new Uint8Array(ab)}).promise;
+          pdfs[plan.id] = pdfDoc;
+        }
+      }catch(e){}
+    }
+  }
+
+  // 2. Sync Supabase (réserves + plans distants)
   await syncFromSupabase();
-  updateBadge();updateStats();updateSettingVal();renderPlansList();
+
+  updateBadge(); updateStats(); updateSettingVal(); renderPlansList();
   document.getElementById('mainTabs').classList.add('show');
   document.getElementById('planSwitchBtn').style.display='flex';
   document.getElementById('scWelcome').classList.remove('on');
   initLocCascade();
-  if(state.plans.length>0){for(const plan of state.plans){try{const ab=await idbGet(plan.id);if(ab){const pdfDoc=await pdfjsLib.getDocument({data:ab.slice(0)}).promise;pdfs[plan.id]=pdfDoc;}}catch(e){}}
-    if(state.activePlanId&&pdfs[state.activePlanId]){await activatePlan(state.activePlanId);return;}
-    const firstLoaded=state.plans.find(p=>pdfs[p.id]);if(firstLoaded){await activatePlan(firstLoaded.id);return;}
+
+  // 3. Activer un plan si disponible
+  const planToActivate = state.activePlanId && pdfs[state.activePlanId]
+    ? state.activePlanId
+    : state.plans.find(p => pdfs[p.id])?.id;
+
+  if(planToActivate){
+    await activatePlan(planToActivate);
+  } else {
+    switchTab('scReserves');
+    if(state.plans.length > 0){
+      toast('⬇️ Téléchargement des plans en cours...', 'info');
+    }
   }
-  switchTab('scReserves');
 }
 
 // ═══════════════════════════════════════════════════════

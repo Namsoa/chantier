@@ -519,7 +519,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:10p
   </div>
 </div>
 
-<input type="file" id="ziPhotoInput" accept="image/*" capture="environment" style="display:none" onchange="ziHandlePhoto(event)">
+<input type="file" id="ziPhotoInput" accept="image/*" style="display:none" onchange="ziHandlePhoto(event)">
 
 <script>
 // ═══════════════════════════════════════════════════════
@@ -865,19 +865,31 @@ function renderZiChecklist(zone) {
     </div>
   </div>`;
 
-  // ── Sécurité libre ──
-  h += `<div class="zi-section" style="margin-top:8px">Sécurité <span style="font-size:10px;color:var(--text2);text-transform:none;letter-spacing:0;font-weight:400">— saisie libre</span></div>
+  // ── Items personnalisés (toutes catégories) ──
+  h += `<div class="zi-section" style="margin-top:8px">Remarques libres <span style="font-size:10px;color:var(--text2);text-transform:none;letter-spacing:0;font-weight:400">— ajouter ce qui manque</span></div>
   <div id="ziSecList">`;
   ziState.secItems.forEach(si => {
-    h += `<div class="sec-item-row" id="ziSecRow_${si.id}">
-      <input class="sec-inp" placeholder="Décrire la réserve sécurité..." value="${si.text||''}" oninput="ziSecText('${si.id}',this.value)">
-      <div class="zi-photo-btn" onclick="ziAddPhoto('sec','${si.id}')">📷${si.photos.length?`<span class='zi-photo-badge'>${si.photos.length}</span>`:''}
+    h += `<div class="sec-item-row" id="ziSecRow_${si.id}" style="flex-direction:column;align-items:stretch;gap:8px;padding:10px 0">
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="sec-inp" placeholder="Décrire la réserve..." value="${si.text||''}" oninput="ziSecText('${si.id}',this.value)" style="flex:1">
+        <div class="ib red" onclick="ziRemSec('${si.id}')">✕</div>
       </div>
-      <div class="ib red" onclick="ziRemSec('${si.id}')">✕</div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <div class="cat-row" style="gap:5px">
+          ${['SEC','FIN','QUA','AVA','NC'].map(c => {
+            const colors = {SEC:'cp-sec',FIN:'cp-fin',QUA:'cp-qua',AVA:'cp-ava',NC:'cp-nc'};
+            const labels = {SEC:'🔴 Sécu',FIN:'🟣 Fini',QUA:'🔵 Qual',AVA:'🟢 Avanc',NC:'🟡 NC'};
+            return `<div class="cp ${colors[c]} ${si.cat===c?'on':''}" style="padding:4px 9px;font-size:10px" onclick="ziSecCat('${si.id}','${c}')">${labels[c]}</div>`;
+          }).join('')}
+        </div>
+        <div class="zi-photo-btn" onclick="ziAddPhoto('sec','${si.id}')">📷${si.photos.length?`<span class='zi-photo-badge'>${si.photos.length}</span>`:''}
+        </div>
+      </div>
+      ${si.photos.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap">${si.photos.map((p,i)=>`<div style="position:relative"><img src="${p}" style="width:56px;height:56px;border-radius:8px;object-fit:cover;border:1px solid var(--border)"><div style="position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:var(--red);border-radius:50%;font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="ziRemSecPhoto('${si.id}',${i})">×</div></div>`).join('')}</div>` : ''}
     </div>`;
   });
   h += `</div>
-  <button class="btn btn-sec btn-sm" style="margin-top:8px;border-style:dashed" onclick="ziAddSec()">+ Ajouter sécurité</button>`;
+  <button class="btn btn-sec btn-sm" style="margin-top:8px;border-style:dashed" onclick="ziAddSec()">+ Ajouter une remarque</button>`;
 
   document.getElementById('ziChecklist').innerHTML = h;
 }
@@ -904,9 +916,29 @@ function ziNett(level) {
   updateZiCount();
 }
 
+function ziSecCat(id, cat) {
+  const si = ziState.secItems.find(s => s.id === id);
+  if (si) {
+    si.cat = si.cat === cat ? 'SEC' : cat;
+    const bat = IGNY_STRUCTURE.find(b=>b.id===ziState.batId);
+    const floor = bat?.floors.find(f=>f.id===ziState.floorId);
+    const zone = floor?.zones.find(z=>z.id===ziState.zoneId);
+    if(zone) renderZiChecklist(zone);
+  }
+}
+function ziRemSecPhoto(id, idx) {
+  const si = ziState.secItems.find(s => s.id === id);
+  if (si) {
+    si.photos.splice(idx, 1);
+    const bat = IGNY_STRUCTURE.find(b=>b.id===ziState.batId);
+    const floor = bat?.floors.find(f=>f.id===ziState.floorId);
+    const zone = floor?.zones.find(z=>z.id===ziState.zoneId);
+    if(zone) renderZiChecklist(zone);
+  }
+}
 function ziAddSec() {
   const id = 'sec_'+Date.now();
-  ziState.secItems.push({id, text:'', photos:[]});
+  ziState.secItems.push({id, text:'', cat:'SEC', photos:[]});
   const bat = IGNY_STRUCTURE.find(b=>b.id===ziState.batId);
   const floor = bat?.floors.find(f=>f.id===ziState.floorId);
   const zone = floor?.zones.find(z=>z.id===ziState.zoneId);
@@ -1077,11 +1109,12 @@ async function batchSaveReserves() {
   // Sécurité
   ziState.secItems.forEach(si => {
     if (!si.text.trim()) return;
-    state.counter['SEC'] = (state.counter['SEC']||0)+1;
-    const code = 'SEC-'+String(state.counter['SEC']).padStart(3,'0');
+    const siCat = si.cat || 'SEC';
+    state.counter[siCat] = (state.counter[siCat]||0)+1;
+    const code = siCat+'-'+String(state.counter[siCat]).padStart(3,'0');
     const r = {
       id: Date.now()+Math.random(),
-      code, cat:'SEC', status:'todo',
+      code, cat:siCat, status:'todo',
       title: si.text.trim(),
       desc: '',
       lot: '',
@@ -1175,7 +1208,24 @@ async function uploadPDFVersSupabase(planId,arrayBuffer){try{const nom=`${planId
 async function downloadPDFFromSupabase(pdfUrl){try{const res=await fetch(pdfUrl);if(!res.ok)return null;return await res.arrayBuffer();}catch(e){return null;}}
 async function syncPlansFromSupabase(){try{const remotePlans=await sbLoadPlans();if(!remotePlans)return;for(const rp of remotePlans){const existing=state.plans.find(p=>p.id===rp.id);if(!existing)state.plans.push({id:rp.id,name:rp.name,pages:rp.pages,pdfUrl:rp.pdf_url});else{existing.pdfUrl=rp.pdf_url;existing.pages=rp.pages;}}await idbSet('app_state',state);renderPlansList();
   // Auto-télécharger les plans qui ne sont pas encore en local
-  for(const plan of state.plans){if(!pdfs[plan.id]&&plan.pdfUrl){try{const ab=await downloadPDFFromSupabase(plan.pdfUrl);if(ab){const pdfDoc=await pdfjsLib.getDocument({data:ab.slice(0)}).promise;pdfs[plan.id]=pdfDoc;await idbSet(plan.id,ab);renderPlansList();}}catch(e){}}}
+  for(const plan of state.plans){
+    if(!pdfs[plan.id] && plan.pdfUrl){
+      try{
+        const ab = await downloadPDFFromSupabase(plan.pdfUrl);
+        if(ab){
+          const pdfDoc = await pdfjsLib.getDocument({data:ab.slice(0)}).promise;
+          pdfs[plan.id] = pdfDoc;
+          await idbSet(plan.id, ab);
+          console.log('Plan téléchargé:', plan.name);
+          renderPlansList();
+          // Si pas de plan actif, activer celui-ci
+          if(!state.activePlanId || !pdfs[state.activePlanId]){
+            await activatePlan(plan.id);
+          }
+        }
+      }catch(e){console.warn('Erreur DL plan:', plan.name, e);}
+    }
+  }
 }catch(e){console.warn('syncPlansFromSupabase ignoré:',e);}}
 async function downloadPlanLocalement(planId){const plan=state.plans.find(p=>p.id===planId);if(!plan||!plan.pdfUrl){toast('Pas de PDF distant','err');return;}toast(`⬇️ Téléchargement de ${plan.name}...`,'info');const ab=await downloadPDFFromSupabase(plan.pdfUrl);if(!ab){toast('Échec du téléchargement','err');return;}try{const pdfDoc=await pdfjsLib.getDocument({data:ab.slice(0)}).promise;pdfs[plan.id]=pdfDoc;await idbSet(plan.id,ab);toast(`✓ ${plan.name} téléchargé`,'ok');renderPlansList();await activatePlan(plan.id);}catch(e){toast('Fichier PDF invalide','err');}}
 async function syncFromSupabase(){const remote=await sbLoadReserves();if(!remote)return;state.reserves=remote;state.counter={SEC:0,FIN:0,NC:0,QUA:0,AVA:0};state.reserves.forEach(r=>{const num=parseInt((r.code.split('-')[1]||'0'));if(!isNaN(num))state.counter[r.cat]=Math.max(state.counter[r.cat]||0,num);});await idbSet('app_state',state);updateBadge();updateStats();renderReservesList();renderPins();try{await syncPlansFromSupabase();}catch(e){}}
@@ -1309,7 +1359,7 @@ function annotMove(e){if(!annotIsDrawing)return;e.preventDefault();currentStroke
 function annotEnd(e){if(!annotIsDrawing)return;e.preventDefault();annotIsDrawing=false;}
 function clearAnnotate(){annotStrokes=[];redrawAnnotate();}
 function closeAnnotate(){document.getElementById('ovAnnotate').classList.remove('on');annotStrokes=[];ziPhotoTarget=null;}
-function renderPhotoArea(){const area=document.getElementById('photoArea');let html='<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:5px;">';curPhotos.forEach((p,i)=>{html+=`<div style="position:relative;flex-shrink:0;height:80px;width:80px;border-radius:8px;border:1px solid var(--border);overflow:hidden;"><img src="${p}" style="width:100%;height:100%;object-fit:cover;"><button onclick="removePhoto(${i})" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.7);border:none;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button></div>`;});html+=`<div style="flex-shrink:0;height:80px;width:80px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;border:2px dashed var(--border);border-radius:10px;text-align:center" onclick="triggerPhoto()"><div style="font-size:24px;margin-bottom:2px">📷</div><div style="font-size:10px;color:var(--text2)">Ajouter</div></div></div>`;area.innerHTML=html+`<input type="file" id="photoFileInp" accept="image/*" capture="environment" onchange="handlePhoto(event)" style="display:none">`;}
+function renderPhotoArea(){const area=document.getElementById('photoArea');let html='<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:5px;">';curPhotos.forEach((p,i)=>{html+=`<div style="position:relative;flex-shrink:0;height:80px;width:80px;border-radius:8px;border:1px solid var(--border);overflow:hidden;"><img src="${p}" style="width:100%;height:100%;object-fit:cover;"><button onclick="removePhoto(${i})" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.7);border:none;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button></div>`;});html+=`<div style="flex-shrink:0;height:80px;width:80px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;border:2px dashed var(--border);border-radius:10px;text-align:center" onclick="triggerPhoto()"><div style="font-size:24px;margin-bottom:2px">📷</div><div style="font-size:10px;color:var(--text2)">Ajouter</div></div></div>`;area.innerHTML=html+`<input type="file" id="photoFileInp" accept="image/*" onchange="handlePhoto(event)" style="display:none">`;}
 function removePhoto(index){curPhotos.splice(index,1);renderPhotoArea();}
 function triggerPhoto(){document.getElementById('photoFileInp').click();}
 
